@@ -25,9 +25,16 @@ export const ghRepoCreateArgs = (
   ...(push ? ["--push"] : [])
 ]
 
+// Trailing punctuation is stripped by hand: `[.,)]+$` is a super-linear regex.
+const trimPunctuation = (url: string): string => {
+  let end = url.length
+  while (end > 0 && ".,)".includes(url.charAt(end - 1))) end -= 1
+  return url.slice(0, end)
+}
+
 export const parseRepoUrl = (output: string): string | undefined => {
-  const matches = output.match(/https?:\/\/[^\s]+/g)
-  return matches?.at(-1)?.replace(/[.,)]+$/, "")
+  const url = output.match(/https?:\/\/\S+/g)?.at(-1)
+  return url === undefined ? undefined : trimPunctuation(url)
 }
 
 const ghFailure = (): InitError =>

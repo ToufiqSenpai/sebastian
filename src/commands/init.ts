@@ -33,12 +33,19 @@ const ensureInteractive = Effect.gen(function* () {
   }
 })
 
+const trimDashes = (value: string): string => {
+  let start = 0
+  let end = value.length
+  while (value.charAt(start) === "-") start += 1
+  while (end > start && value.charAt(end - 1) === "-") end -= 1
+  return value.slice(start, end)
+}
+
+// `^-+|-+$` backtracks super-linearly, so the dash trim is done by hand.
 const suggestRepoName = (cwd: string, path: Path.Path): string =>
-  path
-    .basename(cwd)
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+  trimDashes(
+    path.basename(cwd).toLowerCase().replace(/[^a-z0-9._-]+/g, "-")
+  )
 
 const validateRepoName = (value: string): Effect.Effect<string, string> => {
   if (value.length === 0 || value === "." || value === "..") {
@@ -60,6 +67,16 @@ interface Summary {
   readonly commitRequested: boolean
   readonly commitCreated: boolean
   readonly repository: Repository | undefined
+}
+
+const gitLabel = (git: GitState, initialized: boolean): string => {
+  if (initialized) return "initialized"
+  return git.isRepo ? "already initialized" : "skipped"
+}
+
+const commitLabel = (requested: boolean, created: boolean): string => {
+  if (created) return "created"
+  return requested ? "no changes" : "skipped"
 }
 
 const printSummary = (summary: Summary) =>
@@ -85,22 +102,8 @@ const printSummary = (summary: Summary) =>
     }
 
     lines.push(
-      `  Git: ${
-        gitInitialized
-          ? "initialized"
-          : git.isRepo
-            ? "already initialized"
-            : "skipped"
-      }`
-    )
-    lines.push(
-      `  Commit: ${
-        commitCreated
-          ? "created"
-          : commitRequested
-            ? "no changes"
-            : "skipped"
-      }`
+      `  Git: ${gitLabel(git, gitInitialized)}`,
+      `  Commit: ${commitLabel(commitRequested, commitCreated)}`
     )
     if (git.hasOrigin) {
       lines.push("  GitHub: origin already configured (skipped)")

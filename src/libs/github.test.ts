@@ -24,6 +24,9 @@ describe("GitHub repository creation", () => {
         "✓ Created repository owner/demo on GitHub\nhttps://github.com/owner/demo\n"
       )
     ).toBe("https://github.com/owner/demo")
+    expect(parseRepoUrl("https://github.com/owner/demo.)")).toBe(
+      "https://github.com/owner/demo"
+    )
     expect(parseRepoUrl("no link here")).toBeUndefined()
   })
 })
