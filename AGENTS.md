@@ -12,7 +12,7 @@ A Bun + TypeScript CLI (`sebastian`) plus the skills and templates it installs i
 - `templates/` — files copied into **target** repos (`AGENTS.md`, glossary/ADR formats, and `skills/`). Not this repo's own rules; this repo has no `GLOSSARY.md` or `docs/adr/`.
 - `docs/matt-skills.md` — Indonesian research notes on the upstream Matt Pocock skills; reference, not instructions.
 
-`sebastian init` copies `templates/AGENTS.md`, `templates/docs/agents/`, and `templates/skills/` (to `.agents/skills/`), skipping files or whole skill directories that already exist. It appends `.agents/*` to `.gitignore`, initializes git, and creates a GitHub repository with `gh` when `origin` is missing.
+`sebastian init` copies `templates/AGENTS.md`, `templates/docs/agents/`, and `templates/skills/` (to `.agents/skills/`), skipping files or whole skill directories that already exist; an existing `AGENTS.md` prompts whether to overwrite it. It appends `.agents/*` to `.gitignore`, initializes git, and creates a GitHub repository with `gh` when `origin` is missing.
 
 ## Commands
 

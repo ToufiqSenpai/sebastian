@@ -144,6 +144,7 @@ export const runInit: Effect.Effect<
   yield* ensureInteractive
 
   const path = yield* Path.Path
+  const fs = yield* FileSystem.FileSystem
   const cwd = process.cwd()
   yield* Console.log(`sebastian init\nDirectory: ${cwd}`)
 
@@ -184,7 +185,27 @@ export const runInit: Effect.Effect<
     )
   }
 
-  const report = yield* copyAssets(cwd)
+  const agentsPath = path.join(cwd, "AGENTS.md")
+  const hasAgents = yield* fs.exists(agentsPath).pipe(
+    Effect.mapError(
+      (error) =>
+        new InitError({
+          message: "Could not check for an existing AGENTS.md.",
+          hint: String(error)
+        })
+    )
+  )
+  let overwriteAgents = false
+  if (hasAgents) {
+    overwriteAgents = yield* ask(
+      Prompt.Confirm({
+        message: "AGENTS.md already exists. Overwrite it?",
+        initial: false
+      })
+    )
+  }
+
+  const report = yield* copyAssets(cwd, overwriteAgents)
   yield* ensureAgentsIgnored(cwd)
 
   let gitInitialized = false

@@ -66,6 +66,29 @@ describe("copyAssets", () => {
     expect(result.report.copied).not.toContain("AGENTS.md")
   })
 
+  test("overwrites AGENTS.md only", async () => {
+    const result = await Effect.runPromise(
+      withTempDir((directory) =>
+        Effect.gen(function* () {
+          const fs = yield* FileSystem.FileSystem
+          yield* copyAssets(directory)
+          yield* fs.writeFileString(`${directory}/AGENTS.md`, "custom")
+          const skillFile = `${directory}/.agents/skills/code-review/SKILL.md`
+          yield* fs.writeFileString(skillFile, "custom skill")
+          const report = yield* copyAssets(directory, true)
+          const agents = yield* fs.readFileString(`${directory}/AGENTS.md`)
+          const skill = yield* fs.readFileString(skillFile)
+          return { report, agents, skill }
+        })
+      )
+    )
+
+    expect(result.agents).not.toBe("custom")
+    expect(result.agents.length).toBeGreaterThan(0)
+    expect(result.skill).toBe("custom skill")
+    expect(result.report.copied).toContain("AGENTS.md")
+  })
+
   test("skips an existing skill directory as a whole", async () => {
     const result = await Effect.runPromise(
       withTempDir((directory) =>

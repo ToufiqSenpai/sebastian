@@ -8,7 +8,8 @@ export interface CopyReport {
 
 const copyFileIfMissing = (
   source: string,
-  destination: string
+  destination: string,
+  overwrite = false
 ): Effect.Effect<
   "copied" | "skipped",
   PlatformError.PlatformError,
@@ -17,7 +18,7 @@ const copyFileIfMissing = (
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
-    if (yield* fs.exists(destination)) return "skipped" as const
+    if (!overwrite && (yield* fs.exists(destination))) return "skipped" as const
     const data = yield* fs.readFile(source)
     yield* fs.makeDirectory(path.dirname(destination), { recursive: true })
     yield* fs.writeFile(destination, data)
@@ -89,7 +90,8 @@ export const resolveAssetsRoot: Effect.Effect<
 )
 
 export const copyAssets = (
-  targetDir: string
+  targetDir: string,
+  overwriteAgents = false
 ): Effect.Effect<CopyReport, InitError, FileSystem.FileSystem | Path.Path> =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
@@ -99,7 +101,8 @@ export const copyAssets = (
 
     const agents = yield* copyFileIfMissing(
       path.join(root, "templates", "AGENTS.md"),
-      path.join(targetDir, "AGENTS.md")
+      path.join(targetDir, "AGENTS.md"),
+      overwriteAgents
     )
     if (agents === "copied") report.copied.push("AGENTS.md")
     else report.skipped.push("AGENTS.md")
