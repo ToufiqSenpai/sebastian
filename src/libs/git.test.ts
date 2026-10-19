@@ -2,12 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { BunServices } from "@effect/platform-bun"
 import { Effect, FileSystem, Path } from "effect"
 import type { ChildProcessSpawner } from "effect/process"
-import {
-  commitAll,
-  ensureGitIdentity,
-  initRepo,
-  inspectGit
-} from "./git"
+import { initRepo, inspectGit } from "./git"
 import { runProcess } from "../process"
 
 const withTempRepo = <A, E>(
@@ -48,36 +43,6 @@ describe("git", () => {
     expect(result.after.root.toLowerCase()).toBe(
       result.expectedRoot.toLowerCase()
     )
-  })
-
-  test("creates a commit and sees it", async () => {
-    const result = await Effect.runPromise(
-      withTempRepo((directory) =>
-        Effect.gen(function* () {
-          const fs = yield* FileSystem.FileSystem
-          yield* initRepo(directory)
-          yield* fs.writeFileString(`${directory}/hello.txt`, "hello")
-          const name = yield* runProcess(
-            "git",
-            ["config", "user.name", "Sebastian Test"],
-            directory
-          )
-          const email = yield* runProcess(
-            "git",
-            ["config", "user.email", "sebastian@example.com"],
-            directory
-          )
-          yield* ensureGitIdentity(directory)
-          const committed = yield* commitAll(directory, "test commit")
-          const state = yield* inspectGit(directory)
-          return { identity: [name, email], committed, state }
-        })
-      )
-    )
-
-    expect(result.identity.every((result) => result.exitCode === 0)).toBe(true)
-    expect(result.committed).toBe(true)
-    expect(result.state.hasCommits).toBe(true)
   })
 
   test("detects an origin and a nested repository", async () => {

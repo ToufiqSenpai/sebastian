@@ -9,13 +9,7 @@ import {
   type Repository,
   type Visibility
 } from "../libs/github"
-import {
-  commitAll,
-  ensureGitIdentity,
-  initRepo,
-  inspectGit,
-  type GitState
-} from "../libs/git"
+import { initRepo, inspectGit, type GitState } from "../libs/git"
 
 const ask = <A>(prompt: Prompt.Prompt<A>) =>
   Prompt.run(prompt).pipe(
@@ -32,6 +26,38 @@ const ensureInteractive = Effect.gen(function* () {
     })
   }
 })
+
+export const ensureAgentsIgnored = (
+  targetDir: string
+): Effect.Effect<void, InitError, FileSystem.FileSystem | Path.Path> =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const path = yield* Path.Path
+    const file = path.join(targetDir, ".gitignore")
+    const existing = (yield* fs.exists(file))
+      ? yield* fs.readFileString(file)
+      : ""
+    if (existing.split("\n").some((line) => line.trim() === ".agents/*")) {
+      return
+    }
+
+    let separator = ""
+    if (existing.length > 0) {
+      separator = existing.endsWith("\n") ? "\n" : "\n\n"
+    }
+    yield* fs.writeFileString(
+      file,
+      `${existing}${separator}# Agents\n.agents/*\n`
+    )
+  }).pipe(
+    Effect.mapError(
+      (error) =>
+        new InitError({
+          message: "Could not update .gitignore.",
+          hint: String(error)
+        })
+    )
+  )
 
 const trimDashes = (value: string): string => {
   let start = 0
@@ -64,8 +90,6 @@ interface Summary {
   readonly git: GitState
   readonly gitInitialized: boolean
   readonly report: CopyReport
-  readonly commitRequested: boolean
-  readonly commitCreated: boolean
   readonly repository: Repository | undefined
 }
 
@@ -74,22 +98,9 @@ const gitLabel = (git: GitState, initialized: boolean): string => {
   return git.isRepo ? "already initialized" : "skipped"
 }
 
-const commitLabel = (requested: boolean, created: boolean): string => {
-  if (created) return "created"
-  return requested ? "no changes" : "skipped"
-}
-
 const printSummary = (summary: Summary) =>
   Effect.gen(function* () {
-    const {
-      cwd,
-      git,
-      gitInitialized,
-      report,
-      commitRequested,
-      commitCreated,
-      repository
-    } = summary
+    const { cwd, git, gitInitialized, report, repository } = summary
     const lines = ["", "Summary", `  Directory: ${cwd}`]
 
     if (report.copied.length > 0) {
@@ -102,8 +113,7 @@ const printSummary = (summary: Summary) =>
     }
 
     lines.push(
-      `  Git: ${gitLabel(git, gitInitialized)}`,
-      `  Commit: ${commitLabel(commitRequested, commitCreated)}`
+      `  Git: ${gitLabel(git, gitInitialized)}`
     )
     if (git.hasOrigin) {
       lines.push("  GitHub: origin already configured (skipped)")
@@ -113,15 +123,12 @@ const printSummary = (summary: Summary) =>
       lines.push("  GitHub: skipped")
     }
 
-    if (!commitCreated && !git.hasCommits) {
-      lines.push(
-        "",
-        "  No commit was created. When you are ready:",
-        '    git add -A && git commit -m "chore: initialize project" && git push -u origin HEAD'
-      )
-    } else if (git.hasOrigin && commitCreated) {
-      lines.push("", "  Next: git push -u origin HEAD")
-    }
+    lines.push(
+      "",
+      "  Next:",
+      '    git add -A && git commit -m "chore: initialize project"',
+      "    git push -u origin HEAD"
+    )
 
     yield* Console.log(lines.join("\n"))
   })
@@ -177,20 +184,8 @@ export const runInit: Effect.Effect<
     )
   }
 
-  const shouldCommit = yield* ask(
-    Prompt.Confirm({
-      message: git.hasCommits
-        ? "Commit all files?"
-        : "Create an initial commit with all files?",
-      initial: true
-    })
-  )
-
-  if (shouldCommit) {
-    yield* ensureGitIdentity(cwd)
-  }
-
   const report = yield* copyAssets(cwd)
+  yield* ensureAgentsIgnored(cwd)
 
   let gitInitialized = false
   if (!git.isRepo) {
@@ -198,19 +193,9 @@ export const runInit: Effect.Effect<
     gitInitialized = true
   }
 
-  let commitCreated = false
-  if (shouldCommit) {
-    commitCreated = yield* commitAll(cwd, "chore: initialize project")
-  }
-
   let repository: Repository | undefined
   if (!git.hasOrigin && repoName !== undefined) {
-    repository = yield* createRepo(
-      repoName,
-      visibility,
-      cwd,
-      git.hasCommits || commitCreated
-    )
+    repository = yield* createRepo(repoName, visibility, cwd, git.hasCommits)
   }
 
   yield* printSummary({
@@ -218,8 +203,6 @@ export const runInit: Effect.Effect<
     git,
     gitInitialized,
     report,
-    commitRequested: shouldCommit,
-    commitCreated,
     repository
   })
 })
