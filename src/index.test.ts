@@ -6,7 +6,7 @@ import pkg from "../package.json"
 
 const repoRoot = path.resolve(import.meta.dir, "..")
 
-const run = (args: ReadonlyArray<string>, cwd: string = repoRoot) =>
+const run = (args: readonly string[], cwd: string = repoRoot) =>
   Bun.spawnSync({
     cmd: [process.execPath, path.join(repoRoot, "src/index.ts"), ...args],
     cwd,

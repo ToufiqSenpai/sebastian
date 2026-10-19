@@ -1,15 +1,19 @@
-import { Effect, FileSystem, Path } from "effect"
+import { Effect, FileSystem, Path, PlatformError } from "effect"
 import { InitError } from "./errors"
 
 export interface CopyReport {
-  readonly copied: Array<string>
-  readonly skipped: Array<string>
+  readonly copied: string[]
+  readonly skipped: string[]
 }
 
 const copyFileIfMissing = (
   source: string,
   destination: string
-): Effect.Effect<"copied" | "skipped", unknown, FileSystem.FileSystem | Path.Path> =>
+): Effect.Effect<
+  "copied" | "skipped",
+  PlatformError.PlatformError,
+  FileSystem.FileSystem | Path.Path
+> =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
@@ -24,7 +28,11 @@ const copyTree = (
   sourceDir: string,
   destinationDir: string,
   relativeBase: string
-): Effect.Effect<CopyReport, unknown, FileSystem.FileSystem | Path.Path> =>
+): Effect.Effect<
+  CopyReport,
+  PlatformError.PlatformError,
+  FileSystem.FileSystem | Path.Path
+> =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
@@ -65,12 +73,10 @@ export const resolveAssetsRoot: Effect.Effect<
     if (yield* fs.exists(path.join(root, "templates", "AGENTS.md"))) return root
   }
 
-  return yield* Effect.fail(
-    new InitError({
-      message: "Project templates were not found.",
-      hint: "The binary is missing its embedded assets. Rebuild it with `bun run build`."
-    })
-  )
+  return yield* new InitError({
+    message: "Project templates were not found.",
+    hint: "The binary is missing its embedded assets. Rebuild it with `bun run build`."
+  })
 }).pipe(
   Effect.mapError((error) =>
     error instanceof InitError

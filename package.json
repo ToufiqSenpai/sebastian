@@ -6,14 +6,21 @@
   "scripts": {
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "build": "bun build src/index.ts --compile --asset ./templates --outfile dist/sebastian"
+    "lint": "bun --bun oxlint . --type-aware",
+    "lint:fix": "bun --bun oxlint . --type-aware --fix",
+    "build": "bun build src/index.ts --compile --asset ./templates --outfile dist/sebastian",
+    "prepare": "effect-tsgo patch --typescript --oxlint"
   },
   "dependencies": {
     "@effect/platform-bun": "4.0.5",
     "effect": "4.0.5"
   },
   "devDependencies": {
+    "@effect/tsgo": "0.53.4",
+    "@oxlint/plugins": "1.88.0",
     "@types/bun": "latest",
+    "oxlint": "1.88.0",
+    "oxlint-tsgolint": "7.0.2004",
     "typescript": "^7.0.2"
   },
   "module": "src/index.ts"

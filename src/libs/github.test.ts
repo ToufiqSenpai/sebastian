@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { ghRepoCreateArgs, parseRepoUrl } from "../src/libs/github"
+import { ghRepoCreateArgs, parseRepoUrl } from "./github"
 
 describe("GitHub repository creation", () => {
   test("builds private push arguments", () => {

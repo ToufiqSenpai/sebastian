@@ -7,8 +7,8 @@ import {
   ensureGitIdentity,
   initRepo,
   inspectGit
-} from "../src/libs/git"
-import { runProcess } from "../src/process"
+} from "./git"
+import { runProcess } from "../process"
 
 const withTempRepo = <A, E>(
   use: (

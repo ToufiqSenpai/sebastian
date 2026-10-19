@@ -44,12 +44,10 @@ export const inspectGit = (
 
     const root = yield* runText("git", ["rev-parse", "--show-toplevel"], cwd)
     if (root.length === 0) {
-      return yield* Effect.fail(
-        new InitError({
-          message: "Could not determine the git repository root.",
-          hint: "Run `git status` in this directory to inspect the repository."
-        })
-      )
+      return yield* new InitError({
+        message: "Could not determine the git repository root.",
+        hint: "Run `git status` in this directory to inspect the repository."
+      })
     }
 
     const head = yield* runText("git", ["rev-parse", "--verify", "HEAD"], cwd)
@@ -66,7 +64,7 @@ export const initRepo = (cwd: string) =>
   Effect.gen(function* () {
     const result = yield* runProcess("git", ["init", "-b", "main"], cwd)
     if (result.exitCode !== 0) {
-      return yield* Effect.fail(commandFailure("git init", result))
+      return yield* commandFailure("git init", result)
     }
   }).pipe(Effect.mapError(gitFailure))
 
@@ -75,13 +73,11 @@ export const ensureGitIdentity = (cwd: string) =>
     const name = yield* runText("git", ["config", "user.name"], cwd)
     const email = yield* runText("git", ["config", "user.email"], cwd)
     if (name.length === 0 || email.length === 0) {
-      return yield* Effect.fail(
-        new InitError({
-          message: "Git user.name and user.email are not configured.",
-          hint:
-            'Run:\n  git config --global user.name "Your Name"\n  git config --global user.email "you@example.com"'
-        })
-      )
+      return yield* new InitError({
+        message: "Git user.name and user.email are not configured.",
+        hint:
+          'Run:\n  git config --global user.name "Your Name"\n  git config --global user.email "you@example.com"'
+      })
     }
   }).pipe(Effect.mapError(gitFailure))
 
@@ -99,12 +95,12 @@ export const commitAll = (
 
     const add = yield* runProcess("git", ["add", "-A"], cwd)
     if (add.exitCode !== 0) {
-      return yield* Effect.fail(commandFailure("git add", add))
+      return yield* commandFailure("git add", add)
     }
 
     const commit = yield* runProcess("git", ["commit", "-m", message], cwd)
     if (commit.exitCode !== 0) {
-      return yield* Effect.fail(commandFailure("git commit", commit))
+      return yield* commandFailure("git commit", commit)
     }
     return true
   }).pipe(Effect.mapError(gitFailure))

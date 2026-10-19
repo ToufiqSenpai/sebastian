@@ -5,7 +5,9 @@ A Bun + TypeScript CLI (`sebastian`) plus the skills and templates it installs i
 ## Layout
 
 - `src/` — the CLI. Entry point is `src/index.ts`; `commands/init.ts` owns the wizard, `files.ts` copies assets, `process.ts` runs child processes, and `libs/git.ts` / `libs/github.ts` integrate with external tools.
-- `test/` — Bun tests for asset copying, git helpers, GitHub argument building, and the CLI surface.
+- `src/**/*.test.ts` — Bun tests live beside the code they cover.
+- `.oxlintrc.json` — Oxlint config. Extends the Effect `effecttsgo` strict preset and loads the local anti-slop plugin.
+- `tools/oxlint/anti-slop/` — vendored anti-slop plugin. Generic rules are wired in the config; the Effect rules under `effect/` are available but off. Lint ignores this directory.
 - `templates/skills/<name>/SKILL.md` — the product installed into target repos. One skill per directory; other skills reference each other by bare name.
 - `templates/` — files copied into **target** repos (`AGENTS.md`, glossary/ADR formats, and `skills/`). Not this repo's own rules; this repo has no `GLOSSARY.md` or `docs/adr/`.
 - `docs/matt-skills.md` — Indonesian research notes on the upstream Matt Pocock skills; reference, not instructions.
@@ -16,11 +18,15 @@ A Bun + TypeScript CLI (`sebastian`) plus the skills and templates it installs i
 
 - `bun install` — install dependencies.
 - `bun run dev --help` — run the CLI from source.
-- `bun run typecheck` — type-check with `tsc`.
+- `bun run typecheck` — type-check with the Effect-aware `tsc` from `@effect/tsgo`.
+- `bun run lint` — run Oxlint with type-aware rules.
+- `bun run lint:fix` — apply Oxlint fixes.
 - `bun test` — run the test suite.
 - `bun run build` — compile `dist/sebastian.exe` (Windows) with the embedded `templates/` assets.
 
-Effect v4 is pinned to `4.0.5`; `effect/cli` is still unstable, so upgrade `effect` and `@effect/platform-bun` together.
+`prepare` runs `effect-tsgo patch --typescript --oxlint`, which patches the local TypeScript and Oxlint binaries. Re-run `bun install` after rebuilding `node_modules`.
+
+Effect v4 is pinned to `4.0.5`; `effect/cli` is still unstable, so upgrade `effect` and `@effect/platform-bun` together. `@effect/tsgo` and Oxlint are pinned to versions it supports (TypeScript `7.0.2`, Oxlint `1.88.0`).
 
 ## Workflow chain
 
@@ -36,4 +42,4 @@ Effect v4 is pinned to `4.0.5`; `effect/cli` is still unstable, so upgrade `effe
 
 ## Verification
 
-Run `bun run check` and `bun test` for CLI changes, then `bun run build` and smoke-test `dist/sebastian.exe --help`. Skill changes are verified by reading the `SKILL.md` end to end and checking that every skill it names still exists under `templates/skills/` and that the workflow chain above still holds.
+Run `bun run typecheck`, `bun run lint`, and `bun test` for CLI changes, then `bun run build` and smoke-test `dist/sebastian.exe --help`. Skill changes are verified by reading the `SKILL.md` end to end and checking that every skill it names still exists under `templates/skills/` and that the workflow chain above still holds.

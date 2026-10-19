@@ -26,12 +26,10 @@ const ask = <A>(prompt: Prompt.Prompt<A>) =>
 
 const ensureInteractive = Effect.gen(function* () {
   if (!process.stdin.isTTY || !process.stdout.isTTY) {
-    return yield* Effect.fail(
-      new InitError({
-        message: "sebastian init requires an interactive terminal.",
-        hint: "Run it directly in a terminal, not through a pipe or CI."
-      })
-    )
+    return yield* new InitError({
+      message: "sebastian init requires an interactive terminal.",
+      hint: "Run it directly in a terminal, not through a pipe or CI."
+    })
   }
 })
 
@@ -141,12 +139,10 @@ export const runInit: Effect.Effect<
 
   const git = yield* inspectGit(cwd)
   if (git.isRepo && path.resolve(git.root) !== path.resolve(cwd)) {
-    return yield* Effect.fail(
-      new InitError({
-        message: `This directory is inside the git repository at ${git.root}.`,
-        hint: "Run `sebastian init` from the repository root or use a new directory."
-      })
-    )
+    return yield* new InitError({
+      message: `This directory is inside the git repository at ${git.root}.`,
+      hint: "Run `sebastian init` from the repository root or use a new directory."
+    })
   }
 
   if (!git.hasOrigin) {
@@ -157,10 +153,13 @@ export const runInit: Effect.Effect<
   let visibility: Visibility = "private"
   if (!git.hasOrigin) {
     const suggested = suggestRepoName(cwd, path)
+    const namePrompt =
+      suggested.length > 0
+        ? { message: "GitHub repository name", default: suggested }
+        : { message: "GitHub repository name" }
     repoName = yield* ask(
       Prompt.String({
-        message: "GitHub repository name",
-        ...(suggested.length > 0 ? { default: suggested } : {}),
+        ...namePrompt,
         validate: validateRepoName
       })
     )

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { BunServices } from "@effect/platform-bun"
 import { Effect, FileSystem, Path } from "effect"
-import { copyAssets } from "../src/files"
+import { copyAssets } from "./files"
 
 const withTempDir = <A, E>(
   use: (

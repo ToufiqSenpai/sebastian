@@ -13,7 +13,7 @@ export const ghRepoCreateArgs = (
   visibility: Visibility,
   cwd: string,
   push: boolean
-): ReadonlyArray<string> => [
+): readonly string[] => [
   "repo",
   "create",
   name,

@@ -9,7 +9,7 @@ export interface ProcessResult {
 
 export const runProcess = (
   command: string,
-  args: ReadonlyArray<string>,
+  args: readonly string[],
   cwd: string
 ) =>
   Effect.scoped(
@@ -37,7 +37,7 @@ export const runProcess = (
 
 export const runText = (
   command: string,
-  args: ReadonlyArray<string>,
+  args: readonly string[],
   cwd: string
 ) =>
   Effect.gen(function* () {
