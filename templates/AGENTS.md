@@ -15,3 +15,7 @@ Default five canonical roles (needs-triage, needs-info, ready-for-agent, ready-f
 ## Domain Docs
 
 Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+## Testing
+
+Never smoke-test the built binary. Executing a compiled artifact makes an agent do unpredictable things, and the type checker, the linter, and the test suite already cover what a `--help` run would catch.
