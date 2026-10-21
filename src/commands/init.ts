@@ -4,6 +4,7 @@ import { InitError } from "../errors"
 import { copyAssets, type CopyReport } from "../files"
 import {
   GitHubCli,
+  type IssueLabel,
   type Repository,
   type RepositoryVisibility
 } from "../libs/github-cli"
@@ -89,7 +90,36 @@ interface Summary {
   readonly gitInitialized: boolean
   readonly report: CopyReport
   readonly repository: Repository | undefined
+  readonly labels: readonly string[]
 }
+
+const triageLabels: readonly IssueLabel[] = [
+  {
+    name: "needs-triage",
+    description: "Maintainer needs to evaluate this issue",
+    color: "d73a4a"
+  },
+  {
+    name: "needs-info",
+    description: "Waiting on the reporter for more information",
+    color: "d876e3"
+  },
+  {
+    name: "ready-for-agent",
+    description: "Fully specified, ready for an AFK agent",
+    color: "0e8a16"
+  },
+  {
+    name: "ready-for-human",
+    description: "Requires human implementation",
+    color: "1d76db"
+  },
+  {
+    name: "wontfix",
+    description: "Will not be actioned",
+    color: "6e7781"
+  }
+]
 
 const gitLabel = (git: GitStatus, initialized: boolean): string => {
   if (initialized) return "initialized"
@@ -98,7 +128,7 @@ const gitLabel = (git: GitStatus, initialized: boolean): string => {
 
 const printSummary = (summary: Summary) =>
   Effect.gen(function* () {
-    const { cwd, git, gitInitialized, report, repository } = summary
+    const { cwd, git, gitInitialized, report, repository, labels } = summary
     const lines = ["", "Summary", `  Directory: ${cwd}`]
 
     if (report.copied.length > 0) {
@@ -119,6 +149,9 @@ const printSummary = (summary: Summary) =>
       lines.push(`  GitHub: ${repository.url ?? "repository created"}`)
     } else {
       lines.push("  GitHub: skipped")
+    }
+    if (labels.length > 0) {
+      lines.push(`  Labels: ensured (${labels.join(", ")})`)
     }
 
     if (git.hasCommits || git.hasOrigin) {
@@ -222,11 +255,17 @@ export const runInit: Effect.Effect<
     repository = yield* github.createRepository(repoName, visibility, cwd)
   }
 
+  const labels =
+    git.hasOrigin || repository !== undefined
+      ? yield* github.ensureLabels(cwd, triageLabels)
+      : []
+
   yield* printSummary({
     cwd,
     git,
     gitInitialized,
     report,
-    repository
+    repository,
+    labels
   })
 })

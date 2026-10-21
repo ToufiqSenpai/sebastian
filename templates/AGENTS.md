@@ -1,13 +1,17 @@
-## Domain Modeling
+## Issue Tracker
 
-Actively build and sharpen the project's domain model while designing. Challenge, sharpen, and record as you go — never batch.
+Issues, specs, and pull requests live in GitHub and are managed through the GitHub MCP server, which authenticates as this agent's dedicated bot account. Never use `gh` or `glab`: those act as the human logged in on this machine. If the MCP tools are unavailable, stop and say so instead of falling back.
 
-- Challenge any term that conflicts with the existing language in `GLOSSARY.md`; propose a precise canonical term when language is vague or overloaded.
-- Stress-test domain relationships with concrete edge-case scenarios, forcing precision about where one concept ends and another begins.
-- When a statement about how something works disagrees with the code, surface the contradiction and resolve which is right.
-- Update `GLOSSARY.md` inline the moment a term is resolved. It holds language only: no implementation details, no specs, no scratch pad.
-- Offer an ADR only when all three hold: hard to reverse, surprising without context, and the result of a real trade-off.
+- Pass `owner` and `repo` explicitly, resolved from `git remote -v`.
+- `issue_write` creates, updates, closes, and labels issues; `issue_read` reads one; `list_issues` and `search_issues` find them.
+- `add_issue_comment` comments. `sub_issue_write` attaches a ticket to its parent; `sub_issue_id` is the database id, not the issue number.
+- Blocking edges live in the body under `## Blocked by`, because the dependency tools are feature-gated.
+- `create_pull_request`, `pull_request_read`, and `update_pull_request` handle pull requests.
 
-Layout: `GLOSSARY.md` at the repo root; ADRs at `docs/adr/NNNN-slug.md`. Create these lazily — only when the first term or decision needs a home.
+## Triage Labels
 
-Formats and full criteria: `docs/agents/glossary-format.md`, `docs/agents/adr-format.md`.
+Default five canonical roles (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix). See `docs/agents/triage-labels.md`.
+
+## Domain Docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.

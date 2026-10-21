@@ -9,7 +9,7 @@ A Bun + TypeScript CLI (`sebastian`) plus the skills and templates it installs i
 - `.oxlintrc.json` — Oxlint config. Extends the Effect `effecttsgo` strict preset and loads the local anti-slop plugin.
 - `tools/oxlint/anti-slop/` — vendored anti-slop plugin. Generic rules are wired in the config; the Effect rules under `effect/` are available but off. Lint ignores this directory.
 - `templates/skills/<name>/SKILL.md` — the product installed into target repos. One skill per directory; other skills reference each other by bare name.
-- `templates/` — files copied into **target** repos (`AGENTS.md`, glossary/ADR formats, and `skills/`). Not this repo's own rules; this repo has no `GLOSSARY.md` or `docs/adr/`.
+- `templates/` — files copied into **target** repos (`AGENTS.md`, `docs/agents/`, and `skills/`). Not this repo's own rules; this repo has no `GLOSSARY.md` or `docs/adr/`.
 - `docs/matt-skills.md` — Indonesian research notes on the upstream Matt Pocock skills; reference, not instructions.
 
 `sebastian init` copies `templates/AGENTS.md`, `templates/docs/agents/`, and `templates/skills/` (to `.agents/skills/`), skipping files or whole skill directories that already exist; an existing `AGENTS.md` prompts whether to overwrite it. It appends `.agents/*` to `.gitignore`, initializes git, and creates a GitHub repository with `gh` when `origin` is missing.
@@ -34,7 +34,7 @@ Effect v4 is pinned to `4.0.5`; `effect/cli` is still unstable, so upgrade `effe
 
 - `disable-model-invocation: true` marks user-invoked skills. `code-review` and `pr` omit it on purpose so the model and `implement-spec` can invoke them.
 - The "STOP YOUR TURN" endings in `interview-me` and `planning` are deliberate handoffs; don't soften them into automatic continuation.
-- Skills must stay self-contained. Don't add a hard dependency on a skill outside this repo; copy the content and attribute it in `CREDITS.md` (see `templates/skills/pr/CREDITS.md`).
+- Skills must stay self-contained. Don't add a hard dependency on a skill outside this repo; copy the content and attribute it in the repo's central credits list, not per skill.
 
 ## Language
 

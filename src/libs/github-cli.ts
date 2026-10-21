@@ -9,6 +9,12 @@ export interface Repository {
   readonly url: string | undefined
 }
 
+export interface IssueLabel {
+  readonly name: string
+  readonly description: string
+  readonly color: string
+}
+
 // Trailing punctuation is stripped by hand: `[.,)]+$` is a super-linear regex.
 const trimPunctuation = (url: string): string => {
   let end = url.length
@@ -23,7 +29,7 @@ export const parseRepoUrl = (output: string): string | undefined => {
 
 const ghFailure = (): InitError =>
   new InitError({
-    message: "GitHub CLI is required to create a repository.",
+    message: "GitHub CLI is required.",
     hint:
       "Install the GitHub CLI (https://cli.github.com), run `gh auth login`, then retry."
   })
@@ -37,6 +43,10 @@ export class GitHubCli extends Context.Service<
       visibility: RepositoryVisibility,
       cwd: string
     ): Effect.Effect<Repository, InitError>
+    ensureLabels(
+      cwd: string,
+      labels: readonly IssueLabel[]
+    ): Effect.Effect<readonly string[], InitError>
   }
 >()("GitHubCli") {
   public static readonly layer = Layer.effect(
@@ -92,6 +102,44 @@ export class GitHubCli extends Context.Service<
                     })
                   )
             ),
+            Effect.provideService(
+              ChildProcessSpawner.ChildProcessSpawner,
+              spawner
+            )
+          ),
+        ensureLabels: (cwd, labels) =>
+          Effect.forEach(
+            labels,
+            (label) =>
+              runProcess(
+                "gh",
+                [
+                  "label",
+                  "create",
+                  label.name,
+                  "--description",
+                  label.description,
+                  "--color",
+                  label.color,
+                  "--force"
+                ],
+                cwd
+              ).pipe(
+                Effect.mapError(ghFailure),
+                Effect.flatMap((result) =>
+                  result.exitCode === 0
+                    ? Effect.succeed(label.name)
+                    : Effect.fail(
+                        new InitError({
+                          message: `Could not create the GitHub label "${label.name}" (exit code ${result.exitCode}).`,
+                          hint:
+                            (result.stderr || result.stdout).trim() || undefined
+                        })
+                      )
+                )
+              ),
+            { concurrency: "unbounded" }
+          ).pipe(
             Effect.provideService(
               ChildProcessSpawner.ChildProcessSpawner,
               spawner

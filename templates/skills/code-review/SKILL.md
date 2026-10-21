@@ -123,6 +123,3 @@ A change can pass one track and fail another:
 - Code that is solid engineering but implements the wrong thing → **Quality pass, Spec fail.**
 
 Reporting them separately stops one track from masking the other.
-
----
-_Forked from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT license)._
