@@ -12,6 +12,11 @@ To run:
 bun run src/index.ts
 ```
 
+## Logging
+
+Logs go to stderr. `LOG_LEVEL` sets the minimum level (`Info` by default; also
+accepts `Debug`, `Warn`, `Error`, `Fatal`, or `None`).
+
 To type check:
 
 ```bash

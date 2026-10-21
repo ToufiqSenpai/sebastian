@@ -1,20 +1,18 @@
-import { Console, Effect, FileSystem, Path, Terminal } from "effect"
+import { Effect, FileSystem, Path, Terminal } from "effect"
 import { Prompt } from "effect/cli"
-import { ChildProcessSpawner } from "effect/process"
 import { InitError } from "../errors"
 import { copyAssets, type CopyReport } from "../files"
 import {
-  checkGh,
-  createRepo,
+  GitHubCli,
   type Repository,
-  type Visibility
-} from "../libs/github"
-import { initRepo, inspectGit, type GitState } from "../libs/git"
+  type RepositoryVisibility
+} from "../libs/github-cli"
+import { Git, type GitStatus } from "../libs/git"
 
 const ask = <A>(prompt: Prompt.Prompt<A>) =>
   Prompt.run(prompt).pipe(
     Effect.catchTag("QuitError", () =>
-      Effect.fail(new InitError({ message: "Cancelled." }))
+      Effect.fail(new InitError({ message: "\nCancelled." }))
     )
   )
 
@@ -87,15 +85,15 @@ const validateRepoName = (value: string): Effect.Effect<string, string> => {
 
 interface Summary {
   readonly cwd: string
-  readonly git: GitState
+  readonly git: GitStatus
   readonly gitInitialized: boolean
   readonly report: CopyReport
   readonly repository: Repository | undefined
 }
 
-const gitLabel = (git: GitState, initialized: boolean): string => {
+const gitLabel = (git: GitStatus, initialized: boolean): string => {
   if (initialized) return "initialized"
-  return git.isRepo ? "already initialized" : "skipped"
+  return git.isRepository ? "already initialized" : "skipped"
 }
 
 const printSummary = (summary: Summary) =>
@@ -123,33 +121,34 @@ const printSummary = (summary: Summary) =>
       lines.push("  GitHub: skipped")
     }
 
-    lines.push(
-      "",
-      "  Next:",
-      '    git add -A && git commit -m "chore: initialize project"',
-      "    git push -u origin HEAD"
-    )
+    if (git.hasCommits || git.hasOrigin) {
+      lines.push(
+        "",
+        "  Next:",
+        '    git add -A && git commit -m "chore: initialize project"',
+        "    git push -u origin HEAD"
+      )
+    }
 
-    yield* Console.log(lines.join("\n"))
+    yield* Effect.logInfo(lines.join("\n"))
   })
 
 export const runInit: Effect.Effect<
   void,
   InitError,
-  | FileSystem.FileSystem
-  | Path.Path
-  | Terminal.Terminal
-  | ChildProcessSpawner.ChildProcessSpawner
+  FileSystem.FileSystem | Path.Path | Terminal.Terminal | Git | GitHubCli
 > = Effect.gen(function* () {
   yield* ensureInteractive
 
   const path = yield* Path.Path
   const fs = yield* FileSystem.FileSystem
+  const gitService = yield* Git
+  const github = yield* GitHubCli
   const cwd = process.cwd()
-  yield* Console.log(`sebastian init\nDirectory: ${cwd}`)
+  yield* Effect.logInfo(`sebastian init\nDirectory: ${cwd}`)
 
-  const git = yield* inspectGit(cwd)
-  if (git.isRepo && path.resolve(git.root) !== path.resolve(cwd)) {
+  const git = yield* gitService.status(cwd)
+  if (git.isRepository && path.resolve(git.root) !== path.resolve(cwd)) {
     return yield* new InitError({
       message: `This directory is inside the git repository at ${git.root}.`,
       hint: "Run `sebastian init` from the repository root or use a new directory."
@@ -157,11 +156,11 @@ export const runInit: Effect.Effect<
   }
 
   if (!git.hasOrigin) {
-    yield* checkGh(cwd)
+    yield* github.status(cwd)
   }
 
   let repoName: string | undefined
-  let visibility: Visibility = "private"
+  let visibility: RepositoryVisibility = "private"
   if (!git.hasOrigin) {
     const suggested = suggestRepoName(cwd, path)
     const namePrompt =
@@ -209,14 +208,18 @@ export const runInit: Effect.Effect<
   yield* ensureAgentsIgnored(cwd)
 
   let gitInitialized = false
-  if (!git.isRepo) {
-    yield* initRepo(cwd)
+  if (!git.isRepository) {
+    yield* gitService.init(cwd)
     gitInitialized = true
+  }
+
+  if (!git.hasCommits) {
+    yield* gitService.commit(cwd, "chore: initial commit")
   }
 
   let repository: Repository | undefined
   if (!git.hasOrigin && repoName !== undefined) {
-    repository = yield* createRepo(repoName, visibility, cwd, git.hasCommits)
+    repository = yield* github.createRepository(repoName, visibility, cwd)
   }
 
   yield* printSummary({

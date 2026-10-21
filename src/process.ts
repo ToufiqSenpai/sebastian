@@ -34,16 +34,3 @@ export const runProcess = (
       return { exitCode: Number(exitCode), stdout, stderr }
     })
   )
-
-export const runText = (
-  command: string,
-  args: readonly string[],
-  cwd: string
-) =>
-  Effect.gen(function* () {
-    const spawner = yield* ChildProcessSpawner.ChildProcessSpawner
-    const output = yield* spawner.string(
-      ChildProcess.make(command, args, { cwd, stdin: "ignore" })
-    )
-    return output.trim()
-  })

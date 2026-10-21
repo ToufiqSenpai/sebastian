@@ -1,19 +1,27 @@
 import { BunRuntime, BunServices } from "@effect/platform-bun"
-import { Effect } from "effect"
+import { Effect, Layer } from "effect"
 import { Command } from "effect/cli"
 import pkg from "../package.json"
-import { formatInitError } from "./errors"
+import { LoggerLayer } from "./common/logger"
+import { formatError } from "./errors"
 import { runInit } from "./commands/init"
+import { Git } from "./libs/git"
+import { GitHubCli } from "./libs/github-cli"
 
-const init = Command.make("init", {}, () =>
-  runInit.pipe(
-    Effect.catchTag("InitError", (error) =>
+const reportFailure = (error: {
+  readonly message: string
+  readonly hint?: string
+}) =>
+  Effect.logError(formatError(error)).pipe(
+    Effect.andThen(
       Effect.sync(() => {
-        console.error(formatInitError(error))
         process.exitCode = 1
       })
     )
   )
+
+const init = Command.make("init", {}, () =>
+  runInit.pipe(Effect.catchTag("InitError", reportFailure))
 ).pipe(
   Command.withDescription("Initialize the current directory for agent-driven work")
 )
@@ -25,6 +33,10 @@ const sebastian = Command.make("sebastian").pipe(
 
 BunRuntime.runMain(
   Command.run(sebastian, { version: pkg.version }).pipe(
-    Effect.provide(BunServices.layer)
+    Effect.provide(
+      Layer.mergeAll(Git.layer, GitHubCli.layer, LoggerLayer).pipe(
+        Layer.provideMerge(BunServices.layer)
+      )
+    )
   )
 )

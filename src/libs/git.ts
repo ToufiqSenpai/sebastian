@@ -1,16 +1,18 @@
-import { Effect, Path } from "effect"
+import { Context, Effect, Layer, Path, PlatformError } from "effect"
 import { ChildProcessSpawner } from "effect/process"
 import { InitError } from "../errors"
-import { runProcess, runText, type ProcessResult } from "../process"
+import { runProcess, type ProcessResult } from "../process"
 
-export interface GitState {
-  readonly isRepo: boolean
+export interface GitStatus {
+  readonly isRepository: boolean
   readonly root: string
   readonly hasCommits: boolean
   readonly hasOrigin: boolean
 }
 
-const gitFailure = (error: unknown): InitError =>
+const gitFailure = (
+  error: InitError | PlatformError.PlatformError
+): InitError =>
   error instanceof InitError
     ? error
     : new InitError({
@@ -24,46 +26,104 @@ const commandFailure = (label: string, result: ProcessResult): InitError =>
     hint: (result.stderr || result.stdout).trim() || undefined
   })
 
-export const inspectGit = (
-  cwd: string
-): Effect.Effect<
-  GitState,
-  InitError,
-  Path.Path | ChildProcessSpawner.ChildProcessSpawner
-> =>
-  Effect.gen(function* () {
-    const path = yield* Path.Path
-    const inside = yield* runText(
-      "git",
-      ["rev-parse", "--is-inside-work-tree"],
-      cwd
-    )
-    if (inside !== "true") {
-      return { isRepo: false, root: "", hasCommits: false, hasOrigin: false }
-    }
+export class Git extends Context.Service<
+  Git,
+  {
+    status(cwd: string): Effect.Effect<GitStatus, InitError>
+    init(cwd: string): Effect.Effect<void, InitError>
+    commit(cwd: string, message: string): Effect.Effect<void, InitError>
+  }
+>()("Git") {
+  public static readonly layer = Layer.effect(
+    Git,
+    Effect.gen(function* () {
+      const path = yield* Path.Path
+      const spawner = yield* ChildProcessSpawner.ChildProcessSpawner
 
-    const root = yield* runText("git", ["rev-parse", "--show-toplevel"], cwd)
-    if (root.length === 0) {
-      return yield* new InitError({
-        message: "Could not determine the git repository root.",
-        hint: "Run `git status` in this directory to inspect the repository."
+      return Git.of({
+        status: (cwd) =>
+          Effect.gen(function* () {
+            const inside = (
+              yield* runProcess(
+                "git",
+                ["rev-parse", "--is-inside-work-tree"],
+                cwd
+              )
+            ).stdout.trim()
+            if (inside !== "true") {
+              return {
+                isRepository: false,
+                root: "",
+                hasCommits: false,
+                hasOrigin: false
+              }
+            }
+
+            const root = (
+              yield* runProcess("git", ["rev-parse", "--show-toplevel"], cwd)
+            ).stdout.trim()
+            if (root.length === 0) {
+              return yield* new InitError({
+                message: "Could not determine the git repository root.",
+                hint: "Run `git status` in this directory to inspect the repository."
+              })
+            }
+
+            const head = (
+              yield* runProcess("git", ["rev-parse", "--verify", "HEAD"], cwd)
+            ).stdout.trim()
+            const origin = (
+              yield* runProcess("git", ["remote", "get-url", "origin"], cwd)
+            ).stdout.trim()
+
+            return {
+              isRepository: true,
+              root: path.resolve(root),
+              hasCommits: head.length > 0,
+              hasOrigin: origin.length > 0
+            }
+          }).pipe(
+            Effect.mapError(gitFailure),
+            Effect.provideService(
+              ChildProcessSpawner.ChildProcessSpawner,
+              spawner
+            )
+          ),
+        init: (cwd) =>
+          Effect.gen(function* () {
+            const result = yield* runProcess("git", ["init", "-b", "main"], cwd)
+            if (result.exitCode !== 0) {
+              return yield* commandFailure("git init", result)
+            }
+          }).pipe(
+            Effect.mapError(gitFailure),
+            Effect.provideService(
+              ChildProcessSpawner.ChildProcessSpawner,
+              spawner
+            )
+          ),
+        commit: (cwd, message) =>
+          Effect.gen(function* () {
+            const added = yield* runProcess("git", ["add", "-A"], cwd)
+            if (added.exitCode !== 0) {
+              return yield* commandFailure("git add", added)
+            }
+            const committed = yield* runProcess(
+              "git",
+              ["commit", "-m", message],
+              cwd
+            )
+            if (committed.exitCode !== 0) {
+              return yield* commandFailure("git commit", committed)
+            }
+          }).pipe(
+            Effect.mapError(gitFailure),
+            Effect.provideService(
+              ChildProcessSpawner.ChildProcessSpawner,
+              spawner
+            )
+          )
       })
-    }
-
-    const head = yield* runText("git", ["rev-parse", "--verify", "HEAD"], cwd)
-    const origin = yield* runText("git", ["remote", "get-url", "origin"], cwd)
-    return {
-      isRepo: true,
-      root: path.resolve(root),
-      hasCommits: head.length > 0,
-      hasOrigin: origin.length > 0
-    }
-  }).pipe(Effect.mapError(gitFailure))
-
-export const initRepo = (cwd: string) =>
-  Effect.gen(function* () {
-    const result = yield* runProcess("git", ["init", "-b", "main"], cwd)
-    if (result.exitCode !== 0) {
-      return yield* commandFailure("git init", result)
-    }
-  }).pipe(Effect.mapError(gitFailure))
+    })
+  )
+}

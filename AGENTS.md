@@ -4,7 +4,7 @@ A Bun + TypeScript CLI (`sebastian`) plus the skills and templates it installs i
 
 ## Layout
 
-- `src/` — the CLI. Entry point is `src/index.ts`; `commands/init.ts` owns the wizard, `files.ts` copies assets, `process.ts` runs child processes, and `libs/git.ts` / `libs/github.ts` integrate with external tools.
+- `src/` — the CLI. Entry point is `src/index.ts`; `commands/init.ts` owns the wizard, `files.ts` copies assets, `process.ts` runs child processes, `common/` holds logging and app config, and `libs/git.ts` / `libs/github-app.ts` / `libs/github-cli.ts` integrate with external tools.
 - `src/**/*.test.ts` — Bun tests live beside the code they cover.
 - `.oxlintrc.json` — Oxlint config. Extends the Effect `effecttsgo` strict preset and loads the local anti-slop plugin.
 - `tools/oxlint/anti-slop/` — vendored anti-slop plugin. Generic rules are wired in the config; the Effect rules under `effect/` are available but off. Lint ignores this directory.
@@ -42,4 +42,6 @@ Effect v4 is pinned to `4.0.5`; `effect/cli` is still unstable, so upgrade `effe
 
 ## Verification
 
-Run `bun run typecheck`, `bun run lint`, and `bun test` for CLI changes, then `bun run build` and smoke-test `dist/sebastian.exe --help`. Skill changes are verified by reading the `SKILL.md` end to end and checking that every skill it names still exists under `templates/skills/` and that the workflow chain above still holds.
+Run `bun run typecheck`, `bun run lint`, and `bun test` for CLI changes, then `bun run build`. Skill changes are verified by reading the `SKILL.md` end to end and checking that every skill it names still exists under `templates/skills/` and that the workflow chain above still holds.
+
+Never smoke-test the built binary. Executing a compiled artifact makes an agent do unpredictable things, and the type checker, the linter, and the test suite already cover what a `--help` run would catch.
