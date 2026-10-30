@@ -1,5 +1,7 @@
 namespace Sebastian.Webhooks;
 
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Octokit.Webhooks;
 using Octokit.Webhooks.Events;
@@ -8,14 +10,19 @@ using Octokit.Webhooks.Models;
 using Sebastian.Agent;
 using Sebastian.GitHub;
 using Sebastian.GitHub.Issues;
+using Sebastian.Jobs;
+using Sebastian.Libs;
 
 internal sealed partial class GitHubWebhookProcessor(
     ILogger<GitHubWebhookProcessor> logger,
     GitHubService gitHubService,
-    AgentDispatcher agentDispatcher) : WebhookEventProcessor
+    JobQueue jobQueue,
+    Git git) : WebhookEventProcessor
 {
     private const string FeatureLabel = "feature";
     private const string ReadyForAgentLabel = "ready-for-agent";
+
+    private readonly ConcurrentDictionary<string, byte> _inFlight = new(StringComparer.OrdinalIgnoreCase);
 
     public override ValueTask ProcessWebhookAsync(
         WebhookHeaders headers,
@@ -80,14 +87,14 @@ internal sealed partial class GitHubWebhookProcessor(
 
         if (HasLabel(issuesEvent.Issue, ReadyForAgentLabel))
         {
-            var job = new ImplementationJob(
+            var job = new ImplementSpec(
                 owner,
                 name,
                 issueNumber,
                 issuesEvent.Issue.Title ?? string.Empty,
                 issuesEvent.Issue.Body ?? string.Empty);
 
-            if (agentDispatcher.TryStart(job))
+            if (TryStart(job))
             {
                 LogImplementationStarted(repositoryName, issueNumber);
             }
@@ -98,17 +105,63 @@ internal sealed partial class GitHubWebhookProcessor(
         }
     }
 
+    private bool TryStart(ImplementSpec job)
+    {
+        if (!_inFlight.TryAdd(job.Key, 0))
+        {
+            return false;
+        }
+
+        _ = TrackAsync(job);
+        return true;
+    }
+
+    [SuppressMessage("Design", "CA1031", Justification = "A failed enqueue must not tear down the webhook.")]
+    private async Task TrackAsync(ImplementSpec job)
+    {
+        try
+        {
+            await jobQueue.Add(job).ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            LogEnqueueFailed(exception, job.Key);
+        }
+        finally
+        {
+            _inFlight.TryRemove(job.Key, out _);
+        }
+    }
+
     private static bool HasLabel(Issue issue, string name) =>
         issue.Labels?.Any(label => string.Equals(label.Name, name, StringComparison.OrdinalIgnoreCase)) ?? false;
 
+    protected override async ValueTask ProcessPushWebhookAsync(
+        WebhookHeaders headers,
+        PushEvent pushEvent,
+        CancellationToken cancellationToken = default)
+    {
+        var repositoryName = pushEvent.Repository?.FullName ?? "unknown";
+        LogPushReceived(repositoryName, pushEvent.Ref, pushEvent.Before, pushEvent.After);
+
+        // shortcut: synchronous fetch in the webhook; move to a background queue if delivery latency becomes a problem.
+        await git.SyncMainAsync(pushEvent.Ref, pushEvent.Deleted, cancellationToken).ConfigureAwait(false);
+    }
+
     [LoggerMessage(Level = LogLevel.Information, Message = "Webhook {EventType} ({Event})")]
     private partial void LogReceived(string eventType, string? @event);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Push {RefName} on {Repository}: {Before} -> {After}")]
+    private partial void LogPushReceived(string repository, string refName, string before, string after);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Started implementation for {Repository}#{Number}")]
     private partial void LogImplementationStarted(string repository, int number);
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Implementation already running for {Repository}#{Number}")]
     private partial void LogImplementationAlreadyRunning(string repository, int number);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to enqueue implementation for {Key}")]
+    private partial void LogEnqueueFailed(Exception exception, string key);
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Issue {Repository}#{Number} closed; missing spec sections: {Sections}")]
     private partial void LogInvalidSpec(string repository, int number, string sections);

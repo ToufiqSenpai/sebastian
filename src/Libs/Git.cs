@@ -4,15 +4,13 @@ using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Sebastian.Agent;
 
-internal sealed partial class Git : IDisposable
+internal sealed partial class Git : IHostedService
 {
-    private const string BaseBranch = "main";
-    private const string BaseRef = "origin/main";
+    public const string BaseBranch = "main";
+    public const string BaseRef = "origin/main";
 
     private readonly string _root;
-    private readonly SemaphoreSlim _prepareLock = new(1, 1);
     private readonly ILogger<Git> _logger;
     private RepositoryIdentity? _repository;
 
@@ -22,119 +20,191 @@ internal sealed partial class Git : IDisposable
         _logger = logger;
     }
 
-    public void Validate()
+    public string Root => _root;
+
+    public RepositoryIdentity? Repository => _repository;
+
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        var topLevel = RunGitSync(["rev-parse", "--show-toplevel"]).Trim();
+        await EnsureRepositoryAsync().ConfigureAwait(false);
+
+        // Best-effort, bounded: a missed push webhook must not prevent the app from starting.
+        // shortcut: push + startup sync only; add a periodic fetch if missed push webhooks become a problem.
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(10));
+        await SyncMainAsync(timeout.Token).ConfigureAwait(false);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    private async Task EnsureRepositoryAsync()
+    {
+        var topLevel = await GetTopLevelAsync(CancellationToken.None).ConfigureAwait(false);
         if (!PathEquals(topLevel, _root))
         {
             throw new InvalidOperationException(
                 $"Sebastian must run from the repository root. Content root is '{_root}', git root is '{topLevel}'.");
         }
 
-        var remote = RunGitSync(["remote", "get-url", "origin"]).Trim();
+        var remote = await GetRemoteUrlAsync("origin", CancellationToken.None).ConfigureAwait(false);
         _repository = RepositoryIdentity.Parse(remote)
             ?? throw new InvalidOperationException("Could not parse the origin remote URL.");
 
         LogRepository(_repository.Owner, _repository.Name, BaseBranch);
     }
 
-    public async Task<WorktreeInfo> PrepareAsync(ImplementationJob job, CancellationToken cancellationToken)
+    public Task<string> GetTopLevelAsync(CancellationToken cancellationToken) =>
+        RunTrimmedAsync(["rev-parse", "--show-toplevel"], cancellationToken);
+
+    public Task<string> GetRemoteUrlAsync(string remote, CancellationToken cancellationToken) =>
+        RunTrimmedAsync(["remote", "get-url", remote], cancellationToken);
+
+    public Task<string> GetCurrentBranchAsync(CancellationToken cancellationToken) =>
+        RunTrimmedAsync(["branch", "--show-current"], cancellationToken);
+
+    public async Task<bool> HasTrackedChangesAsync(CancellationToken cancellationToken) =>
+        !string.IsNullOrWhiteSpace(await RunAsync(
+            ["status", "--porcelain", "--untracked-files=no"],
+            cancellationToken).ConfigureAwait(false));
+
+    public Task<string> GetCommitShaAsync(string revision, CancellationToken cancellationToken) =>
+        RunTrimmedAsync(["rev-parse", revision], cancellationToken);
+
+    public async Task<int> CountCommitsAsync(string range, CancellationToken cancellationToken)
     {
-        var repository = _repository
-            ?? throw new InvalidOperationException("Git.Validate() was not called.");
-
-        if (!string.Equals(job.Owner, repository.Owner, StringComparison.OrdinalIgnoreCase) ||
-            !string.Equals(job.Repository, repository.Name, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException(
-                $"Issue repository '{job.Owner}/{job.Repository}' does not match local origin '{repository.Owner}/{repository.Name}'.");
-        }
-
-        await _prepareLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
-        {
-            LogFetching(job.Repository);
-            await RunGitAsync(["fetch", "--prune", "origin"], cancellationToken).ConfigureAwait(false);
-
-            var baseSha = (await RunGitAsync(["rev-parse", "--verify", BaseRef], cancellationToken).ConfigureAwait(false)).Trim();
-            LogBaseResolved(BaseRef, baseSha);
-
-            var divergence = await TryRunGitAsync(
-                ["rev-list", "--left-right", "--count", $"main...{BaseRef}"],
-                cancellationToken).ConfigureAwait(false);
-            if (divergence is not null)
-            {
-                var divergenceText = divergence.Trim();
-                LogDivergence(divergenceText);
-            }
-
-            var workspaceRoot = Path.Combine(_root, ".sebastian", "workspaces");
-            Directory.CreateDirectory(workspaceRoot);
-
-            var number = job.IssueNumber.ToString(CultureInfo.InvariantCulture);
-            var worktreePath = Path.Combine(workspaceRoot, number);
-            var branch = $"sebastian/issue-{number}";
-
-            await RemoveWorktreeAsync(worktreePath, branch, cancellationToken).ConfigureAwait(false);
-            await RunGitAsync(
-                ["worktree", "add", worktreePath, "-b", branch, BaseRef],
-                cancellationToken).ConfigureAwait(false);
-
-            LogWorktreeReady(worktreePath, branch);
-            return new WorktreeInfo(worktreePath, branch, baseSha);
-        }
-        finally
-        {
-            _prepareLock.Release();
-        }
+        var output = await RunTrimmedAsync(["rev-list", "--count", range], cancellationToken).ConfigureAwait(false);
+        return int.Parse(output, CultureInfo.InvariantCulture);
     }
 
-    public async Task<string> GetStatusAsync(string worktreePath, CancellationToken cancellationToken)
-    {
-        var status = await RunGitAsync(
-            ["-C", worktreePath, "status", "--short"],
-            cancellationToken).ConfigureAwait(false);
+    public Task FetchAsync(string remote, CancellationToken cancellationToken) =>
+        RunAsync(["fetch", "--prune", remote], cancellationToken);
 
-        return status.Trim();
-    }
+    public Task MergeFastForwardAsync(string reference, CancellationToken cancellationToken) =>
+        RunAsync(["merge", "--ff-only", reference], cancellationToken);
 
-    private async Task RemoveWorktreeAsync(
+    public Task AddWorktreeAsync(
+        string path,
+        string branch,
+        string startPoint,
+        CancellationToken cancellationToken) =>
+        RunAsync(["worktree", "add", path, "-b", branch, startPoint], cancellationToken);
+
+    public async Task RemoveWorktreeAsync(
         string worktreePath,
         string branch,
         CancellationToken cancellationToken)
     {
-        _ = await TryRunGitAsync(
-            ["worktree", "remove", "--force", worktreePath],
-            cancellationToken).ConfigureAwait(false);
+        await TryAsync(["worktree", "remove", "--force", worktreePath], cancellationToken).ConfigureAwait(false);
 
         if (Directory.Exists(worktreePath))
         {
             Directory.Delete(worktreePath, recursive: true);
         }
 
-        _ = await TryRunGitAsync(["worktree", "prune"], cancellationToken).ConfigureAwait(false);
-        _ = await TryRunGitAsync(["branch", "-D", branch], cancellationToken).ConfigureAwait(false);
+        await TryAsync(["worktree", "prune"], cancellationToken).ConfigureAwait(false);
+        await TryAsync(["branch", "-D", branch], cancellationToken).ConfigureAwait(false);
 
         LogWorktreeRemoved(worktreePath);
     }
 
-    private string RunGitSync(IReadOnlyList<string> arguments)
+    public async Task<string> GetStatusAsync(string worktreePath, CancellationToken cancellationToken)
     {
-        using var process = CreateProcess(arguments);
-        process.Start();
-        var stdout = process.StandardOutput.ReadToEnd();
-        var stderr = process.StandardError.ReadToEnd();
-        process.WaitForExit();
+        var status = await RunAsync(
+            ["-C", worktreePath, "status", "--short"],
+            cancellationToken).ConfigureAwait(false);
 
-        if (process.ExitCode != 0)
-        {
-            throw new InvalidOperationException($"git {string.Join(' ', arguments)} failed: {stderr.Trim()}");
-        }
-
-        return stdout;
+        return status.Trim();
     }
 
-    private async Task<string> RunGitAsync(
+    public Task SyncMainAsync(CancellationToken cancellationToken) =>
+        SyncMainAsync($"refs/heads/{BaseBranch}", deleted: false, cancellationToken);
+
+    public async Task SyncMainAsync(
+        string refName,
+        bool deleted,
+        CancellationToken cancellationToken)
+    {
+        if (deleted ||
+            !string.Equals(refName, $"refs/heads/{BaseBranch}", StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        // shortcut: worktree prep can run during a fast-forward; worst case the prep fails on git's index.lock, the repo stays consistent.
+        try
+        {
+            LogSyncFetching();
+            await FetchAsync("origin", cancellationToken).ConfigureAwait(false);
+
+            var problem = await FindMirrorProblemAsync(cancellationToken).ConfigureAwait(false);
+            if (problem is not null)
+            {
+                LogSyncSkipped(problem);
+                return;
+            }
+
+            var behind = await CountCommitsAsync($"{BaseBranch}..{BaseRef}", cancellationToken).ConfigureAwait(false);
+            if (behind == 0)
+            {
+                LogMainAlreadyCurrent(BaseBranch, BaseRef);
+                return;
+            }
+
+            var before = await GetCommitShaAsync(BaseBranch, cancellationToken).ConfigureAwait(false);
+            await MergeFastForwardAsync(BaseRef, cancellationToken).ConfigureAwait(false);
+            var after = await GetCommitShaAsync(BaseBranch, cancellationToken).ConfigureAwait(false);
+            LogMainFastForwarded(BaseBranch, before, after);
+        }
+        catch (InvalidOperationException exception)
+        {
+            LogSyncFailed(exception);
+        }
+        catch (OperationCanceledException)
+        {
+            LogSyncCancelled();
+        }
+    }
+
+    public async Task<string?> FindMirrorProblemAsync(CancellationToken cancellationToken)
+    {
+        var branch = await GetCurrentBranchAsync(cancellationToken).ConfigureAwait(false);
+        if (!string.Equals(branch, BaseBranch, StringComparison.Ordinal))
+        {
+            return $"Local {BaseBranch} is not checked out (current branch: '{branch}'). Run Sebastian from {BaseBranch}.";
+        }
+
+        if (await HasTrackedChangesAsync(cancellationToken).ConfigureAwait(false))
+        {
+            return $"Local {BaseBranch} has uncommitted tracked changes. Commit or stash them, or move them to a branch.";
+        }
+
+        var ahead = await CountCommitsAsync($"{BaseRef}..{BaseBranch}", cancellationToken).ConfigureAwait(false);
+        if (ahead > 0)
+        {
+            return $"Local {BaseBranch} has {ahead} commit(s) not on {BaseRef}. Move them to a branch: git branch wip/local && git reset --hard {BaseRef}";
+        }
+
+        return null;
+    }
+
+    private async Task<string> RunTrimmedAsync(
+        IReadOnlyList<string> arguments,
+        CancellationToken cancellationToken) =>
+        (await RunAsync(arguments, cancellationToken).ConfigureAwait(false)).Trim();
+
+    private async Task TryAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await RunAsync(arguments, cancellationToken).ConfigureAwait(false);
+        }
+        catch (InvalidOperationException)
+        {
+            // Best-effort cleanup command.
+        }
+    }
+
+    private async Task<string> RunAsync(
         IReadOnlyList<string> arguments,
         CancellationToken cancellationToken)
     {
@@ -161,20 +231,6 @@ internal sealed partial class Git : IDisposable
         {
             TryKill(process);
             throw;
-        }
-    }
-
-    private async Task<string?> TryRunGitAsync(
-        IReadOnlyList<string> arguments,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await RunGitAsync(arguments, cancellationToken).ConfigureAwait(false);
-        }
-        catch (InvalidOperationException)
-        {
-            return null;
         }
     }
 
@@ -221,29 +277,27 @@ internal sealed partial class Git : IDisposable
             Path.TrimEndingDirectorySeparator(Path.GetFullPath(right)),
             OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 
-    public void Dispose()
-    {
-        _prepareLock.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
     [LoggerMessage(Level = LogLevel.Information, Message = "Using repository {Owner}/{Repository} on {BaseBranch}")]
     private partial void LogRepository(string owner, string repository, string baseBranch);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Fetching origin before preparing a worktree for {Repository}")]
-    private partial void LogFetching(string repository);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Syncing local main from origin")]
+    private partial void LogSyncFetching();
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Resolved {BaseRef} at {Sha}")]
-    private partial void LogBaseResolved(string baseRef, string sha);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Skipped local main sync: {Reason}")]
+    private partial void LogSyncSkipped(string reason);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Local main divergence (left=main, right=origin/main): {Counts}")]
-    private partial void LogDivergence(string counts);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Local {BaseBranch} already matches {BaseRef}")]
+    private partial void LogMainAlreadyCurrent(string baseBranch, string baseRef);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Worktree ready at {Path} on {Branch}")]
-    private partial void LogWorktreeReady(string path, string branch);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Fast-forwarded local {BaseBranch} from {Before} to {After}")]
+    private partial void LogMainFastForwarded(string baseBranch, string before, string after);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Local main sync failed")]
+    private partial void LogSyncFailed(Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Local main sync cancelled")]
+    private partial void LogSyncCancelled();
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Cleared previous worktree at {Path}")]
     private partial void LogWorktreeRemoved(string path);
 }
-
-internal sealed record WorktreeInfo(string Path, string Branch, string BaseSha);

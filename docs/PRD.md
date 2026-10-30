@@ -57,6 +57,8 @@ Refactor, dependency update, perbaikan style, dan pekerjaan yang ingin saya lang
 - Tidak pernah menulis detail security di kanal publik.
 - Tidak pernah menghapus/menyunting komentar orang lain.
 - Setiap perubahan kode lewat branch + PR.
+- `main` di origin dilindungi: tidak ada push langsung; semua perubahan lewat PR.
+- `main` lokal adalah mirror read-only dari `origin/main`; agent selalu mulai dari `main` lokal yang bersih.
 - Batas biaya per run dan per hari; lewat batas → berhenti, bukan lanjut.
 
 ## 5. Keputusan
@@ -69,6 +71,7 @@ Refactor, dependency update, perbaikan style, dan pekerjaan yang ingin saya lang
 | 4 | State: label di issue saja, tanpa database. | Cukup untuk satu repo; label menyimpan state sekarang, bukan riwayat. |
 | 5 | Triage bug jika menyentuh salah satu pemicu di bawah; di luar itu auto-fix. | — |
 | 6 | Komentar: bahasa mengikuti issue, nada maintainer biasa. | Singkat, langsung, tanpa basa-basi. |
+| 7 | Base implementasi: `main` lokal (mirror `origin/main`). | Sinkron lewat push webhook + startup sync; ff-only, tanpa auto-resolve konflik. Commit lokal di `main` ditolak sebelum agent mulai. |
 
 Pemicu triage bug (#5):
 
