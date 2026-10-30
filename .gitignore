@@ -1,0 +1,18 @@
+.sebastian/
+bin/
+obj/
+tests/**/bin/
+tests/**/obj/
+.archify/
+
+# Secrets — jangan pernah di-commit
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+*.pfx
+*.p12
+*.pem
+*.key
+*.snk
+*.user
