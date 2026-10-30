@@ -54,4 +54,4 @@ app.Services.GetRequiredService<Git>().Validate();
 app.MapGet("/health", () => "ok");
 app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret);
 
-app.Run();
+await app.RunAsync().ConfigureAwait(false);
