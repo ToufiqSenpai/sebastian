@@ -18,17 +18,18 @@ public sealed class ProviderResolverTests
     }
 
     [Fact]
-    public void MissingProviderFails()
+    public void MissingProviderFailsValidation()
     {
         var config = CreateConfig(providerName: "missing");
 
-        var exception = Assert.Throws<InvalidOperationException>(() => new ProviderResolver(Options.Create(config)));
+        var result = Validate(config);
 
-        Assert.Contains("missing", exception.Message, StringComparison.Ordinal);
+        Assert.True(result.Failed);
+        Assert.Contains("Agent provider 'missing' is not configured.", result.FailureMessage, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void DuplicateProviderNamesFail()
+    public void DuplicateProviderNamesFailValidation()
     {
         var config = CreateConfig();
         config.Agent.Providers.Add(new ProviderConfig
@@ -38,33 +39,40 @@ public sealed class ProviderResolverTests
             ApiKey = "test",
         });
 
-        var exception = Assert.Throws<InvalidOperationException>(() => new ProviderResolver(Options.Create(config)));
+        var result = Validate(config);
 
-        Assert.Contains("more than once", exception.Message, StringComparison.Ordinal);
+        Assert.True(result.Failed);
+        Assert.Contains("Agent provider 'deepseek' is configured more than once.", result.FailureMessage, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void EmptyProvidersFails()
+    public void EmptyProvidersFailValidation()
     {
         var config = CreateConfig();
         config.Agent.Providers.Clear();
 
-        var exception = Assert.Throws<InvalidOperationException>(() => new ProviderResolver(Options.Create(config)));
+        var result = Validate(config);
 
-        Assert.Contains("At least one agent provider", exception.Message, StringComparison.Ordinal);
+        Assert.True(result.Failed);
+        Assert.Contains("At least one agent provider must be configured.", result.FailureMessage, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void InvalidEndpointFailsValidation()
+    {
+        var config = CreateConfig();
+        config.Agent.Providers[0].Endpoint = "not-a-uri";
+
+        var result = Validate(config);
+
+        Assert.True(result.Failed);
+        Assert.Contains("Agent provider 'deepseek' has an invalid endpoint.", result.FailureMessage, StringComparison.Ordinal);
     }
 
     [Fact]
     public void BlankApiKeyIsRejectedByGeneratedValidator()
     {
         var config = CreateConfig();
-        config.GitHub = new GitHubConfig
-        {
-            WebhookSecret = "secret",
-            AppId = 1,
-            PrivateKeyPath = "private-key.pem",
-            InstallationId = "1",
-        };
         var validator = new ValidateSebastianConfig();
 
         var valid = validator.Validate(null, config);
@@ -76,12 +84,21 @@ public sealed class ProviderResolverTests
         Assert.True(invalid.Failed);
     }
 
+    private static ValidateOptionsResult Validate(SebastianConfig config) =>
+        new ValidateSebastianConfig().Validate(null, config);
+
     private static ProviderResolver CreateResolver() =>
         new(Options.Create(CreateConfig()));
 
     private static SebastianConfig CreateConfig(string providerName = "deepseek") => new()
     {
-        GitHub = null!,
+        GitHub = new GitHubConfig
+        {
+            WebhookSecret = "secret",
+            AppId = 1,
+            PrivateKeyPath = "private-key.pem",
+            InstallationId = "1",
+        },
         Agent = new AgentConfig
         {
             Name = "Sebastian",

@@ -21,31 +21,11 @@ internal sealed class ProviderResolver
     public ProviderResolver(IOptions<SebastianConfig> options)
     {
         var agent = options.Value.Agent;
-
-        if (agent.Providers.Count == 0)
-        {
-            throw new InvalidOperationException("At least one agent provider must be configured.");
-        }
-
-        var duplicate = agent.Providers
-            .GroupBy(provider => provider.Name, StringComparer.OrdinalIgnoreCase)
-            .FirstOrDefault(group => group.Count() > 1);
-        if (duplicate is not null)
-        {
-            throw new InvalidOperationException($"Agent provider '{duplicate.Key}' is configured more than once.");
-        }
-
-        var selected = agent.Providers
-            .FirstOrDefault(provider => string.Equals(provider.Name, agent.General.Provider, StringComparison.OrdinalIgnoreCase))
-            ?? throw new InvalidOperationException($"Agent provider '{agent.General.Provider}' is not configured.");
-
-        if (!Uri.TryCreate(selected.Endpoint ?? DefaultEndpoint, UriKind.Absolute, out var endpoint))
-        {
-            throw new InvalidOperationException($"Agent provider '{selected.Name}' has an invalid endpoint.");
-        }
+        var selected = agent.Providers.Single(provider =>
+            string.Equals(provider.Name, agent.General.Provider, StringComparison.OrdinalIgnoreCase));
 
         _apiKey = selected.ApiKey;
-        _endpoint = endpoint;
+        _endpoint = new Uri(selected.Endpoint ?? DefaultEndpoint, UriKind.Absolute);
         _model = agent.General.Model;
     }
 

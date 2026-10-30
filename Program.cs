@@ -42,9 +42,8 @@ var app = builder.Build();
 
 var config = app.Services.GetRequiredService<IOptions<SebastianConfig>>().Value;
 
-// Construct the services now so missing credentials fail at startup.
+// Construct the service now so a missing or unreadable private key fails at startup.
 _ = app.Services.GetRequiredService<GitHubService>();
-_ = app.Services.GetRequiredService<ProviderResolver>();
 
 app.MapGet("/health", () => "ok");
 app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret);
