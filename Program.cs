@@ -10,6 +10,9 @@ using Sebastian.Webhooks;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// appsettings.json stores {env:NAME} placeholders so secrets stay out of git.
+builder.Configuration.ExpandEnvironmentPlaceholders();
+
 builder.Services
     .AddOptions<SebastianConfig>()
     .Bind(builder.Configuration)

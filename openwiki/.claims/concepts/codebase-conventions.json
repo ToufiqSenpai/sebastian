@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:5a509ccaff6bdac513129ae5612a98b0df881796d3d5672258d92fd8a39ea9a3",
+  "claims": [
+    {
+      "id": "claim_bc7e65d2b45644cba5cb6da09d0ff7e6",
+      "statement": "Sebastian builds with TreatWarningsAsErrors, EnforceCodeStyleInBuild, and AnalysisLevel latest-all, so any new compiler, analyzer, or code-style diagnostic fails the build rather than being ignored.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L6-L9",
+          "version": "repo-lines-v1:sha256:a5412f7c00fa141c66ffc8c78f249b3ce0b3f032b33eb8cfa500ed6332209064:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI3ZjYxYzM0NjIwMGZjYWRlNjlhZTYwMDZjYzIzYTVlZTBmZTY2NzhkMGUzNGQzYzc1MTg5Zjc2OGRjZWM1OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk0NjUzN2I3NTc4ZjJiZjUzYzhlOWU0YzIxOGQ1YzM2NDI5Mzc0MTgyYTUzMTBiZTUwMGQ2NjkzZWQ2Mzg1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjdmYTYyY2IxOTUyYTlhZjQxNmFkODM5ZmYzZjM5ZmU5Y2I4YjljZTM5MGIyMjY2YmU1ZDFkMWI2NWI2YjJmOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJjZjU1ODdiYjVmNzJlNTNjYzJhZTVjYjQwMDNhYzYwNTJmNGU4MjZmZDVkMzQ3NzZiODQwYjIwNjQyODgzMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9fbcc1d24ed74c8199c211d6a18cfef5",
+      "statement": "The project-file comment states the policy for newer analyzer diagnostics exposed by `latest-all`: fix them, or add a justified NoWarn per rule; it also records that an SDK upgrade can surface new analyzer errors.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L7-L8",
+          "version": "repo-lines-v1:sha256:cfc6d58542acf1385c9b1fa3054a4e92b222fad71ba5d31f98ac9c80e6ab0a78:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjk3MTRhM2IyOTM4ZGJlN2U5ZmIxMzExOWY4OWQ0MGI2YWNlZTdjMzQyYTUyMzMzM2YyNzIyMTFkYmZjNTc0YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzhlNTEwNDBlZTI4NzI4NzdhMjAyMmRmNWZiZWY1ZjRkYTJhMzAwNjk0Zjk0MDExYTU2YWU5MTc5YWE0Y2UyNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjNkM2IxZDZkNTAyYjNiMjZlNTgwMjc1YzFmYzVjZTY4YThiN2Q1ZjBhNzRlYTE5ZDYxYzc2N2VhMDAyNjhlZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTFmMDlhYzcxYWUxZjFlNWU1M2Q3MmJiYjZkNTRiMmM2M2JhYTNlZDI4NWM0MDY4ZDdlNWYyYmJlNWYxOGI2ZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_001ccd1531cd430381c26a5e50a9e5fd",
+      "statement": "PublishAot plus EnableConfigurationBindingGenerator make reflection-based configuration binding a build-breaking pattern: binding must use the source-generated binder, and config properties keep `= null!;` initializers instead of `required` because the generated binder needs settable non-required members (CS9035).",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L10-L15",
+          "version": "repo-lines-v1:sha256:d38ea80df098ce59be80ae2b6f7bbc41d8341e0449e698d3052889e1c00bd566:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODExMTdkYmM4ZTZlMzQzNDlkMzE3MDQwYmNjMDA0YTM4YTE3N2JmOTIwMTg4NjA1MzkwMGUzNjBmZjBmMGFjZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWNkNGQwN2VlMDdkZGUzOGIzMDkwNjc1YTQyODQwNjZhNGY0ZjA1N2JkZjkzYmJkYTdkMGQ0YjFlZmU2YTEzMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWM2M2E3NWZlMDNkOTdhNzg1N2ZmMDUxYTExZjc1ZTYyMTc2MWZlN2NhMjVlZjMyNTNmZTNiMmE1NDU4Yjc3MiJ9"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L9-L17",
+          "version": "repo-lines-v1:sha256:94562dcb3ed1a5486601a1e1f524f0e465b7bfffc1cc21f31ebac785673197d0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTgzZGJmZGVkODEzOGZlYzBmYjAyNDMwNTIyMTdjNDAzNWJkMmNkOTdlMzRhNWM4NmZjOGQxOTEyY2M4Nzg4ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjM2OTQxODU4NWJkNGM5OGU1MGViMzdmMjczOGFiMmQwYzhhMDQxM2IzMjE0ZGQ1YTk3YjQ5YWRhYjcyYjE2ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmYxOTY3NmIwNWI0YjkwYzkyMDNmZWIyZTMzYWUzY2VmN2ZiMjNjZTgxMjQ0OGU1NTk0Y2MzZjdiNTMzZGJlMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDU1OTgyODI4Mjc4NDQ4MWU5YzMxNDY2OTY1YWQ5ZTNiYzNlNWFmOGRjYjgzMzQ3YmI1NjIxNjRlYTBhNjk3MCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_481c6caadc2d4f97a49f4353427c31ec",
+      "statement": "Preview agent and AI APIs are suppressed with file-level pragmas that name the rule and reason — MAAI001 and MEAI001 in the role files and ImplementSpec, and OPENAI001 plus MEAI001 in ProviderResolver — keeping the experimental surface confined to the agent layer.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L1-L2",
+          "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmRlZDkyZGZkYzE4N2RhNzNlMzdlOGU4NzQ3NTVkM2ZjNzIxNzgyZmQ4MGY0ZWU5MTYwOTg0MmU4OTNkNmU3YSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L3-L4",
+          "version": "repo-lines-v1:sha256:61e2b4531e3ba7eeb26e9cdab92b08498f8892fc36fd4012c65691e7b6884c63:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDVkMjQ3OGUyNmI5YTNkNWM1ZGVjZTYxMjRlZDEzYTFiM2YzNWJkMDIzMTI0ZTNkZGNjZTEyYTYxMGE1YjAxNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJhMDMwYzk3MmM2ZTIyZGQ4NDE2NTY3YWE0NTA4MGRhZWFkZTc4NmZjZWUwNDk5MmZlMzFiNjE4MTY1MzgxNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzg4YjM4NzA3ZGRhMzdkNzg2NWZiNWU2MTgzOWM0MTUyNjlkYTJlNDYyMDJjOGNjNmZlMDJmNzRhNTQ4ZDcxYyJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L1-L2",
+          "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWEwMzE1NDBkNDk4NzEwOGM4NjIxOWEwNmYwM2QzNTc3NmUwZmNhYjE4ZGRmYzE0MWRhMmU2YzM4NjcxNzM2YiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L1-L2",
+          "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWEwMzE1NDBkNDk4NzEwOGM4NjIxOWEwNmYwM2QzNTc3NmUwZmNhYjE4ZGRmYzE0MWRhMmU2YzM4NjcxNzM2YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b6f51894560e4c7e83d76ab22aa0acde",
+      "statement": "Member-scoped suppressions use SuppressMessage with a category, a rule id, and a Justification sentence: CA1031 on JobQueue.ExecuteAsync because a failed job must not tear down the queue, and CA1812 on SebastianConfig because the options infrastructure instantiates it.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L7-L9",
+          "version": "repo-lines-v1:sha256:4a3faa6233f2bba25ff6b871b5a31761090bd63965a37cc0fd93b701f54edb80:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWExYmM3NWMzMjk0OTVkMTMyZGIzMzU2OWQwZjI4ZmFkZDc4M2Y1NDdjMmM5ZDc5ZGJmZjdlYTdlNTVjYzEwZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTgzZGJmZGVkODEzOGZlYzBmYjAyNDMwNTIyMTdjNDAzNWJkMmNkOTdlMzRhNWM4NmZjOGQxOTEyY2M4Nzg4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2Q0NGIxOTUxZTMzNDMyZWYzMjJjNDE5NThjNGZlNGQxMWU2NDg2NDI3NWUzMGU5MDhjYzEyNjJjYmRiZTI2MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTIxMTI1NjA1NDM0ZGJhZjY2MTJkMjk5NGFkZWI0MTVmMjQzYWQyZjkzNjI1OGMyZTg5ZDljNzBlMGY5YTRiNyJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L41-L42",
+          "version": "repo-lines-v1:sha256:61b8ae8509b0c326042472e60e7568ee8c4783b18794c9ce4a6b29cc261a3a4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWQ2MzBmZGU4ODU1MDRiZjdjMGExYTgyZWNiNmQwOWNhMDVjNmFlMTE1MmZlNGUzY2Q4ODBmNGQzNGEzYjY0ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI3ZTZlN2VkODMxODk1ODk4YWM1YWNkYTQxZjJkNTRlZGFjMDE0YjU2YjhiZTNjMDZjZmY2NzNjMDg2OTFiZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTU0OGU2ZGJmZjNmMzI4NDZkOGFjNTM4MzZjZjlmMDlhMjVlZTk3NTQxMDliMmRiM2MxOTdlZTdkOGVjNzM1NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDllYzkwNDEyZTBhMWMxMjFkZDVkNmFkZjUwZWNkOWUxN2EwZDQ3YTQwZDM1MmRmYmIwYjBiNmRiZGRkZmNhMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_07698271f1444d3e9a37ba11c2f0aea5",
+      "statement": "All logging is source-generated with `[LoggerMessage]` partial methods on `partial` classes; a static variant takes ILogger as a parameter when the declaring type holds no logger field, and exceptions are passed as the first parameter.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L134-L135",
+          "version": "repo-lines-v1:sha256:ea6cd1b17c509cf336822a997c7b7c67972107c332c584b8e6ebd246be79eb58:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODY3ODI1MTg0ZjI1YjM4YzEwODcyMjE5YzBjYTQ5NmM3YzVkZDk1ZmExMDk2ODc5N2Q1NThhZjcyZjk2Y2FlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjMwYTJjYjgzZjQ2Njg1MDQyOTFmNjJjY2YwNDhmZWYwOGU5Y2NkYjNiZTc3YjU3MGJhMDEyNzI1ODlkOWQ3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGJjNzI5ZTFlZTc1ZmRlNjM4ZGUyNmU3Yjg0NTI0NDJlYTIyYTQwYWFlZmYzNjQxZDRkMzc1MTlmMjIzMWVkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L81-L82",
+          "version": "repo-lines-v1:sha256:49bb67e77a7e4f7d5399141e31623eb8db5f3d34370e07ae31d9fbbbc89a4537:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcyNWYzMDQzOTE5ZDk5ZjJkMzMwZTg2MWMyYzJlMzlhOGM2NTEyYzAzYmFhMzUxZDQ5ZDMzZDU2NmI5OTJiZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODI0MjZlODU2MTY3YzNjMjFmY2YwZjhhZmUxMDBlY2UwZTBlMTZkNTNhOWQ3MDI0YTliNmMwNGUzNzAxNWQ3YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L253-L272",
+          "version": "repo-lines-v1:sha256:e836f30383e33261328493e8239a6eb005f60f36e23b14e113d1e0121a8fdd79:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiOTZmNjU0NTgxMDUyNmFmZGJmYjk2NDI0ZmM3ODA2ZjIxM2FiYzQ2YTg4MTA5NGQxMDkxNGRjYjFiYjU4NTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiMWIwZGIxODdlOTI2ZTlkZTFlZGU5YTU1MWY4YjRlNmMzZjBiMGU5NTBlMDk0OWI3NmUxZWM1ODdmZTBmMDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI0NzhkNTQ0ODJjNGRhYjdjYTYyNzExMjI4ODA3OWVmMTkwMTljNTIwMzdiYTJiOWQxYzkxN2RhNjc3ZmVkZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L119-L132",
+          "version": "repo-lines-v1:sha256:f3978f79a40951518d88d6170356e2655860f60c8f7779651f4fba559541538a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NmUyNjg4MmJjYjZmMjcxYjk0ZTNiNDYwMDU3MTc3MDFjYWNjYTI1M2NkZGMyNDMxNDdlNDkyNWY4OTIzZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyM2NiYmZhMzdlOGY5NmMwN2FjNjM2MDllZWJjMThjZTRjMmUzZjgxNGRiYmUxMmNiMmEzMmE0OGI3NzY2N2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0NzRhM2RmY2VkZWJlYTlkNTc0N2Q0NDc4NmJjM2NlN2I2ZjhjOGY4MmE2NDllNWM1NDUxODQ4YzAzMmVkNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62dc21e66f2f4aadae17b8493f175a22",
+      "statement": "Production types are internal by default and tests see them only through `<InternalsVisibleTo Include=\"Sebastian.Tests\" />`, so no type needs to be made public for testability.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L25-L27",
+          "version": "repo-lines-v1:sha256:3159a2bd30178eac04b8fdc6a1064ad5ec21ce71fe5870c124ee79dcecf8af82:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NiZWJmYjQ2ZjEyOTkxYWU0ODhlZWRiMzQxNDAyOWFiMWY5ODA3Y2RjMDllZjA2ZjNkMTBhYzk2YjI4NmJlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkYzE1OWJiNTk3NDk4ZjUyMmU3OTM1YzgxMjE3YmVlMjc5NzI4NmUwM2Q2ZGVhZDZhZTFkNTI2MjVlN2U2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Q4NWJjOWE0NDYzNzE4ZDViMjE3MTkzMjA1YmU2ZmFkZDc0MTA2OTllNjBmMDA0MDE1MDllOWJlM2RlNjU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWNhZWQxNmFkMzlmMDEwMzZhMWY5NTI2NTZiOGJmMmUyNDdhMjI2NmY1NWM2OGVmNTAyOTA1OTRiZTU3ODEzOSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L9-L19",
+          "version": "repo-lines-v1:sha256:a1a9b6aad7c6d9a2dec543eff60b918d6bc2712302ea4442a027a831c006b7e9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlODY0MDg1YzU3YmRlMThiMTFiMDQ5ODE1ZDUxNzJhNzljNjA1MjU3ODRjNjkwOTkxNWIyODJmMTkzZjJkNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxYThmY2U0ZjQ2NTZiNTY4NTdjYWE3ZTA2ZTE5ZjdhOTUxZDM3NTBkODFhNGEwNjZlZWM2ZTg2N2QzY2QwMmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0OTZiZjUzZTNlMzE1NjZhNGQ0ODVlZWQ4N2NjNzk2NzQ1NWMyZWIwZDEwZjk0YTUwMGMyYzRiYjU3MTU2NjMifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L21-L23",
+          "version": "repo-lines-v1:sha256:c5cafb2531531080cbc8a168a9175616246eee1b0ce0955e922290d6faac135e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRiZjE1NGI4NTViYWFlN2RmZjNkYmVmZjQ5NGQyOTc0M2MwZWJiOGExNzY1YzA1ZmYwYTJlNzhmMWJjNzA3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU5OTY0ZGU2N2MwYjNiMzhmNzA0YTJiY2ViNDBmNDgxNDhhMWJmOGVmMjlmNGFhYzNiMTBmZTQ3MmQ1ODAzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzdlMGNjZDBjNGMyYTkwMDE3MzQzM2VjM2E4Mzk5MjU2NWFjY2I1NzA2NmQ3NWRiYWFiMDNkN2IzNTUzMmU3YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzQ0NDZkYjliY2ZlYWFjMDczMDY1MDJjYzExNDY1MTMxMGFkNmYwMmFmZTMxOTRmOTgxYjYwZjg5MjkwMjEyZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2769ec896faa42c8a3450f31e2347c8e",
+      "statement": "The web project excludes the test tree from compilation via DefaultItemExcludes so tests are compiled only by the test project, which holds the only ProjectReference to the web project.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L15-L15",
+          "version": "repo-lines-v1:sha256:d3b39b46eddf4064368526de567687c9659d8e881304e0804c645fe04797a171:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ0YjYwMGZmNjFhMDRjNzg3ZmFmMjg3M2JkZWRiZDUzMTQwZjE4MmU3ZTMzODUyYzU3ZTE0NzE1ODBjNjUxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWM2M2E3NWZlMDNkOTdhNzg1N2ZmMDUxYTExZjc1ZTYyMTc2MWZlN2NhMjVlZjMyNTNmZTNiMmE1NDU4Yjc3MiJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L21-L23",
+          "version": "repo-lines-v1:sha256:c5cafb2531531080cbc8a168a9175616246eee1b0ce0955e922290d6faac135e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRiZjE1NGI4NTViYWFlN2RmZjNkYmVmZjQ5NGQyOTc0M2MwZWJiOGExNzY1YzA1ZmYwYTJlNzhmMWJjNzA3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU5OTY0ZGU2N2MwYjNiMzhmNzA0YTJiY2ViNDBmNDgxNDhhMWJmOGVmMjlmNGFhYzNiMTBmZTQ3MmQ1ODAzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzdlMGNjZDBjNGMyYTkwMDE3MzQzM2VjM2E4Mzk5MjU2NWFjY2I1NzA2NmQ3NWRiYWFiMDNkN2IzNTUzMmU3YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzQ0NDZkYjliY2ZlYWFjMDczMDY1MDJjYzExNDY1MTMxMGFkNmYwMmFmZTMxOTRmOTgxYjYwZjg5MjkwMjEyZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_536d7efe45874982992695afe907f223",
+      "statement": "The test project deliberately opts out of the production build gates: it declares no TreatWarningsAsErrors, AnalysisLevel, PublishAot, or InvariantGlobalization, and adds only the xunit stack, a global `<Using Include=\"Xunit\" />`, and IsPackable false — so AOT cleanliness cannot be validated from the test project.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L1-L8",
+          "version": "repo-lines-v1:sha256:288a7372422532d62df9baaadab6c0deace7eaa50fb6b6f5819982305e57471f:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjNlZjE0YjQwMGQ3MDJiZmFkZTU4ZTM0MjdiNTZkYzA5MTA4ODFlZjEyNzNmMGMzZTQ0NmU5MWE2OGQxNzdmNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2RiYWU5NTMzMjVhMzY0ZjE5MTVhY2I5MmMwOWQ3NjNiYmMxOTlmMWZkNjgzODMyZmRkNWQ1YjhjYmM4YWMwMSJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L1-L19",
+          "version": "repo-lines-v1:sha256:d956c5a9f0d91ddd7d9c28262f164039241d2f9dcbe94d76d55ca30019eacd04:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4YWZmMzdmYzg4YWFiODM0YjQ2ZDQ3MTk2NmM0MmQ5NGM5Y2U0MzhhNWM0YzkwYjMyOGU2ZDI0Mzg3OWI3MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlOTk2NGRlNjdjMGIzYjM4ZjcwNGEyYmNlYjQwZjQ4MTQ4YTFiZjhlZjI5ZjRhYWMzYjEwZmU0NzJkNTgwM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3M2Y2MTk4OGI5YjFmYzA5ZjcxYWQzMGNlOTI4OGE0Mjg1OTdhODAxYjRlZDE2NWFhN2E2MjVhZDNiMGJiZTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f7cf36dd011c4c80bc97f3ffd6ff1aee",
+      "statement": "Primary constructors are used when the constructor only captures dependencies (ImplementationAgent, JobQueue, ImplementSpec, GitHubWebhookProcessor), while types that validate or normalize inputs before use keep an explicit constructor (Git resolves the content root, ProviderResolver validates provider configuration, GitHubService imports the PEM key).",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L50",
+          "version": "repo-lines-v1:sha256:bb1476050eb1307edd00cd5c314f809db6a6f3937fc490c01caed6601f93a81e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWJjNmZlNDA3Zjg1OTQzMThiMTYxNDA4OTU2YTE2MjZlY2U2ZDEzMjg2Zjc5ZWE5ZjEwMGRiYTZhZGJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWJiOTNiY2FkMWY2ZjJmZTc3ZmZjNGJiN2Y3ZDlhZjEzYzEwMGE2OGM3ZGI1MTRhNWFlMDU2MjlkNzU1NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3MDMzNWE4ZDNiNGRhMTAyOGI5ODc0ZDNjODgyNDc2MWQxZGFhZTBiYjYwZDFiNmQ0MDc1N2RmMzc4NjQ5NTYifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L10-L12",
+          "version": "repo-lines-v1:sha256:1c2b70fc5393d5325a7cc2c34a70d63c5edffffd7a852fc77ad74c951a4fcf36:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTcyOTNmOTVjNGRjNmY0YmQzY2VjODY2ZmY1MjQ0ZmQ0OGUyMmNkY2M0ODlkYTllNWIxZWQ1NjYwYjIxYzc3ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzI3OGY0NjI4ZDE3MWNlNGI3ZDc0ZDY4ODZiYzI3ODE5NWJhODNmYmZjMTA1Mjg5MzgwYjE4YzZlZWZjNmViNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzIwNjBhZGZlOTc4YTMzYWEyYzYyNzZjOGFmODNiMTFjMTIwODVjMDdlOGY4MDE0Y2Y0ZmM4NTFjOGY5YzlmYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmY4NTViOWI3ODFlYjUxZDljNWI4ZjVlYzBmZGFjNmQwZmM2YWE4MDRmMzlkYjU4ZWRjNGY3ZjZlOWYwNzRmNiJ9"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L23-L38",
+          "version": "repo-lines-v1:sha256:918ac9ffdfb965cdb6c2cfc95cabe480f1e34a819d167361d3b1c3370247b38e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjIxYmUyMjAxZGMwMGUwZDI0NDVhMTg4ODdkOTFjNmQ5ZjVhY2UxZjdhODM4NjAzZjFlNzI3ZTFjNzI2YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZjY4Y2VlODdkMGMyZmRhYWI1NmU2YTk4ZDc1MzJlYzEzMWQwOTI4MDc5M2M5NzFjNDFkMDQzNGVkNmNhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYzAyYzVmMjc5YjM1ODlhNzhkMDM4ZWIzMDRjNmFkMmM4MWJlNmI5NWVkZWM3MjNiNWY5MjgxYmY2OTdhNjYifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L10-L12",
+          "version": "repo-lines-v1:sha256:69446be5f6b52e8fd9604731f97822a6a81090a1685d3d328c527b4fc0a1b4a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGEwMjVjMTkyODlkMzY4MGI2YTI5YTA4MWM3ZWJhNDY2MDFjM2E5MWY3NmM4MDA4YzljOWFhYzQxYmVkODRjNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzZlZTliMGViNTJjNDBkYTQxNmJiZDJmNjEwMjdlZDczM2EwYWRkN2Q5OTdjZmM0NTljMmJhMWMyZjEwOWMwMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjY5NTM3N2YzZWMzMGQzNDJmYWM1NDk4YjJmNGE4ODdmZWNjM2I4MTNjYmU4NDNjMjk2YTQ5OTc1ZTIzYzk0YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTBlODA1YzczN2ZlNTM1MDJmNTVhODM5YzNmYjE5MjYwNTU3YTk4ZTVlNWQzM2FiMGMzMzMwZDJkNWY3N2UyYSJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L17-L21",
+          "version": "repo-lines-v1:sha256:8c873d57b5c49dcf07ae7d1178179318a3b1fe23bac72db2c66d566cabd04a1e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJhMzk2YjZmOWQ0NTRjYjg5MjViZWVhZjBlODFiNzI5NjIyYjUxNjIzNWE1MmNkZjQyMzA4NDRmNWYwZTg4MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzRkMTZmNTBhOGNhNThjNDRiOGQwZTliYWRmYTE0NTQwOTUwN2QyZGQyNjgxMzQ0ZDhkMDhiMDQ5ZmMyYTBjZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGRjNDg5OTliMDc3Mjk5MTliMDZlOWYzYjNlYzFjMTc2ZDVjODFkM2M0NTlkZjgzNDQ2MDVkNDg4MmVlNGYxYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7f4784243dc844f1bc04cb38bac325b3",
+      "statement": "Services whose implementation type is internal are registered through explicit factory lambdas rather than implementation-type generics, because the DI container's reflection path cannot construct an internal processor; the comment in Program.cs records that reason.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L20-L28",
+          "version": "repo-lines-v1:sha256:ca29ecb8cf979786608e9d126363d2b0d734c76bc054d6fe2ca762cb1f0fcda0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2Q5NmIxYTExY2E1Y2I1OWFhNTIwZjMyNDUxMGQyYzExZWM0OWFkYTYxZDEwNGI4YWI3YmJkNWFlZDM4OWEzZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNThkN2U3MWVmOTQyNDk5ZmFhNGZiMWFiNmU0NWYxNTI0ZmI2YmJmNWU2MDU2ZTJmMzc0YTRiM2VkMTIzNDY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ2MDdhZTg1Yjg2NjM2NDE3ZjNkNDM1MDEzMGVlZjYyZWYwOGY4ZTBiYWQ5ZDNiMjhlZDA1YTkyN2M5N2NlNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjRkMzgzNzBjMjY0Nzg0ZGY2NmM2MjA4YjA5ZWNkMjU5NTA3ZmY4ZjQyMGVlMTY3Y2EzMjJlMDk3YmE0NTQ1MiJ9"
+        },
+        {
+          "resource": "repo://Program.cs#L30-L36",
+          "version": "repo-lines-v1:sha256:ed7e5dd05c485dbdb7297e1f0147bc989d244ace5f55d048fb5d939c8af2ebe3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTkyM2VmZGE3NTk5YzBlZTQ5ZmI2OTJhZTE1NDJhN2FiODNmZmVkZDNkYTM2ZDllMzkzMDM1MWM5NWVlNTZjZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTU3YzFlZWJlMWM2NzNjNWQ5YWU0YmU2MThkMGY1MzM1ZjZjZWQ5ZmYxNzRjOTA3NzVmZDA4MTJhZWEyYmM2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTFjYmUyMzZiNjNiZjBjZjUxYjk2MzlmNGI5MTgzNWE3YjZjMTU3ODU4ZjkyYjYwZjk1MWE2ZWI1NjQxNDQxOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_62acec3a9ed9493cabeced82ed7419e2",
+      "statement": "`// shortcut:` comments mark decided pragmatic tradeoffs with their upgrade condition, not defects: push-driven plus startup-only sync in Git, worktree preparation racing a fast-forward, and the synchronous fetch inside the push webhook.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L118-L121",
+          "version": "repo-lines-v1:sha256:eed2d0c261e5b1e06269e2242ebfc45443f045e61aee46434a2f4c2775909033:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjAwZjVmZmFjOWUyZmQwZDM1YTdkYzRiMzhhYzczYjMxNjVkMmQyYzIzYmQwNjM1MmQzZTM1YTBjZjE3YjlmZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY0YmM4ZjkwMTMzYjAzOWNjODU0NmY2ZDI1MjhjNjAzMjk2YmI2ZDFjN2JjNTM5MWNkNjgxNTU4NThhYzBhNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjMzOGZkMjgxZjEwNjQ3MjE4NDNkMzRmMDc4Y2NjMmM0Y2M2OTgzZTVjODJiZDgyYmVmOTkyNjFlZDA2Y2YyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmJmZTE1NjIxOTdlZDkwODVjMTIwZWM3ZmY4YzMwMzRmZmY4ZTQ4OGU5OTE5MmE1MDE5MTRlN2FjNzhlYjNmZSJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L31-L33",
+          "version": "repo-lines-v1:sha256:0bc0664cf966252ec17df647ac655248fd8e189776ec32e1b08d8982a030c665:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDRjZWM4NzUzNDk0MjNmMjNjYTc4NDg5ZjliNDY5NDMyY2E3YWIzOGQxZjFlMGE2NDAwYTllNTZkZDEyYjIxOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWU0NWU1MmIzMGJjMzZhNDBhN2E5Y2Q5YTAwMjA4YjdmOTJiZDljMmQ4ZDhhOWJmMDc0ZTk2ODg0ZDM4Yzc5MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDY2Y2YyMDY1MzlmMjA5NDg5NTFkY2IzYjYxOGI1NTEzOGQzYjM2NzcwZjllMWI0NGMyMTZjN2M5MmExM2RhYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTVlMzM5YWUyNGM3YTQyNTM4YzVmODFlZjE3OTA3OTZhZGVmYjJjMDgxYzJkMjhjNjk2ZDgwOTMwMjE3NmRiMSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L115-L116",
+          "version": "repo-lines-v1:sha256:2afd8447f58141b2a4f89fe04ccf130eda84b3312d3636553d0c90193b4b1425:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk0MzRkYjc0YmFjMGRiNTU3MzhhODdhYzZkYmRlNDlkMTgwNTYzNWZlMmRiMGY2YzZiMjU4MmFmZTkwOTYxNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzgxMzFiYzQ4OWJiYWRiNWUxZmEwM2RmODczNmQ5MjkzOTEzM2U1Nzg3Njg2ZTg3ZTBlYzkxYmVlYTc0MGMwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTM4MGRkMWViYTZiMjY3MjFkMDFhNWNkZmQ2Nzc3NjZmZGJjMTUyYWIzMDkwOTg2OWFmNGVjMmE4ZmZlN2ViZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTRhNzU1MTIwNmQ5Nzg3Mjc5NDZmZDI2OTdkNWM5ZWE4YTQ3MTRlZDk5MGI0ODliZDc3N2Q3YTc1NTlmNjE5OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_80b327d717dc473eb491b787a47e11a1",
+      "statement": "Plain comments in the codebase explain rationale that would otherwise look wrong (the static PrepareLock serializes repository-wide git operations, an existing worktree directory is reused so uncommitted agent work is not deleted); the repository contains no XML doc comments and no TODO markers.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L23-L24",
+          "version": "repo-lines-v1:sha256:0576f1b593e9868ab2b453e66c149e20168af01fd386b5f8b9e124a0220ee8c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQwMGIyMGJlMzc3OGFiMTBmZGViODliMWMyY2FmNjBiYmU4ZjU5ZWJjYWIzNDcwOGRiZTc3ZjlkNzQ4M2EzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTg4NGZmY2M4YjMxYjdjMWM3NmVmYzAxOGU1OWFlMmQ3OGJjMGUyYjEyMWIwYzhiZTJlNGEwODVjNmRkYmVlNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzk1MTk2NTE4OGU4ZjcwMzVkYmY0YTAxODBjNWM3ODVlMzhiMDkzMWUxZDcyMTc1NDA3YzNmNGRiZGVkOGUzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGI2NzRkZThkYWZlM2EwOTZlNDk1ZmQ1NzA1MDdmYWQ0ODRlNGNlYTFjY2UzYjUzYjZiMTU0NzlmODM3ZTRjYSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L95-L99",
+          "version": "repo-lines-v1:sha256:59866d8135ddd7d25778fa5d3545c4bb62174c24cf1b7532fa534fdbc8b66388:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODU1Njg3OGQ5MmQ2NjUwNDJmZTViYWI5ZTQ3NGE4OTFiMDc3NmMxZmNlZjhhNGU5MjQ4YmY3YzE0MTg0MWVjZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmMxNWYxOTlmYWVjZDQzMThiZjI4OWM0MjM1YWEyZmUxN2NmM2IzMzhmYWE2OGZjYjNmMTU4NzE0N2IzMjIxNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmUzNDU1MDU3OTA1NTg2YzNmM2I0MWZkMTFiMDljODgxZTI1OTg4M2JlOGZmNTgyMTkyNGMwM2E0ZTQ0NjMyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6c59f14dda234ecb8892d7ffd77605a8",
+      "statement": "InvariantGlobalization is enabled and the code pairs it with CultureInfo.InvariantCulture for number parsing and formatting, e.g. parsing rev-list counts and naming worktree directories from issue numbers.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L11-L11",
+          "version": "repo-lines-v1:sha256:d417f1d22c692599f203c792c57aa4b40d6f3fe55cf5ef9454d9f8c83f29c687:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQxN2YxZDIyYzY5MjU5OWYyMDNjNzkyYzU3YWE0YjQwZDZmM2ZlNTVjZjVlZjk0NTRkOWY4YzgzZjI5YzY4NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQxN2YxZDIyYzY5MjU5OWYyMDNjNzkyYzU3YWE0YjQwZDZmM2ZlNTVjZjVlZjk0NTRkOWY4YzgzZjI5YzY4NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMThmYTZhNGRhYTU5NDE2NjJmNzExNDdjNTIyZDRjMzU5ODUxY2VhMTBmNzgyYzJkYjU1ZWViZjBjMDcxZmEwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQ0YjYwMGZmNjFhMDRjNzg3ZmFmMjg3M2JkZWRiZDUzMTQwZjE4MmU3ZTMzODUyYzU3ZTE0NzE1ODBjNjUxZiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L88-L93",
+          "version": "repo-lines-v1:sha256:49b04e4535d36d107b0e615813d4da282071c4d74d3669599fc3c8742245b37d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQxZjVhYTE3NjYzYjQ2ZmI0OGRhMjBkNWQ5MmI3MjU2ZjFjNjc2OWYyOWMzOTViODJmMjQyNGIyYjk3ZmRkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGIxYzZiOWYwYTA0ZWJmMzIwNDBlMzIwYmFlMGZjNDFjMzE2NzZhZGFhN2I3ZDI2YTdkMGZhNmY4N2NiOGRmNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGNiNDYyY2U2NDU1MjQ3ODI5OTM2M2FkYWIzNThhNTRmODlhZGRhMWU0ZmQ0YWIyYTRhOTZjM2M5NGYwNmMzZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmJiOTgzMGQ5Yjc5NmE1MzI3NmYxZWFjNzIwNTFjNmE3MzBlMzg0ZjgyYTJjYWVhNjg1MTMzMTYzZGI1NDA2NSJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L73-L77",
+          "version": "repo-lines-v1:sha256:63b8c4601e7d41719c633e42f23fcec7f7388ed0826d66882bf3a1a80a4a7ad6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmQzYzhkN2E1MmU3MzgyZjE1OGQ5NTU2MTcxYzFjMzg5ZDJlMmYxMTVkNDdjY2FhYjc2MDNlNDJiY2NjNWI2ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjA5YzhlZWE5OGZjOGY4YjQxZTRiOTc3ZjExOGFkZGYyOTNkZmRmY2VhNDhlYTJiYzk1NjQyYjVkNDdhM2RmNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWJkMmYwZTdlMjk4NTcyN2Q2MjU3YjM5MzIyZWI4MzdjZGNhY2I4NTdhYmY4ZWJlMGE3MWUyNDY0YzU3OWM5MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6f29ea2a7fad4f0891db3efcdf3692a6",
+      "statement": "ConfigureAwait(false) is applied consistently to every await in production code, including `await using` scopes and the per-job scope in the queue.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L35-L50",
+          "version": "repo-lines-v1:sha256:6b3f6bea5098a8f91975d8721705df0306e65d2e1a54ef5e7ddb9a8f0ca1d3ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3ZGVmOWJiNmU0M2NlYjc1Y2M4MzM0NmI3ZTE3ZmQzNWIwNGI1ZTFjMzIxODQ2OTI2MjRkMTYyY2Q5NzhiZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxNDc2ZGIxMzAwMzdjYzJhY2RkZTU0NTAxZDZkOTk2OWUxNDZmZTAwNGNmY2VkMTJiZmNmZmExMThmOTRiM2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3YzQ2MDgxYmE5MmI5NWVmM2UxZGUxMDg2MTdhYjA3MDJkOTc2Yjc4NmIzMTVkODllZjBiYjcwYzY3NTkzZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ZWE3ODE2NTY1M2E0ZjY4MDI1NTM5OTE5NDBlMmRjODg4ZTliYjAxOWNiYWMyNjllNDc4YzVhN2EyNzgxMWEifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L57-L61",
+          "version": "repo-lines-v1:sha256:424e7910bcd853fd9db2b75143e3bc99b6dbd3f8fe6ffc52e5b420b9c42cb59c:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmM5Y2I5NjM4NmU1NjM1ODA1OGRjMjQ2MTZjZDIxZDNjNGQ4ZDdlMmY0YWQyZmFlOWFjZjJhZjIyMWRkMTdjZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTdhNWZmYTNlMDk1ZGYwNWI2YjMzMzM4NzFhYmExYzFiM2UyNWFiM2RiZjFkNDkyZjE1NGMyY2MyYjEyMmY1NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDZmOTcxOTk3MDc0NWM2ZTIwOTNlMmYyMzljNDhmNTA5YmE1MmE5MDEzOTlkMzI0NTI1NTYwN2FiNDI2OTk0MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGVmNWI2ODMyYjFmMWQxNTEwYTdiZGEzODU5ZDg1ZjJlYzBmMzVhZWRkNWNhMzg5ZGMwOGM5OTRiOTdiOTBjMiJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L36",
+          "version": "repo-lines-v1:sha256:8e54e79299ad569dfe53557e093a405a6d5eeba2d1ed1679dd9caf9dfc8bbbea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

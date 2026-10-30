@@ -1,7 +1,5 @@
 namespace Sebastian.Webhooks;
 
-using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Octokit.Webhooks;
 using Octokit.Webhooks.Events;
@@ -21,8 +19,6 @@ internal sealed partial class GitHubWebhookProcessor(
 {
     private const string FeatureLabel = "feature";
     private const string ReadyForAgentLabel = "ready-for-agent";
-
-    private readonly ConcurrentDictionary<string, byte> _inFlight = new(StringComparer.OrdinalIgnoreCase);
 
     public override ValueTask ProcessWebhookAsync(
         WebhookHeaders headers,
@@ -94,7 +90,7 @@ internal sealed partial class GitHubWebhookProcessor(
                 issuesEvent.Issue.Title ?? string.Empty,
                 issuesEvent.Issue.Body ?? string.Empty);
 
-            if (TryStart(job))
+            if (jobQueue.TryAdd(job))
             {
                 LogImplementationStarted(repositoryName, issueNumber);
             }
@@ -102,34 +98,6 @@ internal sealed partial class GitHubWebhookProcessor(
             {
                 LogImplementationAlreadyRunning(repositoryName, issueNumber);
             }
-        }
-    }
-
-    private bool TryStart(ImplementSpec job)
-    {
-        if (!_inFlight.TryAdd(job.Key, 0))
-        {
-            return false;
-        }
-
-        _ = TrackAsync(job);
-        return true;
-    }
-
-    [SuppressMessage("Design", "CA1031", Justification = "A failed enqueue must not tear down the webhook.")]
-    private async Task TrackAsync(ImplementSpec job)
-    {
-        try
-        {
-            await jobQueue.Add(job).ConfigureAwait(false);
-        }
-        catch (Exception exception)
-        {
-            LogEnqueueFailed(exception, job.Key);
-        }
-        finally
-        {
-            _inFlight.TryRemove(job.Key, out _);
         }
     }
 
@@ -159,9 +127,6 @@ internal sealed partial class GitHubWebhookProcessor(
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Implementation already running for {Repository}#{Number}")]
     private partial void LogImplementationAlreadyRunning(string repository, int number);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to enqueue implementation for {Key}")]
-    private partial void LogEnqueueFailed(Exception exception, string key);
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Issue {Repository}#{Number} closed; missing spec sections: {Sections}")]
     private partial void LogInvalidSpec(string repository, int number, string sections);

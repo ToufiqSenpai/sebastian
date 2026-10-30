@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:48b5322ba663eff4c2b58d96adb2758c55ccbf9d6576a61ef251708fe53d5e4d",
+  "claims": [
+    {
+      "id": "claim_da6b629d75284e799e46dffe995d0446",
+      "statement": "GitHubService builds its outbound credential chain in its constructor: it reads the PEM at GitHub:PrivateKeyPath, imports it into an RSA instance, constructs an AppInstallationTokenProvider from AppId + that key + InstallationId + a GitHubAppTokenProvider, wraps it in an AppInstallationAuthProvider, and creates a Kiota HttpClientRequestAdapter via GitHub.Octokit.Client.RequestAdapter.Create before handing it to GitHubClient.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L17-L21",
+          "version": "repo-lines-v1:sha256:edd82f0c2f6f0a00076b6409bbaba3d0aaa144e90c8a8a95bb0150aefa2fce63:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzY2NTdhNDI2OTlhYTUzMGNjZDU1ZmFjMTUzMjU1MmZlZjA4MDBlY2JjZDJjMDViYTExMGIzNDU4ZmExZTlkOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDRkNTNkZjcxZTEyYTU1ZjUxOTFkMTRlYTBjZTRkOTc2NzBiY2VmMTVlNGFiOTE4YTFhNTk2NDBiNGYyNGQ2NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTkzZGE3ZDk3NThlZDVmYzI5N2Q1MjA2YTIyNmEwZTE3OTgxYTA3NDlkYzVhYjI2MThjZTYwNmNmMDVjZmUyZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzNlYmMyZjc2Yjg2ZWUxMDRjODYwNjJlNDVhMTRkZGVhYmJlMTY0NjQ0OGEyYTRhODU4ODczY2RlOTljMzI4MiJ9"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L23-L38",
+          "version": "repo-lines-v1:sha256:918ac9ffdfb965cdb6c2cfc95cabe480f1e34a819d167361d3b1c3370247b38e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjIxYmUyMjAxZGMwMGUwZDI0NDVhMTg4ODdkOTFjNmQ5ZjVhY2UxZjdhODM4NjAzZjFlNzI3ZTFjNzI2YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZjY4Y2VlODdkMGMyZmRhYWI1NmU2YTk4ZDc1MzJlYzEzMWQwOTI4MDc5M2M5NzFjNDFkMDQzNGVkNmNhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYzAyYzVmMjc5YjM1ODlhNzhkMDM4ZWIzMDRjNmFkMmM4MWJlNmI5NWVkZWM3MjNiNWY5MjgxYmY2OTdhNjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9bb28cec73804221bf78bc04b0cc9516",
+      "statement": "The credential settings have asymmetric validation: PrivateKeyPath is a path string (never key material) that is required, AppId is an int constrained to [Range(1, int.MaxValue)], and InstallationId is a plain required string that Sebastian never parses, so a malformed installation id survives startup and fails only when the SDK requests a token.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L20-L33",
+          "version": "repo-lines-v1:sha256:eb1a2544d5fac0e77f2ce4fd84de9b669df34c0ca580ab6c5c24df50624a3bba:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYjQ4NWM5MDQ4YTQyZDI2ZTRiZTMwZDE0NjNjZTgyODhlYzE3ODYzMGMzMGZjNWE4NmQzYTVkYTdiOWE3NzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzZmE2OTA2NDQ0M2JjNGQ3MTI4OWQxYjJlYWQwODRkMjY4ZWE1ZjNkMWNlNmU3ZjAxNWU0M2Y4YmI3NzNjNWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTM0YzZlZGJkOGQ2NTUzNzRkZWMyNTg0NTI5ZThhNDMwYWUwYjgyOTFiMjM5OTVlMzI0ODI2ZDBjMTFmZTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8b2b089f1af74ba58f3fb872de7baf21",
+      "statement": "GitHubService exposes exactly two write operations and no others: PostCommentAsync forwards the caller's string verbatim as the comment body to the issue comments endpoint, and CloseIssueAsync patches the issue with State = closed and StateReason = Not_planned, deliberately not completed.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_56ca3a5b37b34a57a487bd425b00ef1c",
+      "statement": "The observable intake side effects are owned by the webhook processor, not the client: it composes the exact comment string 'Closed: the spec is missing required sections: <sections>.', calls PostCommentAsync before CloseIssueAsync so the reason survives closure, and has no try/catch around either call, so a failure propagates out of the webhook request and can leave one effect applied without the other.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L63-L82",
+          "version": "repo-lines-v1:sha256:61fd2ffce9308b6d2d577af4347ee4a46367ea92c77f5642f2a54f7bdf11d157:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDBjMjY1OWJjYTY3NmE3MmJiODFlNzU0MTAwZTMxYjhhYmY3MjExN2U5YWUxMmRiMDU2OTQ4ZGQ0YmQ5OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OTU2OTA4YmQzOTA5MjMzNDA5ZjdiZWU3ZDhhNWIzODQ0OGY5YjA0M2E1ZDA4ZWIxZTg5MWQ0ZDQyNDFlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMjQ5YTMxYmRjN2UyMWU0OGFjZTA2YjI3OTczY2YyM2Y1OGIwNzVkODU2MmQ0YzhhNGQ1ODRmYmQwNmE2YmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d7cc0b35b00d4a1a8e8184de573b7746",
+      "statement": "Program.cs resolves GitHubService eagerly right after Build() specifically so constructor-time credential failures abort startup, which converts an unreadable or invalid PEM into a deployment failure; because no network call is made during construction, a well-formed but mismatched AppId/InstallationId/key set instead fails on the first write during a webhook request.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L40-L44",
+          "version": "repo-lines-v1:sha256:b36b1b1c86bb9d607d883845b284904cc9c67fc6b38a5dc26ebd25b756eb0b42:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI2YmU0M2EwZWEyMWEyODA3YWZhMzI2MDM4MDQ0MGM1YzM0MTU5NTY5ZWMzMGRlYmZkYzlkM2QwOGIyZGE1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L27-L34",
+          "version": "repo-lines-v1:sha256:128870302ed000a7b442682c456dbe878f5cee0dc3060302747300c748f75f41:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTY1YjE3ZDg4ZjZhN2M3MDQwZGU1ZGFiMzcxYjBlNGYyM2YyZDlhZGI2MTAxMTFlOTRlYjFmNmU2NWI5YmEzNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjMyZDBkMmI4Y2E0YzJlNWJkOGZkZWVlZGQwY2JkNGI2YjgxOTY2M2E0NDY2N2U1MmRmMjE4ZTZhMTA1OGE0YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTE4MmViZWZhM2I0ZmFkMjQ1MjhiOGM1YmEyYjJmNmEyN2ZjYWI1Y2NiMjUyYmM3YzZlMzM0YWRmZjIwNDU2NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzMwYWQ1ZmJlNDZmYzUzZTRjYzVlYmNiNWNiMjczZDY0NWI3OWUxZWJmOGJlYzRjYTA3Yzk5YzY0YTMwNTBiNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c9de5f893b934188a44532d8a2ac202a",
+      "statement": "GitHubService is registered as a root singleton implementing IDisposable, so one RSA key and one HTTP request adapter serve every request for the process lifetime (configuration and key rotation require a restart), and the host disposes it at shutdown in the order adapter first, then private key.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L19-L19",
+          "version": "repo-lines-v1:sha256:19cc96cae38f7f22b6eea8ad1addeed2ba13d6aa828744c6a5cd381e6ac60b0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTljYzk2Y2FlMzhmN2YyMmI2ZWVhOGFkMWFkZGVlZDJiYTEzZDZhYTgyODc0NGM2YTVjZDM4MWU2YWM2MGIwZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTljYzk2Y2FlMzhmN2YyMmI2ZWVhOGFkMWFkZGVlZDJiYTEzZDZhYTgyODc0NGM2YTVjZDM4MWU2YWM2MGIwZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjlkMDc4YjcwOWZmOGE1NzQ4NTJjNjFiNDBhMjYxYTBhYWEyMDlhMjIwYzIzNWExMjlhNjhlYWE1MzAwMGUyZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTFkMGM4ODA2YWU1OWZiMzFmZDg1MGIzMWQwNmU5MDBmNmQwNmY4N2MzNTNjYmUyZDA2Y2YwZGE0NTM0OGI5MSJ9"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L71-L76",
+          "version": "repo-lines-v1:sha256:fbd5caed18584b11ee10fcff20b85b948339667dd83bc4fc4af6534039dd7d14:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY4MmM0NjgwYTAxNGRkN2VjNzU3YzIyNTY4ZjhjOTFkYzVhOGE2ZGZlMjk4OTU1NGE3MGY3MzUyMDg1NTVlMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDEyMGMxMDdiMjA3ZWE5MmRjNWNiNjMzNjMxODM5ZTQzM2MxYjg1YzkxZDlhMTgxM2JmMjMxZTQ3MDJlMzVkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e7bc062abd834a27af8b69f363d7bc0f",
+      "statement": "The write surface is deliberately thin and cannot be widened by configuration: no label write exists (both the feature and ready-for-agent labels are read-only filters), and no pull-request create/comment/review/merge operation exists, nor is ProcessPullRequestWebhookAsync overridden — so adding a label or PR operation means adding methods to GitHubService and extending the caller in GitHubWebhookProcessor.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L104-L105",
+          "version": "repo-lines-v1:sha256:a738bcc56ff2a6df6e42876fc9a2505ef09b6ec099f134d3c09da19ddd9c20bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmNiY2IxYTljMDEzYzIzODIwOGRmZjZhODk1MTZhNjZmNmE1NDc4NWE4N2MzYmJlMTM3OGZlYjk5MzcxM2JiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJlMDBhZjdlYjhkOGU5ZDFlMTViYWQwYjQzODljOTNjOWNhODIwNmIyNzI1MTliMDUzMDNjMjc1MTNmMGIxOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEyY2E1NmFiMjk3NGQwZjZlZTA0OGZlZTRhM2I2YTc1ODI3OTNkYTFkMWI3YTM4MjdhZTQ0ZjRmZDk5Zjc0MCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L49",
+          "version": "repo-lines-v1:sha256:64cd89c45f7399cfb2e43ec37f99f605b9bbae1ae09c44f78ab261cc8ea8e253:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiOTAwMzZmY2M3ZGQ5MWYyYWM1Y2ViYmY4NDQ3ZjY0MjQ1ZGU1NWEyYTFlMDlhY2I2OWRkYmZmZTgzNmVhMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5689377ebf1944d697382922dc0a53c1",
+      "statement": "The owner, repository, and issue number are supplied explicitly on every call from the webhook payload, so the client is scoped to the app installation rather than to the single repository the process mirrors; the owner/name cross-check against the parsed origin happens later in ImplementSpec.PrepareWorkspaceAsync, after intake has already been allowed to comment on and close the issue named by the delivery.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L68-L76",
+          "version": "repo-lines-v1:sha256:712da247a86982f2c86bbdbd1202f86af79b9c18b336672ba4953a640a490545:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FlYTJiZmZkYTMyYTBkMWMxY2FjMDYxZDJiODY5MGJhY2IzOGEzMmQ1NzM1ZTVkNGJiMGNmYWMxOWU3MDkwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQxYWE1ZDlmNzdmNTY5NTY5OTkxMjg0YmFlZTY0MTU2MjU5YTNkZmZhOWQ5YjBhYzg2NmI2ZmY4MzIwYmE3MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM5MGRkZTRiZjE2NzFhMDdhNDNlNGVjN2QwMTJkNjVhY2M3YWI3YTYwMDA1ODY0OGYyOGFiNWVhZTVjODY0MCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L51-L78",
+          "version": "repo-lines-v1:sha256:0049575289d56ca14e86394888ad78269597a363b0eacbc2f7a1c075dcc18e5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYWNlYzJiOGRjNzIwZWE1ZmRlY2M4MDkzYjQxNDJjMDFlOThiMjU3Y2ZmNmVmNGVjNTI4ODdmYjY1MGRkOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmMDIzZDM1NDE5YTM2MGQ1ZWY1ZjViZDMxYzRiYjI5NTQ2NzIyMGVkOTg3YTIyZDM4ZDM4ZTBjYjQwYWIzYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlYmQ0MzMxYzA2MDgwYTAxMDM2NThjYzM3MDA1MzhkZGEyZTg5NTNjODJkZDQ0NWU3ZTk1ODI3NDk5MjdhOWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_52fde02d084b430f8f87a5ea6270051e",
+      "statement": "Every SDK type in GitHubService is reached through global::-qualified aliases because the file's own namespace is Sebastian.GitHub, which shadows the GitHub root namespace; the aliases also name the generated nested payload types (CommentsPostRequestBody, WithIssue_numberPatchRequestBody) and disambiguate GitHubAppTokenProvider from AppInstallationTokenProvider.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L1-L15",
+          "version": "repo-lines-v1:sha256:bf24b415b0b3a0175b1f1fcad0875049a11a9bda44a6af62b1d6e8e68f877af8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4ZjM0Yjc1MjgxZjE5NDM4OWNmZDc0MTc0NGQxMzc2NzdmNTQxMjdiMmY3MmYwYjM4Y2RmYjQ3NjEwZDk0NGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmMTVjMjkxZDQ0YTBmMGRmZWE5YTg0M2JjZGFiMGNkMWRhOGJjNjE4NjIzY2RmYzA1MWFkZmUxYjA3N2NmNTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlZGY1MDdkMmFhOGZhM2E3OWJmZDcyOTNiYjhlYWVjZDM1Yjc5OWQyNDk1MGNkYjNjYjllYWEwMmZhN2NmNTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_426d6eb54acd4f55bad8431b3f805a51",
+      "statement": "Outbound REST uses the Kiota-generated GitHub.Octokit.SDK plus Microsoft.Kiota.Bundle while inbound webhooks use Octokit.Webhooks.AspNetCore, so two separate GitHub SDKs coexist in the process; GitHubService contains no AOT accommodation (no DynamicDependency, JsonSerializerContext, or trimming roots), and the project's AOT settings and their justification are scoped to configuration binding.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L10-L24",
+          "version": "repo-lines-v1:sha256:51ef8bd52cf837f387813e84ff8a95b72f5fe8d457b333e89c5bd24f6b331343:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgxMTE3ZGJjOGU2ZTM0MzQ5ZDMxNzA0MGJjYzAwNGEzOGExNzdiZjkyMDE4ODYwNTM5MDBlMzYwZmYwZjBhY2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkZGMxNTliYjU5NzQ5OGY1MjJlNzkzNWM4MTIxN2JlZTI3OTcyODZlMDNkNmRlYWQ2YWUxZDUyNjI1ZTdlNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljZDRkMDdlZTA3ZGRlMzhiMzA5MDY3NWE0Mjg0MDY2YTRmNGYwNTdiZGY5M2JiZGE3ZDBkNGIxZWZlNmExMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxNTlhMmJkMzAxNzhlYWMwNGI4ZmRjNmExMDY0YWQ1ZWMyMWNlNzFmZTU4NzBjMTI0ZWU3OWRjZWNmOGFmODIifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L1-L76",
+          "version": "repo-lines-v1:sha256:1573bcfbfe16e62121a802ae3f937fec912e7ce45dafb6759ebabcb094278189:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4ZjM0Yjc1MjgxZjE5NDM4OWNmZDc0MTc0NGQxMzc2NzdmNTQxMjdiMmY3MmYwYjM4Y2RmYjQ3NjEwZDk0NGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f90ce0f99c314ff8a2d2e9eb0c85fc60",
+      "statement": "Neither GitHubService nor its two write methods are covered by the test suite — the only test touching GitHubConfig asserts that the generated validator rejects a blank API key — so the not_planned close reason, the comment-then-close ordering, and the absence of retry rest on review alone and need manual verification against a real installation when changed.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L57-L77",
+          "version": "repo-lines-v1:sha256:f0d95df3cd933a9f96bb529be2f42da3b7f45491596c0dde39ca3c0426e7ac4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4YjljODZlNjQxNmU1NGUyMTc1YjY1ZjA0MzQ4NzI2ZmYwOTgxNzAyOGU3ZDE4ZWU5NjlkNTUzYzhkYmVjOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhMDU4MDRmYmQ4Njg5NzU4YjA1ZDM1MmQ2YzI3MzkzYjE4N2UyNmJiODliNTNjMDQ5YTA0N2MyNWUwMTc5ZjUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:663c23c5749052989a7e98937b6c1887609eddbc832cc9f822b801b185b6853f",
+  "claims": [
+    {
+      "id": "claim_eb3eb0b48f3c481fb7ca4a228057b09a",
+      "statement": "The test suite is a single xunit project at tests/Sebastian.Tests targeting net10.0 with a ProjectReference to Sebastian.csproj and a global `<Using Include=\"Xunit\" />`; because the repository has no solution file, `dotnet test tests/Sebastian.Tests/Sebastian.Tests.csproj` and `dotnet build Sebastian.csproj` are the entry points, and no test file needs a `using Xunit;`.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L1-L24",
+          "version": "repo-lines-v1:sha256:338a7899defd428065c599ccfce46b630a319d6ca7a2226a6f97f8ad325c5d99:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4YWZmMzdmYzg4YWFiODM0YjQ2ZDQ3MTk2NmM0MmQ5NGM5Y2U0MzhhNWM0YzkwYjMyOGU2ZDI0Mzg3OWI3MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0YTM0YWNiNDZiOGU2YTIzMDQxY2RlMGE0N2E1NWIwY2Y5NjQ5MGFiYzllYjU2NDE0NTNhYjFjNTM4ZmFiMzAifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L17-L19",
+          "version": "repo-lines-v1:sha256:ab58ab68e3e6e1500990f71239ecc92664660e1d8d6e5d40a8ec8c1a8ef7db06:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGRiZjE1NGI4NTViYWFlN2RmZjNkYmVmZjQ5NGQyOTc0M2MwZWJiOGExNzY1YzA1ZmYwYTJlNzhmMWJjNzA3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU5OTY0ZGU2N2MwYjNiMzhmNzA0YTJiY2ViNDBmNDgxNDhhMWJmOGVmMjlmNGFhYzNiMTBmZTQ3MmQ1ODAzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjg3YjhiNDg2ZjZiZWZmOGQxMDZlYWMzZjM3Njc0YTM2NTQ2ZTZiNDIyMDk2NWFjZjAwZWQxYzA4Y2Y1MTBmZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTczZjYxOTg4YjliMWZjMDlmNzFhZDMwY2U5Mjg4YTQyODU5N2E4MDFiNGVkMTY1YWE3YTYyNWFkM2IwYmJlNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7655701318d54a299766e4654de075a1",
+      "statement": "The pairing of `<InternalsVisibleTo Include=\"Sebastian.Tests\" />` with `<DefaultItemExcludes>…;tests/**</DefaultItemExcludes>` in the product project file is what lets every service stay `internal sealed` while tests construct those types directly, and it also guarantees the web project never compiles the test tree, so making a member `public` for test visibility is unnecessary.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L15-L16",
+          "version": "repo-lines-v1:sha256:328bca0d6dbf6b12feaae48c51ece1bd662a99010001fa264056f8ed08f4f1d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDU2ZDUxNDgxZGEyN2JhYTNkM2FkZTA5NDA2NTg0YjZiNzg4OTY4NmZiNjg1YTMyZjFmODZlMzhiYzAwZWE3NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ0YjYwMGZmNjFhMDRjNzg3ZmFmMjg3M2JkZWRiZDUzMTQwZjE4MmU3ZTMzODUyYzU3ZTE0NzE1ODBjNjUxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGRjMWRmYTBlNDJhMTQ4ZTE3MTVmYzM5NzdmODIxOTVjZTMwNmYzMWUwYmIwZGJkOGEwNTRkOGZhMmIxNjQ3ZCJ9"
+        },
+        {
+          "resource": "repo://Sebastian.csproj#L25-L27",
+          "version": "repo-lines-v1:sha256:3159a2bd30178eac04b8fdc6a1064ad5ec21ce71fe5870c124ee79dcecf8af82:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NiZWJmYjQ2ZjEyOTkxYWU0ODhlZWRiMzQxNDAyOWFiMWY5ODA3Y2RjMDllZjA2ZjNkMTBhYzk2YjI4NmJlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkYzE1OWJiNTk3NDk4ZjUyMmU3OTM1YzgxMjE3YmVlMjc5NzI4NmUwM2Q2ZGVhZDZhZTFkNTI2MjVlN2U2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Q4NWJjOWE0NDYzNzE4ZDViMjE3MTkzMjA1YmU2ZmFkZDc0MTA2OTllNjBmMDA0MDE1MDllOWJlM2RlNjU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWNhZWQxNmFkMzlmMDEwMzZhMWY5NTI2NTZiOGJmMmUyNDdhMjI2NmY1NWM2OGVmNTAyOTA1OTRiZTU3ODEzOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5d121180ee8f45e981af4f188ee6156d",
+      "statement": "The test project is a deliberately less strict compilation than the product: it does not set TreatWarningsAsErrors, AnalysisLevel=latest-all, PublishAot, or InvariantGlobalization, so a diagnostic or AOT-unsafe construct in test code does not fail the build and test code cannot be used as AOT evidence.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L6-L16",
+          "version": "repo-lines-v1:sha256:eeb299fd919dfbca35de699f5a814aec97930e7660b75c12050d0ae1633445fe:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyN2Y2MWMzNDYyMDBmY2FkZTY5YWU2MDA2Y2MyM2E1ZWUwZmU2Njc4ZDBlMzRkM2M3NTE4OWY3NjhkY2VjNTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1NmQ1MTQ4MWRhMjdiYWEzZDNhZGUwOTQwNjU4NGI2Yjc4ODk2ODZmYjY4NWEzMmYxZjg2ZTM4YmMwMGVhNzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3ZmE2MmNiMTk1MmE5YWY0MTZhZDgzOWZmM2YzOWZlOWNiOGI5Y2UzOTBiMjI2NmJlNWQxZDFiNjViNmIyZjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkYzFkZmEwZTQyYTE0OGUxNzE1ZmMzOTc3ZjgyMTk1Y2UzMDZmMzFlMGJiMGRiZDhhMDU0ZDhmYTJiMTY0N2QifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L3-L19",
+          "version": "repo-lines-v1:sha256:b93e8812abde1568308ae36efd3f325d76f62b558fe723fc0621deab26ffca01:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3MDY5MmJkNGVkNzRjMjlkZTA1YzY5NWEwNTE3MGE0YzI0YThmMjY2N2Q1NWJjNWZmNzQ0MjU4ZTM3ZWY3ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlOTk2NGRlNjdjMGIzYjM4ZjcwNGEyYmNlYjQwZjQ4MTQ4YTFiZjhlZjI5ZjRhYWMzYjEwZmU0NzJkNTgwM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzNzMxZDU4NDMxMDZhMDZlMmYyMGY4N2FiY2Q5ZjM3OGUzODZhNTE5ZTM1ZTc0MjIyZWExMTI4YjFmOWZkMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3M2Y2MTk4OGI5YjFmYzA5ZjcxYWQzMGNlOTI4OGE0Mjg1OTdhODAxYjRlZDE2NWFhN2E2MjVhZDNiMGJiZTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1e9fa9e1d36142abb24bde6358fb855d",
+      "statement": "`TestHostEnvironment` exists solely because `Git`'s constructor reads nothing from `IHostEnvironment` except `ContentRootPath`; the fake supplies that path plus a `NullFileProvider`, which is honest because `Git` never reads files through the content-root file provider. This is what allows `Git` to be aimed at a temporary clone.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L17-L23",
+          "version": "repo-lines-v1:sha256:0022516d4f356a4d2dd0abd818d9487d348ad40f8ede7d7e801f2d2ece12cb0a:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJhMzk2YjZmOWQ0NTRjYjg5MjViZWVhZjBlODFiNzI5NjIyYjUxNjIzNWE1MmNkZjQyMzA4NDRmNWYwZTg4MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGU2OTM0ZDM1ZTNlY2E4MDU1OWM5Zjk2N2ZiYjkxZTY3ZTAzNDlkMjA4ODFkNGNkNzA2ZWVlN2U5NDQzZDg5MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzRkMTZmNTBhOGNhNThjNDRiOGQwZTliYWRmYTE0NTQwOTUwN2QyZGQyNjgxMzQ0ZDhkMDhiMDQ5ZmMyYTBjZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjYyZjkwMzRiZDQzMDMyMjkyZWM0MzFkYTMwZjI2YmJlNDUwZWU2MjY1YThiNmVhYTRiMmUyYmYzNmE0ZTg2YSJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestHostEnvironment.cs#L1-L15",
+          "version": "repo-lines-v1:sha256:e5830145d8265657cac8af7c7950d4fc96bce1f9924f97bf7e11b78a03b433d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1OWM5NWVkMjcwMjkyZWNhODFmZWVjMDc3MWQzNWVlNDMwOWYzZGVmY2Y3NzIxNTY4ZjA0YzgwMGQ1MTI5NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3e794e4d9c9447d9a089610bc55bbe75",
+      "statement": "Configuration-dependent services are tested with in-memory objects through `Options.Create(config)` rather than the binder: `ProviderResolverTests` builds a `SebastianConfig` with `GitHub = null!` because the resolver reads only `Agent`, whereas the generated-validator test must populate a full `GitHubConfig` first, since `[ValidateObjectMembers]` would otherwise report the missing section instead of the blank API key under test.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L50",
+          "version": "repo-lines-v1:sha256:bb1476050eb1307edd00cd5c314f809db6a6f3937fc490c01caed6601f93a81e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWJjNmZlNDA3Zjg1OTQzMThiMTYxNDA4OTU2YTE2MjZlY2U2ZDEzMjg2Zjc5ZWE5ZjEwMGRiYTZhZGJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWJiOTNiY2FkMWY2ZjJmZTc3ZmZjNGJiN2Y3ZDlhZjEzYzEwMGE2OGM3ZGI1MTRhNWFlMDU2MjlkNzU1NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3MDMzNWE4ZDNiNGRhMTAyOGI5ODc0ZDNjODgyNDc2MWQxZGFhZTBiYjYwZDFiNmQ0MDc1N2RmMzc4NjQ5NTYifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L9-L33",
+          "version": "repo-lines-v1:sha256:fe96ce08686ed5b2c10ed0ed2f8b9a377c7b9ef35f89c9d8a15dfdc380fc5514:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4M2RiZmRlZDgxMzhmZWMwZmIwMjQzMDUyMjE3YzQwMzViZDJjZDk3ZTM0YTVjODZmYzhkMTkxMmNjODc4OGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMTk2NzZiMDViNGI5MGM5MjAzZmViMmUzM2FlM2NlZjdmYjIzY2U4MTI0NDhlNTU5NGNjM2Y3YjUzM2RiZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTM0YzZlZGJkOGQ2NTUzNzRkZWMyNTg0NTI5ZThhNDMwYWUwYjgyOTFiMjM5OTVlMzI0ODI2ZDBjMTFmZTQifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L58-L103",
+          "version": "repo-lines-v1:sha256:8ab4adca475957ca289a3eb140c0bd9ca2d136cb995baefda7737e772bebadc5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3ODg1ZWEyMWY5ZjJmYzIwNTZmNGZhNzlhY2I1N2YxMWI2NzNiNmYyMmU1YzFjYTg2YzAyMjc4NjBiN2EzMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyYzFiMjZlYWRjMzA5ZGYxODQ3OTAwODlhMTNjMmNiZTI1MmIzOTdmNGRhYmI2NjU2NzZiMGE0MjJmNjVjOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bd6c5bdee8ed47d5984d2735567a74c1",
+      "statement": "`ImplementSpec.PrepareWorkspaceAsync` is `internal` rather than private purely as a test seam, so `ImplementSpecTests` can exercise the whole workspace policy (identity check, fetch, mirror guards, fast-forward, worktree reuse or creation) with no model provider, chat client, or agent session — meaning the git half of the job is tested while `RunAsync`'s agent half is not.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L28-L110",
+          "version": "repo-lines-v1:sha256:5e5da13006ceaf8e473bc594f603eda074823f51474f8a5934942a444149def0:eyJzZWxlY3RlZExpbmVDb3VudCI6ODMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4NzkyMzc4NDU2ZTAyODc4YWEwMjNiZjM0MjUzYzkyMzMyZDdkZTJjYmUzNmU1YmNiMDY1MThhNzcwNTVjNjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNjc0ZGU4ZGFmZTNhMDk2ZTQ5NWZkNTcwNTA3ZmFkNDg0ZTRjZWExY2NlM2I1M2I2YjE1NDc5ZjgzN2U0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhMDJiZjRjNjQ2ODhmYWM0MTNkNmI4ODgwOWFiOGFlNzgxNDE5ODZkYTUwMDRjNmY2YjIzY2JjNmI3OWE1NjMifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L7-L23",
+          "version": "repo-lines-v1:sha256:27087dde422d2083aa3f7e1c9ad82a0ab481ffe867a32483b809e0e9a81b04e1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2NGY5MTY3NmZiMTU1NTMxNTM1OWRhOGQ4NGRkM2Y0ZTVlMThiNTRlOTlkOTI4ZmQxNmRiYjBjNDNkNDcxN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2NGIzNzUwOTRiZTAyM2M3MDZmMGNlNmYwODM5YzJhZTdhMDYyM2E5YjBhZjIzNTE2MjZhNzMzYmQ0OTI4MDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ad2bf74dd4d946bba053dd8c843a5f21",
+      "statement": "`AgentRole.CreateOptions()` is `internal` as a test seam: `AgentRoleTests` asserts a `FakeRole`'s override reaches the option graph and that `ImplementationAgent` yields a file store with write tools enabled, one AI context provider, and exactly one tool — none of which requires an `IChatClient` or a network call.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L11-L21",
+          "version": "repo-lines-v1:sha256:cddf19dac6fe934ea3593eecf012db0debc409b9a9bc47b4e90e300c589ac0b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkYjIyZTM4NDAzZjU0ODFjNjY0MGQ5N2ZlNmQ3NzVjMmNmYTc0NDhiYzk2Y2JlODRkNTZhZGQyZTZhMzY0MmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZmExNWIzNjlkZTIxZjViNGRhYTUyMTY1ODVmNmQwODliNTk4ODJmNWVlN2QzNzljOTY2OGUyZjk0MWZhOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQxZWEyNGMxOGRiNjg5NTRmYjYwOTQ3NzIxMzA1YjU3ODdhZjEwMGU3YTU4OGNiMGNmMWUwMzIyNGZhZjNlZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L12-L44",
+          "version": "repo-lines-v1:sha256:5ce6f692c50d8ecedd21e007680f7ee469054fca3584b39a2efed2956b92f160:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlZGZhNTZiNzE3ZTYzNmJhMDc2MTgyZTQ0ZDYzZDczZDNhZGI0N2E3YTg2ZDQyZGRkNDIwMGU3OTBmZTE5YjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4d81e550f6dc4d629ba4828b93821f93",
+      "statement": "`TestRepository` is a real-git, offline fixture: it initializes a bare origin at `<temp>/owner/repo.git`, clones it through a `file://` URL, commits and pushes a seeded `README.md`, and exposes `CreateGit()` returning `new Git(new TestHostEnvironment(work), NullLogger<Git>.Instance)`; consequently the four `ImplementSpecTests` cases require a `git` binary on PATH and a writable temp filesystem but no network or credentials.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L22-L55",
+          "version": "repo-lines-v1:sha256:0aea365c3f384d955cbacc3168ff2e016273113b6d099e4dfa5f42a4d55c51ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4OTNkZTIxNGY2OGE0ODZjOGIyMmUxM2Y0NWZhMTFlZDU3MDAzNzFlNGZiMzczZGQ4MGY5MWJkOGRmMzI1MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliYTJiYTRkMWRhNDdkMjcwYjE4YzhkMWEyMGRjMWM3MjIwOWNmZmMzM2FkYTdkNzFjNDlmZDE4YzIyYTU5ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMzdjYzUzZTY5MzIwYzdmYjg0ZDFlZjk5ZDkzYTczYzUxMzcxMmIyNTk2MWM3ZjVhNDkxMWY3MmIwMzk4MWIifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L66-L95",
+          "version": "repo-lines-v1:sha256:3bcd23694a3c26f0af7eb4d0e85c03a0e0bd53179343f5295849a5cc6bc62285:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjOTVkODUzOTI5ZGU5NDIwNzZkMmVjNDJlZDJlMGMwMjBmNDVkMzM4MWU5NTFkOGI0ZWExYjU2OWNhY2VhMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZkYTZkZTk3NmYyOWI4NWE2Y2JmNTI2MTNhYmI2MTAxZmU1NmQwNmE3NjI2MDBkYzRhOTI1ZDUzMDBhZTI3NjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmOTdiNzdiMjc3YTJmZDkxOTY3YzgyOGVmOGEzNzk1NTZiNGUwNDcwZjg4ODAyNGI3NWU5MWRkZWNhYWRiNTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0861481fdb034c7693ba00ebb8788aef",
+      "statement": "The fixture's `<root>/owner/repo.git` layout is load-bearing, not cosmetic: `RepositoryIdentity.Parse` takes the last two segments of the remote URL, so the temp origin parses to `owner`/`repo`, which is what makes `RejectsForeignRepository` throw for `new ImplementSpec(\"other\", \"repo\", …)` instead of failing for an unrelated reason.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/RepositoryIdentity.cs#L38-L44",
+          "version": "repo-lines-v1:sha256:32199dda77794c205eaae447315810bcc73149f61291aa0f75d2c45da501e30e:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTI2ZWY0NzNkOTg5NjhlMjM2OGQzMmZiNTQ1YmQ2YTM3YzM2ZDFjMjlkNGMzNGI4Mjg5OWMzMDQ3ZGE2MGJhMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L55-L65",
+          "version": "repo-lines-v1:sha256:a786041e407d9d66f35c914677cdc6418f4dd1113c9ccbbec64eb4ed7a7ad715:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1YjE5ODI1NTA5NDIzYWViMGY2MWYyYzYzYmJlYTgzMDMyNmEyZTUyYmM0MjcxM2FiMGRiNGU5YzY0NTg5NjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L24-L31",
+          "version": "repo-lines-v1:sha256:8e963ee229848f299cd1ab2092f1bba02d02231d5aefeee52345c6fd7e5c990e:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkN2U3MmU4ODVlYjliOTZkMmM4ZmI5ZThiMzYwMzZkYjA4MDA4YTRkNjcyYzdkMjdjYmY2YzNhMWMwM2VkMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU4NDlmNzUwNTMwMDljMDUwOWQxNjQzYjYyMTU4NmRkZjk1Mzg5YzUwNWJkYTk5YzdlM2ExN2IzYWMyZDM5ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzM5ODc0YWViOTMzMWJhZTkyY2EyZjBkZDgzOTlmNGM1MWYzYTQ2MTFlMTA5YTQ2YzUzYjFmZDcwNjc4ZTM3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWQ1NjhhYzAyM2NiYmNkNzc5YTI1NDQ0M2NkYjRiNDc0MzAwYjBiNmVlZGY0ODllMGM4OGY3Nzk2N2M4YTNkYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d543101bb88b444bbe691681f88a5e0b",
+      "statement": "Every `ImplementSpecTests` case calls `await git.StartAsync(...)` before preparing a workspace because `Git.Repository` is populated only by `EnsureRepositoryAsync`, and `PrepareWorkspaceAsync` treats a null `Repository` as \"hosted service not started\" and throws.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L68-L76",
+          "version": "repo-lines-v1:sha256:712da247a86982f2c86bbdbd1202f86af79b9c18b336672ba4953a640a490545:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FlYTJiZmZkYTMyYTBkMWMxY2FjMDYxZDJiODY5MGJhY2IzOGEzMmQ1NzM1ZTVkNGJiMGNmYWMxOWU3MDkwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQxYWE1ZDlmNzdmNTY5NTY5OTkxMjg0YmFlZTY0MTU2MjU5YTNkZmZhOWQ5YjBhYzg2NmI2ZmY4MzIwYmE3MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM5MGRkZTRiZjE2NzFhMDdhNDNlNGVjN2QwMTJkNjVhY2M3YWI3YTYwMDA1ODY0OGYyOGFiNWVhZTVjODY0MCJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L40-L54",
+          "version": "repo-lines-v1:sha256:d49009078aab2cac66c9694db993ff8886a75772e91084583bc594cbe995a535:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNDI0M2U1ZDc2YTZkYmFhMjY3NTgzNTQzZTc4NjRkYWEwODkwMGQ1YWY0MzkxOGRhNWM2MTRhMWFlZjBiNGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L10-L15",
+          "version": "repo-lines-v1:sha256:15913cdb42c89b41e29c3705ad8e1768dbba10228d283c1c7391e0fd2642393d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI5OGE4M2VmYWMwNGY2Y2IwYzQwZGJjY2M1NDA5OTkwZDcwZTlhYjdhNmZkYWEwNWY4OGY1ZTJkODVmYWY3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNlZWQ1ZWIwZjhjZDkyZDg2YTU5YjNkZWE3NjY2NWQzZjhkMGE1NmEzNjc0NzQ5MjM1YjAxNDIxMDY3Yjg1MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWU1NzE5MzU1ZTdkYTYyN2YwNWE3YTYwN2Y4ZGQ3ZGFjNjZjMDgyZjlkMDlkZGU2M2YwOTBiNjMxYzU2MThkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2YwMDNhNmZlYjVhNDA5MmU4YjA2ZTA5YzcyNzkzNmY1OTE1OGZiYWRmNThlNTI0ODYwN2NhNDZhZTMyNjAyYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5a2b356ddbd54c49ae1c5f79d7b15b5f",
+      "statement": "`ImplementSpecTests` pins exactly four workspace behaviors — an existing worktree is reused and an uncommitted marker file survives, a worktree removed with `git worktree remove --force` is recreated at the same path, a dirty local `main` makes preparation throw, and a mismatched owner makes preparation throw — which exercises two of the three `FindMirrorProblemAsync` reasons; the \"commits ahead of origin/main\" and \"not on main\" branches have no test.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L153-L173",
+          "version": "repo-lines-v1:sha256:81b2daf69aaa09e46e0e9a8016e58c6eb4e7737508cfe5c23914a8c00198e6ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZTZhMGQ5YjBmZjlkMDgwZThmODM5MmM4NzQ2ZThjNGE5NWM2NWJiN2NjNTVhNmNhYWMzMjY0MTU1ZTEwYTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkOGM4ZDUyMmQzOWZiZmUyYjViNTliNTYzMzY5YzllYzliOTNjM2U5MGQzODRjZDhiNDE3MjE1Mjg4ODc5YjMifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L7-L65",
+          "version": "repo-lines-v1:sha256:dcf1bda3471d8b06a98367c87966f09afd434f30378f12a087bba5c78ca844e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2NGY5MTY3NmZiMTU1NTMxNTM1OWRhOGQ4NGRkM2Y0ZTVlMThiNTRlOTlkOTI4ZmQxNmRiYjBjNDNkNDcxN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8e5f0022a6834e7d85873529f48a21c2",
+      "statement": "`JobQueueTests` builds the queue directly over an empty `ServiceCollection().BuildServiceProvider()` and a `NullLogger`, with a local `TestJob` that signals its completion `TaskCompletionSource` in a `finally`; the three tests pin the effective concurrency cap of ten (twelve gated jobs, exactly ten started before release), that a throwing job neither escapes the handler nor stops the loop, and that a key is refused while its job runs and accepted again after completion.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L14-L79",
+          "version": "repo-lines-v1:sha256:795459051d4c73aa1f62a15a6ffb63b10f3bb7442bcc2bf248c46c99a1983015:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1NTY5OWEyZjkyZGZlODc5ZjdlODc1NDU4YTNlMzVmZjk5OTY2OTk4ZTRmYTU1OGE1OTk1MzFlNzdkM2Q0MzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZWQ3YmE2Njc1MDI5ZmYwODFjNTNhYjViYzRhZTg0NDdmMzk4NjYzOGRhOTVmOWRjNDNkYTQyMjQ3NGU2NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzM2MwZTI4ODQxZjc2MjQ3NWI4MjI5NTFkNGI2M2YzNTg3MzBjYmY4YWJjNjljZDRkODBkZmYwZjY3NDQ0YmEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L9-L111",
+          "version": "repo-lines-v1:sha256:a9d98e2eea48ab8812f32b21d2e93fe863fb4363d0d08bf6ec19571bdc679e9b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2N2MwYTBiMmNmNTZjNmZhZWMyNDY4MTM0YzM5NjBiODQ0NWE5MDI5NTQxMWEyYzZmMGVkYjBlNzRhOWM5ZWE5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmMDVmMDRlYzNiMjljNDg5M2IxYmUyMDk0ZjU2NDRmOTJlY2FkN2EzZTJhZTQwYWMxYjU5YWUwZGMzMzgyZDM5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_004907a5a2ce4a5d847e7beaaf055275",
+      "statement": "The `JobQueue` shutdown and cancellation paths have no test: nothing asserts `TryAdd` returns false after `StopAsync`, that buffered jobs are abandoned rather than run, or that either `OperationCanceledException` filter suppresses a cancelled job without logging it as a failure.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L35-L79",
+          "version": "repo-lines-v1:sha256:c480ecc8edfca579c430edf5997575a6f03598fd5a08d2e923cdf99a740f0249:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjOGI3YjEyN2M4ODRhMjJiNzk5ZmJjM2Q0M2ZhMzNjNDAxZjNiNmI5NjFiMDE1YTY0NGE1OGQ4ZTg4YmFmMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4MGVhYTY2ZTVlMzFjNjE1ODAyN2Q3NjQwYzdkYTRhMjNjNDhiNDM1NGQ1MWM1ZDk1YzExMDdkNDBhYTU2Y2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzM2MwZTI4ODQxZjc2MjQ3NWI4MjI5NTFkNGI2M2YzNTg3MzBjYmY4YWJjNjljZDRkODBkZmYwZjY3NDQ0YmEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L63-L90",
+          "version": "repo-lines-v1:sha256:eb63edd09b4ac41a41900e8037c8289557a833ddbc5926b4da6bf7e739064e04:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwZWE3NGJmNDU0OTJiNTUwMTZhOGQxOTI2MTBhMDI2NjkyMWE0MjY3M2RhMzQ5ZGQ5NDM5YmMwYTM5YzI3N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ZmJmYzA4ZWQwZjFkNjkyNDE3ODViY2E4YzI2ZjNkNTZiMDlmYzhhNzY0ZTM5MGI0MGEzZTM4NDlmMmM2OTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_631a431305f54e9295e559c170150571",
+      "statement": "`RepositoryIdentityTests` pins remote parsing as two theories: the four supported shapes (`https://…` with and without `.git`, scp-like `git@…:owner/repo.git`, `ssh://…`) all yield `owner`/`repo`, and the empty string, a non-remote string, and an owner-only URL all return null.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/RepositoryIdentity.cs#L3-L44",
+          "version": "repo-lines-v1:sha256:9eeb1e45059bc4d9ff259baf5ca702827264463cc7d591b05bc638c17aeb7afe:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjY2ExOTVkM2FhNTkzMmVkZTUwZTRiZDc1ODczMzU4NjdlNzU0NjQ0YTY0NTEyZTA3YjY2YjE5ZTdhNTUxMzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlmODhkY2E5NTg0NmQ0ZGM0OTZkODc0YmExZDEzYzgzNzNhODZlZjc3YjU2ZDk2ZDdhMTcxNjVkZmE1NzJkY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Libs/RepositoryIdentityTests.cs#L7-L28",
+          "version": "repo-lines-v1:sha256:2250b172523f2c3ed54ddabc5b916366b67ab9faeb2ea4db4815ebc9e37cbb2f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmMjg3MmRiYTcxNzM1ODE0ODhkYjdhMGYwZTcwZmNiMWE3YTZkYzk1YzdhYjdhOGI5MDAyMjQ4ZGMzNTA5MjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1NzM2NmY2NWNhNGM4NDA0ZWI4MGU3ZDBmZTkyMjFiNzA0N2ZmNTAwZjgwNTI5YjgwOGExMjhhMDFkYTM5MmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_226380dafc3f430cac9c09e08dbbafec",
+      "statement": "`SpecTemplateValidatorTests` duplicates the seven required section names as its own array rather than reading the production list, so editing `SpecTemplateValidator.RequiredSections` breaks a test; the file also pins that lowercase headings, CRLF line endings, `###` subheadings and unknown sections are tolerated, that `Further Notes` is optional, and that a null body reports all seven. It therefore pins the validator against itself, not against `skills/to-spec/SKILL.md`, which nothing reads.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L5-L41",
+          "version": "repo-lines-v1:sha256:160dfcf630bc991b8f21e93c31614ccdfd696a4c1ebae1fec8cdf3985bf818f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlYjc2YTc1MDFiMTg5MDkyZGIwZGUyNTBiZDZjZWYzNTUxY2VlZWJkYmMyYzAxNzcyMDlkODEyZDk0NzkzMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzZTQ0MTAxYzU1YmJhYTkwODRjOWViZjJiOTE4MDk5OTM1NWE1NjY5NWU4NzA0YjU5YmE5NmY2ODYxMGQ0ODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4NGZiYjIwOGUwOTcyMDY0NDhlZDczNmUwYmQ3NWQ2ZDE0MTAxMjEzYTk3NzFmNDk2NjJlNDI3YTJhOWNlZDMifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L7-L118",
+          "version": "repo-lines-v1:sha256:a522e16ab9af19bcbb9a97b57ea73b0c743c224180fbb244109aa01955c700cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjN2UyNDVkMTlkZjkzYTJlZTJlMTMyZGUyYjQ1NTE5MmM5NzcyYjc5ZDRhYmRiMmEwZjFlNGVmY2ZjYmQxNjRiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3M2ZiYWZkNDY0ODUwNjg0MTNkYzNhMDllNDJmYjdkNmI4MzAzMTc0OTJhZjM0ZDczMmFiYmVhZDc2ZWM1MmUwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjNjc4Mjc0MDMxZGM2ODk1MDgwNzAyMDgyNTMzZDQ5NWZlM2JhMGIxOWQ0ZmZiZTMyYzg0Yjc5YmE3OTAwNDgyIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_40ee3f3c21264e22b98bb4c760c66428",
+      "statement": "`ProviderResolverTests` pins the three fail-fast conditions of `ProviderResolver` by message text (unconfigured selected provider, duplicate provider names, empty provider list), asserts `CreateChatClient()` returns non-null without any network access, and proves that a whitespace-only `ApiKey` is rejected by the generated `ValidateSebastianConfig` rather than by the resolver's constructor.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L25-L59",
+          "version": "repo-lines-v1:sha256:b8257cb5fc69ea8f498615012839da425ba56cbd1e1a8059740a26de796d030c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3NmNkYWJhZmNiODQwMGVkODFhY2YyMDk3ZjI0YzEwZTQ1MWZkMWZhYjEwYjUyZmYwMTI0ZTQ4MmQ4ODNkMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2ZTU5MzNjMzE2ZWUyMDQzMWI5ZTBmMjFjYWYzODJmYmUxYzM0MzAwYjZjY2Q4MTJlMDFjYmM0OTZhMDU5MGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L9-L77",
+          "version": "repo-lines-v1:sha256:b5e9b6fe9751a2f4c5396d1d9488c72e1b26ba5029391b6793a46a14b9731712:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1ZmRjMzFmZWRlMjBiNDE4ZmE4NDBiOWE2ZDFhZjEzODk1ZGY0NGNjMjBmMDc2ZDdiMjM0N2VhNDcyMzhjZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhMDU4MDRmYmQ4Njg5NzU4YjA1ZDM1MmQ2YzI3MzkzYjE4N2UyNmJiODliNTNjMDQ5YTA0N2MyNWUwMTc5ZjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fffa6478a45d4ac08e52f962dfc4a170",
+      "statement": "Nothing in the suite exercises intake or GitHub writes: no test references `GitHubWebhookProcessor`, `GitHubService`, `PostCommentAsync`, or `CloseIssueAsync`, and there is no `WebApplicationFactory`, so the action list, label checks, spec-before-approval ordering, comment text, `not_planned` close, enqueue path, PEM import, and token adapter all rest on review alone. Making the processor testable requires first introducing a seam, because it takes concrete `GitHubService`, `Git` and `JobQueue` instances and constructs `ImplementSpec` inline.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L19-L36",
+          "version": "repo-lines-v1:sha256:e38a35e1f2c411aee52d2c741b8a04cbcb2fe042a6c2626d21c9b48cb81222db:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1N2MxZWViZTFjNjczYzVkOWFlNGJlNjE4ZDBmNTMzNWY2Y2VkOWZmMTc0YzkwNzc1ZmQwODEyYWVhMmJjNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L17-L38",
+          "version": "repo-lines-v1:sha256:145ab1c7fd73550e82986b165d910da840b7023b1b580dcead410bfbabbb267a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2NjU3YTQyNjk5YWE1MzBjY2Q1NWZhYzE1MzI1NTJmZWYwODAwZWNiY2QyYzA1YmExMTBiMzQ1OGZhMWU5ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5M2RhN2Q5NzU4ZWQ1ZmMyOTdkNTIwNmEyMjZhMGUxNzk4MWEwNzQ5ZGM1YWIyNjE4Y2U2MDZjZjA1Y2ZlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYzAyYzVmMjc5YjM1ODlhNzhkMDM4ZWIzMDRjNmFkMmM4MWJlNmI5NWVkZWM3MjNiNWY5MjgxYmY2OTdhNjYifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L14-L18",
+          "version": "repo-lines-v1:sha256:32beb1f13edbb310eef430a4ad12eecbf5d5fac92c974d925fd8eb3a1f3b308f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjMwMGQ1NTg5MTQ2NGVhODU1YjVmMDkyYjNmZDQ4ZWFlMDYyNDk5YjZhMzQ2ZjAyOGQ2MDA4NTY2NDJlNDJkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTY0ZDJlMWEyZTA2YjRhOGI2MzIxNzZhYjgzNGVlMWE2N2YyNDRmZmUwYzhkYzZiMzBkMGY3Zjk4NzA0ZDg1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjFjY2VmNDliYjQ3Nzg3YmEzNzc4YWUzYzE2OTI2MzUwYzQwYzQzMGY5ZTMwNjg5MjlkOTI5ZjZhYzc0Mzc1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmEyMTA5N2UwOTdiNzFjMzAyYzk2YWRhZmE4YjQzMzRlMmQwMjcwNGFkYmYxMjU1NzVkYmYzMjViZmU2MmMxNyJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L84-L101",
+          "version": "repo-lines-v1:sha256:fdd2d4f2a8483fade318c2d81bd6a1e7c75efbaa56a6bd9229386427af16fbde:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_50bd55aeafd14d018205cfa1392c79e8",
+      "statement": "No test starts an agent: `RunAsync`'s provider resolution, session creation, model turn, `git status` read, and completion log are unexercised, and no test creates a `HarnessAgent`. The available but unused seam is `AgentRole.CreateAgent(IChatClient)`, which would accept a fake client; `AgentRoleTests` instead carries the MAAI001/MEAI001 pragmas because it touches the harness option types directly and disposes a constructed `ImplementationAgent` with `await using`.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L35-L60",
+          "version": "repo-lines-v1:sha256:85ec316adc8c49c8692c7f5023466425d4e2adf1d79a046ff871655f06110832:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3ZGVmOWJiNmU0M2NlYjc1Y2M4MzM0NmI3ZTE3ZmQzNWIwNGI1ZTFjMzIxODQ2OTI2MjRkMTYyY2Q5NzhiZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3YzQ2MDgxYmE5MmI5NWVmM2UxZGUxMDg2MTdhYjA3MDJkOTc2Yjc4NmIzMTVkODllZjBiYjcwYzY3NTkzZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyZDQxNjZmMmFiZDQyMzU3MDI5NWM0OTNmYWIyYzhkYjBlNzFhZjg0NTIxNGNlN2MyYmVkMjNhYTQxZDFjZWQifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L11-L12",
+          "version": "repo-lines-v1:sha256:a64beec460bfb14136a01321dcf15764978688433c3af61b30369f53a2db495a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRiMjJlMzg0MDNmNTQ4MWM2NjQwZDk3ZmU2ZDc3NWMyY2ZhNzQ0OGJjOTZjYmU4NGQ1NmFkZDJlNmEzNjQyYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTlmNzE2YjA4MGYwNjE0NWFmNDlhOGUyYWY0OWJiYTIzZWY3MTlmZWNhOTRiZjU5MGU3ZWZmMmQ5NmFhYzE2MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDFlYTI0YzE4ZGI2ODk1NGZiNjA5NDc3MjEzMDViNTc4N2FmMTAwZTdhNTg4Y2IwY2YxZTAzMjI0ZmFmM2VmZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTdhMzhjYmRjYjIzYWFiYzM0YmJjYjk0MTQ2NzI0OGZkYzE0MmJiODQ3YjM1YjZkNjk0ZjgwNDM2ZmNmNDYxYiJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L1-L35",
+          "version": "repo-lines-v1:sha256:c2e2bd3c9b8617f5a735380e738bd3bf56ca810552ff60dfa67ce599e85184fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhNmRkZjA0NGVmYmY2ZDJiMmEwNDYwNTgyMWY4NDg3MmI4NDJlNzdiNGFhZDMxZWFmMTkxY2EwNmI5OGU1MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiZGE2ZmMxMmNjOTFkYjRiZWEzMWJkMTI1OTI3Mzg2NWQzZWUyODA5OGQ0MDk2Yzc3N2Q4NDZjM2M3MmMyZGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a1f6d55f7c3d43a19185489cba022280",
+      "statement": "`Git.SyncMainAsync` has no test of its own: the `ImplementSpecTests` calls to `StartAsync` incidentally cover only the happy startup path against a file remote, so the ref filter, the behind-count short-circuit, the swallow-on-failure behavior, and the ten-second bound are unverified.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L104-L151",
+          "version": "repo-lines-v1:sha256:9ec279195720fae6d2da9d58223b8b75341d212bc7128ed4b36ba72bcee0ae4e:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjg0NzU3MTcyNmQ4YjU1MmJlM2NkODM2ZGRiMjcwZGM5NGRjMGMxY2E4NDQ4ZDliYzU5YmY5OTZkNWQ5YzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2YTRlYTliNzU5NjQ1ZjY5MThhZjIzMzMyZDY4ZGFiODJmZWQyYzU5NDg4NGU4ZmVlYTBmNTQ5NmVmMTFiMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5MTEyYmIwNTNiMzA4NGExNjFkMzJiYzg1ODE3NzRjYWExNmZkNTQwZDNlZDgzZGVhNzdkYzcyNjcwM2NlMTEifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L36",
+          "version": "repo-lines-v1:sha256:8e54e79299ad569dfe53557e093a405a6d5eeba2d1ed1679dd9caf9dfc8bbbea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L12-L12",
+          "version": "repo-lines-v1:sha256:d6cb5e5c3100df4520e6217c95154ecd3c8bec9b130043c8df03155439ed4f9f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZjYjVlNWMzMTAwZGY0NTIwZTYyMTdjOTUxNTRlY2QzYzhiZWM5YjEzMDA0M2M4ZGYwMzE1NTQzOWVkNGY5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZjYjVlNWMzMTAwZGY0NTIwZTYyMTdjOTUxNTRlY2QzYzhiZWM5YjEzMDA0M2M4ZGYwMzE1NTQzOWVkNGY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzEzNjA0ZTNlNGZjYTY2YzI2ZTFhNDk4OTc4OTYwODdiM2I0YTYwMzg4YmE1OWZkN2IyMzk2MDNhZWNmYWE3OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWRkZTBhOTdmMzA0NzhkYzkwMzE4NDY1YTVjMjIzYTEzYTkzYjAzOTEzZjUzNmViNDg2NWM5ZjcyYjYzYTAxZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d95301c9baf94198a3bd3610d9705ef4",
+      "statement": "`TestRepository` exposes more surface than the suite uses: `LocalHead`, `RemoteHead`, `RemoteTrackingHead`, `CloneAgain`, `CommitFile`, and `HeadAt` are referenced by no test (only the static `RunGit` is used from outside the fixture), so the scaffolding a mirror-sync test would need already exists but is currently dead weight.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L34-L34",
+          "version": "repo-lines-v1:sha256:f18f2a9b13189de936ed66c675b960da86dc37c871d8eaa5619c42f23aeeafab:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjE4ZjJhOWIxMzE4OWRlOTM2ZWQ2NmM2NzViOTYwZGE4NmRjMzdjODcxZDhlYWE1NjE5YzQyZjIzYWVlYWZhYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjE4ZjJhOWIxMzE4OWRlOTM2ZWQ2NmM2NzViOTYwZGE4NmRjMzdjODcxZDhlYWE1NjE5YzQyZjIzYWVlYWZhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWRkZTBhOTdmMzA0NzhkYzkwMzE4NDY1YTVjMjIzYTEzYTkzYjAzOTEzZjUzNmViNDg2NWM5ZjcyYjYzYTAxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDA3ZDBhYTQyYzIzMjUyNzZjMDQxMGU0NjE5MTlkOTFmODBiYTFkZDRlY2U3ZWFlN2MxOGQ1NWQ5OGU1NTcwYyJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L43-L64",
+          "version": "repo-lines-v1:sha256:21132eba83f15f9e423c7a5470672f06a7a17ab2c2fbee9b66fb32cc66d82101:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkNDliOTk0MTM3MzFmOGNiYjY2YjkyNDM3NzlmZjI2NmMxODUyM2RjMmFiZWFjNmIxZTQ3MGM4N2YwZDUyY2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4MTM3MmZhZmFhMjNhOTcwZDYxMDIzNjg0MWVjYWQ0ZTRkNDRjMTZjMWIzNGM1ZTVlODc0MjAyN2ZlNjIxY2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhODQ4YmMzM2Q5YzNmMDhiZmYwMWI0ZDY3ODViZmMxNWFmOTJmMWRlNzI3Y2JmZDZmZmQ5NTdjZTU4OTEyODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlYjJhNjg0MTRhMTZkOTUxNWJmMmU5MWZhNTdiZTlkZGU4Y2Y5ZjhiNTg5YTc2ZGVmNGMwYjU3MmZhM2Y3NzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4b74c40f15fd49898cc76512e01bc568",
+      "statement": "There is no CI pipeline for the test suite. The repository's only workflow, `.github/workflows/openwiki-update.yml`, installs OpenWiki, runs `openwiki code --update`, deletes transient run state, and opens a documentation pull request; it never builds, tests, or publishes Sebastian, so a failed run signals a documentation failure rather than a code failure.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/openwiki-update.yml#L1-L36",
+          "version": "repo-lines-v1:sha256:f837b8d106b259811d3f57c2c549871f94c8a3ef24805dd792c8b9ae70ae3ecc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0MWM2MGQ4MzU5N2M3NmNjYTY5NmFhYzc0ZGZiN2FjNWRjMzM2MmZlNjUxZjhjYWI1YTMwNDk5NjMwMTdkNDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmN2U0NjgzNzQ4MTRlYmU4MWZhYzkwZTA2NjVjYTkwZDM4NzE5YjUxNGZjMmYxZWExMzljNjI5MGYwNTdjODQifQ"
+        },
+        {
+          "resource": "repo://.github/workflows/openwiki-update.yml#L51-L89",
+          "version": "repo-lines-v1:sha256:8a16c25992e382f80a5b31b3d85e8d23224696724c52368fb8e668084ee2430c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3OWM4ODBmNjJkNDIyNTM4YmNhODRjYjU1ZWNlOGZlMTBlOTY1OGIwNjExMTVjM2ZhYmNkYzdiM2JlY2Y0NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NzE4ZjA2N2I1ZTVjMWYwOTkxYTZlNzQ3MjZmZTJhMjNkMjY0MzQ1ZTA4ZTRlYWQwNGZhZjczYzI3ZWQ0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxOTEzNzMyNTgyYzNlNjAzNTkwNzg2Yzg2ODM2OTUxZmYzNWU5YjJkMGY4ZDMxMDY3ZDRmNGM4NzQzZGIyYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

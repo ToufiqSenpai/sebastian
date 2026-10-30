@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:7e88c073d6b680b76f803e78b28526bc7bf313b9b8d535b1ef45100e7e7bfcfd",
+  "claims": [
+    {
+      "id": "claim_6e1c31fe563341868069c19c2c77be22",
+      "statement": "Program.cs is the sole composition root: all options binding, singleton and hosted-service registrations, the eager construction calls, and both endpoint mappings live there, with no extension methods, Startup class, or second registration site elsewhere in the repository.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L11-L49",
+          "version": "repo-lines-v1:sha256:55c780b60958294912167d4df7ef03f84d978eb4acaf0f5d177a37bcbb41a099:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dc42685ff04341c09eb9127a4013b605",
+      "statement": "Configuration binding is a three-part declaration: AddOptions<SebastianConfig>().Bind(builder.Configuration).ValidateOnStart(), plus ValidateSebastianConfig registered as a singleton IValidateOptions<SebastianConfig>, so an invalid configuration terminates startup instead of surfacing on the first request.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L13-L17",
+          "version": "repo-lines-v1:sha256:9e5f8f1d827151e65b50737011dd7e6d186f09579173640ef6dcd7514eb20030:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjJmOTRlMzNkY2NhNzA5NGY2NjMyZDljMzQ3YzE0ZTBmMjI3MjE0YjcwMzU5ZDZhNjQ3NzJiYTkxNzllNzVlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzJjOWEyNDA2OGUzY2JiMzU4NzJiYTYxZGI3ZGJhNDk1ZjVhYjk5MzMyZDdlYzhmNWQzMzk0M2U2NzQxNTFhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmYzMGQxZGVhOGE4ZjBiMzc3OTM0NTMwNDM1ZDY2NzYwYzMzOWJiY2JiMjk1ZGI5MGQzN2RkMTFlODljNmM1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJiNGUyYzM5MjE4NjQzYjE4MzNlZWVlZGU2MWY4ZjNjODZjZmJmMzVlZDIyN2NjNmM1MWZmZWZlZmE1Y2I4ZCJ9"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L69-L70",
+          "version": "repo-lines-v1:sha256:2770c2438d029bd8e21609dfb185e3001cff608e1d3d75a7f552d0172b033f88:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJjZTdmMjhhOTI5Nzk2NzAzNWRkOTc2YzI1YzM1NzhkMjE3MjhhMTJhODNjYTk3MDcwNTgxZjNjOGM3OTRlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDkyMjIwMWJlZWU4NmU1NGU0ZDA3MTEyNTFjZTlmOTAzZjllM2I1YzJjYmQwZDZjMDY5NjNlZjhjOGExNTFiMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2RlMzdmMDQ0Y2M1YmYxZjFmN2RhZTIwZDUzYjFhMGRlZmI2MDYxZGMzMjlkYmZkOTMwZGJmMDk0ZTQ5Zjg3YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c28074b5582e4830a694b2af59014e03",
+      "statement": "ValidateSebastianConfig is a source-generated options validator: the empty partial class carries [OptionsValidator], so validation logic is emitted at compile time from the DataAnnotations attributes on the config tree, and nested validation is made explicit with [ValidateObjectMembers] on GitHub/Agent/Agent.General and [ValidateEnumeratedItems] on Agent.Providers.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L9-L70",
+          "version": "repo-lines-v1:sha256:b7701b83211fd80acd84c38e668c5fe9c523e31baaa01e0e633a7e9ae7b5f6ab:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4M2RiZmRlZDgxMzhmZWMwZmIwMjQzMDUyMjE3YzQwMzViZDJjZDk3ZTM0YTVjODZmYzhkMTkxMmNjODc4OGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MjIyMDFiZWVlODZlNTRlNGQwNzExMjUxY2U5ZjkwM2Y5ZTNiNWMyY2JkMGQ2YzA2OTYzZWY4YzhhMTUxYjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMTk2NzZiMDViNGI5MGM5MjAzZmViMmUzM2FlM2NlZjdmYjIzY2U4MTI0NDhlNTU5NGNjM2Y3YjUzM2RiZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3eb7bdace2ef40929081e61ad76c5491",
+      "statement": "The SebastianConfig property names are the configuration key paths: GitHub:WebhookSecret, GitHub:AppId, GitHub:PrivateKeyPath, GitHub:InstallationId, Agent:Name, Agent:General:Provider, Agent:General:Model, and Agent:Providers:<index>:{Name,Endpoint,ApiKey}; PrivateKeyPath is a filesystem path, not inline key material, and Agent:Providers binds as an indexed list.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L20-L67",
+          "version": "repo-lines-v1:sha256:ae5941155f66a055c5164ec256e665649c3d53138b226a25b04443e9b6309702:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYjQ4NWM5MDQ4YTQyZDI2ZTRiZTMwZDE0NjNjZTgyODhlYzE3ODYzMGMzMGZjNWE4NmQzYTVkYTdiOWE3NzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzZmE2OTA2NDQ0M2JjNGQ3MTI4OWQxYjJlYWQwODRkMjY4ZWE1ZjNkMWNlNmU3ZjAxNWU0M2Y4YmI3NzNjNWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5M2EwMGE3NzA5ZmY3OWFiM2QzYjY1ZjNmNjFjOTk4MGJjYWE5N2E0MzUyMTA2NDE3Y2E0NTA5Y2E4OGQ2ZjIifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L25-L34",
+          "version": "repo-lines-v1:sha256:22fefb1411f4489b5c1d3687619678abd843b3d55e673b16097a7dbf37b8252b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5NTExODI4YWI3MzQyODI0MTJmZjZjNjJlMTU2MDYyZjhiNzM3MTY3ZjZjZjQ2NjQ0YzFlODU4MWM0OGE5NjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzMmQwZDJiOGNhNGMyZTViZDhmZGVlZWRkMGNiZDRiNmI4MTk2NjNhNDQ2NjdlNTJkZjIxOGU2YTEwNThhNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzZWJjMmY3NmI4NmVlMTA0Yzg2MDYyZTQ1YTE0ZGRlYWJiZTE2NDY0NDhhMmE0YTg1ODg3M2NkZTk5YzMyODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzMGFkNWZiZTQ2ZmM1M2U0Y2M1ZWJjYjVjYjI3M2Q2NDViNzllMWViZjhiZWM0Y2EwN2M5OWM2NGEzMDUwYjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4deac5d4f6104d77b8c1d10ccb09865d",
+      "statement": "Sebastian is published AOT and enables EnableConfigurationBindingGenerator because reflection binding is not AOT-safe, which forces the config classes to use = null!; initializers on non-required properties (the in-file note cites CS9035); converting them to required properties or relying on reflection-based binding breaks the build.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L10-L15",
+          "version": "repo-lines-v1:sha256:d38ea80df098ce59be80ae2b6f7bbc41d8341e0449e698d3052889e1c00bd566:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODExMTdkYmM4ZTZlMzQzNDlkMzE3MDQwYmNjMDA0YTM4YTE3N2JmOTIwMTg4NjA1MzkwMGUzNjBmZjBmMGFjZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWNkNGQwN2VlMDdkZGUzOGIzMDkwNjc1YTQyODQwNjZhNGY0ZjA1N2JkZjkzYmJkYTdkMGQ0YjFlZmU2YTEzMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWM2M2E3NWZlMDNkOTdhNzg1N2ZmMDUxYTExZjc1ZTYyMTc2MWZlN2NhMjVlZjMyNTNmZTNiMmE1NDU4Yjc3MiJ9"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L11-L18",
+          "version": "repo-lines-v1:sha256:f3a35dcf1ee94b663f84eee20399c548014b7621fefce2aec660eaf664cf14f6:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmU0MzlkZmU3Nzg2MzIwYzQ2MDdmMjE4NTI5ODQxNmE0NGNhM2E1ODM0MWE2OGVkZDkyZWYyMzMzOWM4ZTRjMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzU5MzI1NzQzNjkzZjNhZDFhMTBlNWJhMmIwOWE4ODBjZjk0YzA4NmU0YjRmNjZlMDA2ZDFlYzYxMjJmZjk5NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzA1ODk3Yjk5ZmVjM2I1ZDgxZDAwMjdmMjI5ZGQyMmNjYThlYWNhODY0NTBlMjg4YTNjM2FhNGQ0ZWEwNTRkMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_30e4243eb61c4edfbd207900bb621212",
+      "statement": "Configuration is a startup-time snapshot: every consumer injects IOptions<SebastianConfig> and reads .Value, nothing in the repository uses IOptionsMonitor or IOptionsSnapshot, and Program.cs reads the value once to pass config.GitHub.WebhookSecret into MapGitHubWebhooks, so changing any setting including the webhook secret requires a process restart.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L40-L47",
+          "version": "repo-lines-v1:sha256:ae703da5b213c015d96da29c802eb50f80474ecdef1652da6c79aec732759a36:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI2YmU0M2EwZWEyMWEyODA3YWZhMzI2MDM4MDQ0MGM1YzM0MTU5NTY5ZWMzMGRlYmZkYzlkM2QwOGIyZGE1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L23",
+          "version": "repo-lines-v1:sha256:effe169fbe18e561578f99c0594eb6c8a1233a5ce6e1012e41d897144b6e8c92:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmU1YmM2ZmU0MDdmODU5NDMxOGIxNjE0MDg5NTZhMTYyNmVjZTZkMTMyODZmNzllYTlmMTAwZGJhNmFkYmZiMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGFkMmQxNmQ0ODczNjViNTU0MTRiMWZiOTE0NWFkNmZmMTgwY2RhYmRiNzUxN2I5ZmFjMDI4M2E1ZWQzOTE2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmMxYmI5M2JjYWQxZjZmMmZlNzdmZmM0YmI3ZjdkOWFmMTNjMTAwYTY4YzdkYjUxNGE1YWUwNTYyOWQ3NTU1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGU3NmY5MTM1OWZmZGEwNDQ5NDkzMTc0ZWFhZDViZmJjOTI4NDc4NjkyYWY5MGQ2ZTliYTY4MmJiZWFlNjFlNyJ9"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L23-L25",
+          "version": "repo-lines-v1:sha256:f796118ee444c6643113d25ad69dffd1e21be5079df1065e819416ef15f723f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGViMjFiZTIyMDFkYzAwZTBkMjQ0NWExODg4N2Q5MWM2ZDlmNWFjZTFmN2E4Mzg2MDNmMWU3MjdlMWM3MjZhZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDk1MTE4MjhhYjczNDI4MjQxMmZmNmM2MmUxNTYwNjJmOGI3MzcxNjdmNmNmNDY2NDRjMWU4NTgxYzQ4YTk2OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDZmNjhjZWU4N2QwYzJmZGFhYjU2ZTZhOThkNzUzMmVjMTMxZDA5MjgwNzkzYzk3MWM0MWQwNDM0ZWQ2Y2ExZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDZkNmZjZTU1ZmI5ZjU1NjJlZmM4ODdlNzcxZGE1OGY5NDg3YjhmMjljYjJhM2M2YmZhNWJkMGM1MjkyYTVkZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_424f85d2e9b6438b9ca481b001d48fcf",
+      "statement": "No appsettings.json or launchSettings.json exists in the repository, so configuration must come from the default host sources (environment variables, user secrets in Development, or the command line); .gitignore protects the secret-bearing files — .env and .env.* with .env.example allowlisted, appsettings.Development.json, and *.pem/*.key/*.pfx/*.p12/*.snk/*.user — but no code or package loads a .env file, so values must actually be in the process environment.",
+      "evidence": [
+        {
+          "resource": "repo://.gitignore#L8-L17",
+          "version": "repo-lines-v1:sha256:b855c83f40cbc931695e755149541ce43d93e55889037a936130295ca938f790:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5YWE3M2NmNWJjMzM3N2E3ZDk3ZjJlOGQyYmI3NzMxOTU4MTVlZmUyMjVhZjdmMWJlNmY1YjkzMDZiYmUxNGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3N2I3ZDUxYjIzNmYzMjYzYTAwYWVlZWY2OTMxMmM5ZTU0M2ZiZGEyYTM1OWVmNGRhZjFkY2ZjMmQ1ZmU3NzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1OGVhMmVlNjFhNjRjMGIwMDM4MGQyYzFmYjFhMWY3YTFjYzc5NTZiOTBhOTczYWU1MjYwYjBmYzU0NzQyYTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmMzIwYzllODY2NTMyNGQ2YTc0Yzg4NTg1MTI5ODU0NGMxYzY5M2NkOGIyOGM3YTI2ZmZmMTc2Y2E3YmFjODQifQ"
+        },
+        {
+          "resource": "repo://Program.cs#L11-L15",
+          "version": "repo-lines-v1:sha256:33826fabecd12720ff4a0321df14eda0469407c5d4e1e23dbd16d9ecca7853b4:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzYyZjBkM2NlMzI1MmJhZGU4NzdkY2U1OWVlZjM1YTYyNmM2OTUxYTg4NWQ2YWE4NzdhZDRiYmIyMWJmZDczMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDVmYTY4ZTRkZThlN2JkMGRjNjJkZmMxYjdkMTFmOTQ0YTA1YmFlM2MzODVjODE1ZDkzNWJjMWM2ZGFjZmQ4YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTAyYmY4Yzg2Yzk1Y2I1NzNhMTdjODNjNDYxYjlkZjE1YTlmY2ExMWE5M2YyZjQ3YTA3ZmI0YmIwN2M1NjRhOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjlkMDc4YjcwOWZmOGE1NzQ4NTJjNjFiNDBhMjYxYTBhYWEyMDlhMjIwYzIzNWExMjlhNjhlYWE1MzAwMGUyZSJ9"
+        },
+        {
+          "resource": "repo://Sebastian.csproj#L17-L24",
+          "version": "repo-lines-v1:sha256:309199a8e78177b14c0602044318028e952ad54f20dd08ce3e29d118716244de:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NiZWJmYjQ2ZjEyOTkxYWU0ODhlZWRiMzQxNDAyOWFiMWY5ODA3Y2RjMDllZjA2ZjNkMTBhYzk2YjI4NmJlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkYzE1OWJiNTk3NDk4ZjUyMmU3OTM1YzgxMjE3YmVlMjc5NzI4NmUwM2Q2ZGVhZDZhZTFkNTI2MjVlN2U2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTY1NjZhNjlkZTllNmVkMzQ2YjlmOTIyZDdlODA1ZGNlNDU3NTNlYzY0Mjg2ZjMzZGYwZGE3NWE3OGM4NTA5NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzE1OWEyYmQzMDE3OGVhYzA0YjhmZGM2YTEwNjRhZDVlYzIxY2U3MWZlNTg3MGMxMjRlZTc5ZGNlY2Y4YWY4MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ad7c631f76324fc097efb27a3c0f9578",
+      "statement": "Git and JobQueue are each registered twice by design — as singletons and as hosted services resolved through a factory (AddHostedService(sp => sp.GetRequiredService<T>())) — so the instance the host starts is the same instance injected into the webhook processor; a separate AddHostedService<T>() or second singleton would leave the processor holding an uninitialized copy, surfacing as \"Git repository is not initialized\" or a channel nobody reads.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L22-L28",
+          "version": "repo-lines-v1:sha256:fee6b797141bf852590d80f4cd28e8c4a88741a28993832cdc533e698c3f3f89:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWYxYzBhMWYyMTViMWM3NDU1NDQyYjRiN2I1Yzk2YzM2MmZlM2RhYWExZjg0YzdkOThlNmM2OGNmYTVkNGE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNThkN2U3MWVmOTQyNDk5ZmFhNGZiMWFiNmU0NWYxNTI0ZmI2YmJmNWU2MDU2ZTJmMzc0YTRiM2VkMTIzNDY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzU5OGNkYTZkMjBkOWQ2NjAxZDY1NjViNDI1M2I4ZjFlMmFkMDg2NDI3NDZhYmYyZDNhMTc0ZmJiMjA5MzFmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjRkMzgzNzBjMjY0Nzg0ZGY2NmM2MjA4YjA5ZWNkMjU5NTA3ZmY4ZjQyMGVlMTY3Y2EzMjJlMDk3YmE0NTQ1MiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L68-L70",
+          "version": "repo-lines-v1:sha256:38d1305f165d0132911987267b31d2f36d915a695e8d19ec094a0c5f9f9616d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FlYTJiZmZkYTMyYTBkMWMxY2FjMDYxZDJiODY5MGJhY2IzOGEzMmQ1NzM1ZTVkNGJiMGNmYWMxOWU3MDkwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQxYWE1ZDlmNzdmNTY5NTY5OTkxMjg0YmFlZTY0MTU2MjU5YTNkZmZhOWQ5YjBhYzg2NmI2ZmY4MzIwYmE3MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDk2NzM4ODllNDZhNjMzNjI3ZmRmMzFlYzM5ZTI5MThkYTMwZDQ0Y2UzYTdiODMzYWJmN2UwNGRhYzIzNWQxZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0a1e9cd0499b42ac805e41e115c16402",
+      "statement": "WebhookEventProcessor is registered with a factory that calls the GitHubWebhookProcessor constructor directly rather than AddSingleton<WebhookEventProcessor, GitHubWebhookProcessor>(), because the internal implementation type would otherwise be passed through DI's reflection-based activation path; the factory also pins the four dependencies (logger, GitHubService, JobQueue, Git) at the registration site.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L30-L36",
+          "version": "repo-lines-v1:sha256:ed7e5dd05c485dbdb7297e1f0147bc989d244ace5f55d048fb5d939c8af2ebe3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTkyM2VmZGE3NTk5YzBlZTQ5ZmI2OTJhZTE1NDJhN2FiODNmZmVkZDNkYTM2ZDllMzkzMDM1MWM5NWVlNTZjZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTU3YzFlZWJlMWM2NzNjNWQ5YWU0YmU2MThkMGY1MzM1ZjZjZWQ5ZmYxNzRjOTA3NzVmZDA4MTJhZWEyYmM2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTFjYmUyMzZiNjNiZjBjZjUxYjk2MzlmNGI5MTgzNWE3YjZjMTU3ODU4ZjkyYjYwZjk1MWE2ZWI1NjQxNDQxOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L14-L18",
+          "version": "repo-lines-v1:sha256:32beb1f13edbb310eef430a4ad12eecbf5d5fac92c974d925fd8eb3a1f3b308f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjMwMGQ1NTg5MTQ2NGVhODU1YjVmMDkyYjNmZDQ4ZWFlMDYyNDk5YjZhMzQ2ZjAyOGQ2MDA4NTY2NDJlNDJkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTY0ZDJlMWEyZTA2YjRhOGI2MzIxNzZhYjgzNGVlMWE2N2YyNDRmZmUwYzhkYzZiMzBkMGY3Zjk4NzA0ZDg1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjFjY2VmNDliYjQ3Nzg3YmEzNzc4YWUzYzE2OTI2MzUwYzQwYzQzMGY5ZTMwNjg5MjlkOTI5ZjZhYzc0Mzc1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmEyMTA5N2UwOTdiNzFjMzAyYzk2YWRhZmE4YjQzMzRlMmQwMjcwNGFkYmYxMjU1NzVkYmYzMjViZmU2MmMxNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0c385c95d84d4e8fa9de7484ce0cc86c",
+      "statement": "JobQueue creates an AsyncServiceScope per job and passes scope.ServiceProvider to IJob.RunAsync, but since Git, GitHubService, ProviderResolver, and JobQueue are all root singletons, the scope does not produce per-job collaborator instances — per-job mutable state must not be put in a singleton.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L19-L28",
+          "version": "repo-lines-v1:sha256:18f8a3f5f75a746282936aa86706d377e9e6f5ecbc9ec222267e48f4ea9be623:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4ZDdlNzFlZjk0MjQ5OWZhYTRmYjFhYjZlNDVmMTUyNGZiNmJiZjVlNjA1NmUyZjM3NGE0YjNlZDEyMzQ2OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0ZDM4MzcwYzI2NDc4NGRmNjZjNjIwOGIwOWVjZDI1OTUwN2ZmOGY0MjBlZTE2N2NhMzIyZTA5N2JhNDU0NTIifQ"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L28-L36",
+          "version": "repo-lines-v1:sha256:48e54d5c38dc112dbf2c5bf20845e3330966fc8e0a606bc5a624bf88cf72f2a7:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjg3OTIzNzg0NTZlMDI4NzhhYTAyM2JmMzQyNTNjOTIzMzJkN2RlMmNiZTM2ZTViY2IwNjUxOGE3NzA1NWM2MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdmM2VlMjc5NWVkNWVlYjUwOTEwZGRlYjhhZGZkNjc3ZGNiZTQwMjFmMDE4MTNiZDk0YjRmYTI4N2E5NjdiMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGI2NzRkZThkYWZlM2EwOTZlNDk1ZmQ1NzA1MDdmYWQ0ODRlNGNlYTFjY2UzYjUzYjZiMTU0NzlmODM3ZTRjYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzNkZTZhOTg2NTdlMjE2ZmU3NDZhMDEwZGYzYzEzNjZhYThlYWU1NDc3YzMzMjIxYzM2N2M4MDMxMzgyZTdlMiJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L53-L61",
+          "version": "repo-lines-v1:sha256:0296a3afe80eed9634076b51c9fc26a623b8dd4be7ef3e5e484d002f409f9a42:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmNjZjNjZWUyYjRmMDZkYmE0YTUyNDNmZmY1ZTAyNjM0MDg5ZjViODhmZGIwYWZlMDhjZmVkODBkNGQ3ZDViYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTdhNWZmYTNlMDk1ZGYwNWI2YjMzMzM4NzFhYmExYzFiM2UyNWFiM2RiZjFkNDkyZjE1NGMyY2MyYjEyMmY1NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzg4ZTdjZTdiNWEwNTI5YWQ5OWY2N2VkMTc1OTNlMDM1YWJiMWUwNDAwYWZhZWI3YzFhNGI3M2I5OTY0YWM1OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGVmNWI2ODMyYjFmMWQxNTEwYTdiZGEzODU5ZDg1ZjJlYzBmMzVhZWRkNWNhMzg5ZGMwOGM5OTRiOTdiOTBjMiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e2343892eb504337a21b7030db4f8741",
+      "statement": "Program.cs resolves GitHubService and ProviderResolver immediately after Build() — before the app runs — solely so missing credentials fail at startup rather than on the first job; construction is the validation because both types do their checking in their constructors.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L42-L44",
+          "version": "repo-lines-v1:sha256:c929e30b2209c342f3a1782e8af22f55dd8f0bbbdd57b6997d044e750f1f5eee:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE0NjAxMTMzZmMzN2RiOTQ1MGZmZjU1YjZmODJkYzQ0MzcxZDkwZjY4MzdkYWZjYTc1ODVlZDkwNDBkNWMyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGQ0NGViZTFkYzE3Y2I5ZDgyMTgzZTU5ZWRiZTI1MGFhNWE4MmFkNDdkM2NiOTRhZmJmYTMyYmIxMDZhNjJhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L50",
+          "version": "repo-lines-v1:sha256:bb1476050eb1307edd00cd5c314f809db6a6f3937fc490c01caed6601f93a81e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWJjNmZlNDA3Zjg1OTQzMThiMTYxNDA4OTU2YTE2MjZlY2U2ZDEzMjg2Zjc5ZWE5ZjEwMGRiYTZhZGJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWJiOTNiY2FkMWY2ZjJmZTc3ZmZjNGJiN2Y3ZDlhZjEzYzEwMGE2OGM3ZGI1MTRhNWFlMDU2MjlkNzU1NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3MDMzNWE4ZDNiNGRhMTAyOGI5ODc0ZDNjODgyNDc2MWQxZGFhZTBiYjYwZDFiNmQ0MDc1N2RmMzc4NjQ5NTYifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L23-L38",
+          "version": "repo-lines-v1:sha256:918ac9ffdfb965cdb6c2cfc95cabe480f1e34a819d167361d3b1c3370247b38e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjIxYmUyMjAxZGMwMGUwZDI0NDVhMTg4ODdkOTFjNmQ5ZjVhY2UxZjdhODM4NjAzZjFlNzI3ZTFjNzI2YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZjY4Y2VlODdkMGMyZmRhYWI1NmU2YTk4ZDc1MzJlYzEzMWQwOTI4MDc5M2M5NzFjNDFkMDQzNGVkNmNhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYzAyYzVmMjc5YjM1ODlhNzhkMDM4ZWIzMDRjNmFkMmM4MWJlNmI5NWVkZWM3MjNiNWY5MjgxYmY2OTdhNjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_16d01659679c47ad866a44d45a3bfbf1",
+      "statement": "ProviderResolver throws InvalidOperationException from its constructor for an empty provider list (\"At least one agent provider must be configured.\"), a case-insensitively duplicated provider name (\"Agent provider '<name>' is configured more than once.\"), an Agent.General.Provider that matches no entry (\"Agent provider '<name>' is not configured.\"), and an Endpoint that is not an absolute URI (\"Agent provider '<name>' has an invalid endpoint.\").",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L25-L45",
+          "version": "repo-lines-v1:sha256:bc45fbcc084c53a20ae63da6881e496f8576eaecaab9a5ca2e680876742f1529:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3NmNkYWJhZmNiODQwMGVkODFhY2YyMDk3ZjI0YzEwZTQ1MWZkMWZhYjEwYjUyZmYwMTI0ZTQ4MmQ4ODNkMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2ZTU5MzNjMzE2ZWUyMDQzMWI5ZTBmMjFjYWYzODJmYmUxYzM0MzAwYjZjY2Q4MTJlMDFjYmM0OTZhMDU5MGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxMzJkOTcyODhkNDI5MGU5ZTE0NGEwMzBlNzU1YmQ5YWMyZWJhOGNjNjE2OWZhZWYwZDdkNWJmMmViM2M1NGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c7542747e9534cd6b19de7aa0424f40f",
+      "statement": "GitHubService's constructor reads the configured PEM path and imports it into an RSA instance before building the installation-token provider and Kiota request adapter, so an unreadable or malformed private key is a startup failure once the service is resolved eagerly.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L42-L44",
+          "version": "repo-lines-v1:sha256:c929e30b2209c342f3a1782e8af22f55dd8f0bbbdd57b6997d044e750f1f5eee:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE0NjAxMTMzZmMzN2RiOTQ1MGZmZjU1YjZmODJkYzQ0MzcxZDkwZjY4MzdkYWZjYTc1ODVlZDkwNDBkNWMyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGQ0NGViZTFkYzE3Y2I5ZDgyMTgzZTU5ZWRiZTI1MGFhNWE4MmFkNDdkM2NiOTRhZmJmYTMyYmIxMDZhNjJhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L23-L38",
+          "version": "repo-lines-v1:sha256:918ac9ffdfb965cdb6c2cfc95cabe480f1e34a819d167361d3b1c3370247b38e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjIxYmUyMjAxZGMwMGUwZDI0NDVhMTg4ODdkOTFjNmQ5ZjVhY2UxZjdhODM4NjAzZjFlNzI3ZTFjNzI2YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZjY4Y2VlODdkMGMyZmRhYWI1NmU2YTk4ZDc1MzJlYzEzMWQwOTI4MDc5M2M5NzFjNDFkMDQzNGVkNmNhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYzAyYzVmMjc5YjM1ODlhNzhkMDM4ZWIzMDRjNmFkMmM4MWJlNmI5NWVkZWM3MjNiNWY5MjgxYmY2OTdhNjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e0ee8358e1494af589220e065106756d",
+      "statement": "Git.StartAsync enforces the single-repository invariant before anything else: EnsureRepositoryAsync compares the trimmed full path of IHostEnvironment.ContentRootPath against `git rev-parse --show-toplevel` and throws the \"Sebastian must run from the repository root...\" InvalidOperationException on mismatch, then parses the origin remote URL and throws \"Could not parse the origin remote URL.\" when RepositoryIdentity.Parse returns null.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L54",
+          "version": "repo-lines-v1:sha256:04743b75adf9aacca2db0a3dab0e92cd4445e827ee28e392050812fdb3b2eaf8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        },
+        {
+          "resource": "repo://src/Libs/RepositoryIdentity.cs#L5-L43",
+          "version": "repo-lines-v1:sha256:82c350302cab30066216bc48c98414b01e5b884abc9ae08ee86b8d0e0c61666b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkNWYwNmFlNzU2YjAzMjdiNjFjNzdkYTU4ZmQ4Mjk2ZTAxN2I5MTA5NWM5MmUyNmZiZjZjZWJlNGM3NTE1NjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkYzZiYTM3ZTZkNzM0NWE0OTE1NDcxMGIxMGU3MDQxYzA2YjJkN2E2NmY2ZjcwNWJjNDQwMjUxNWY5YTdhMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7aa73e5b0ae64763a8ed10d1fb6f7782",
+      "statement": "Registration order is meaningful: Git is registered as a hosted service before JobQueue, so the repository/top-level guard runs before the queue starts consuming work, and the host does not route traffic until hosted services have started.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L22-L28",
+          "version": "repo-lines-v1:sha256:fee6b797141bf852590d80f4cd28e8c4a88741a28993832cdc533e698c3f3f89:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWYxYzBhMWYyMTViMWM3NDU1NDQyYjRiN2I1Yzk2YzM2MmZlM2RhYWExZjg0YzdkOThlNmM2OGNmYTVkNGE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNThkN2U3MWVmOTQyNDk5ZmFhNGZiMWFiNmU0NWYxNTI0ZmI2YmJmNWU2MDU2ZTJmMzc0YTRiM2VkMTIzNDY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzU5OGNkYTZkMjBkOWQ2NjAxZDY1NjViNDI1M2I4ZjFlMmFkMDg2NDI3NDZhYmYyZDNhMTc0ZmJiMjA5MzFmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjRkMzgzNzBjMjY0Nzg0ZGY2NmM2MjA4YjA5ZWNkMjU5NTA3ZmY4ZjQyMGVlMTY3Y2EzMjJlMDk3YmE0NTQ1MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_19f6bd9213e14d5086111d3980a0b728",
+      "statement": "The startup main sync is deliberately not fail-fast: StartAsync links the start token to a 10-second timeout and SyncMainAsync swallows InvalidOperationException and OperationCanceledException as warnings, because a missed push delivery must not prevent startup; mirror problems (wrong branch, uncommitted tracked changes, commits ahead of origin/main) are instead rejected per job by FindMirrorProblemAsync inside PrepareWorkspaceAsync.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L78-L84",
+          "version": "repo-lines-v1:sha256:8b8af0bcb7fe4281f030feb6fd1a8bae1466b0739c1f77f20bf782fef4e33ea6:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTI3NmY2NDljYTUxMjk2YzAwYjc4ZDA3ZDk0MWIwYzhmOTAwMTljMjg4ZDIxZDQ1YmY0N2YyZjBlYjMxZTAyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjMzYjEwNWU4MGE0MzgyNzc1YjA3ZWUwZDZjNzFmMWU0ODhlMjM5NDgzOWI0M2Q2M2ZlYWVhYjJkYjViNGQzZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGNiNDYyY2U2NDU1MjQ3ODI5OTM2M2FkYWIzNThhNTRmODlhZGRhMWU0ZmQ0YWIyYTRhOTZjM2M5NGYwNmMzZiJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L143-L150",
+          "version": "repo-lines-v1:sha256:a098a102352d17ad03f20f5607aa4c41a99a0165c44bdb2ac9175293381c7d8b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDg5YWQxYmJiYjgxYmI4NDM2NmIwNzRmNTRmYTQ5MGU1NjQ0MTVkYzEzNjc3ZTgzYjMwMTFkNDNlZDMzMjcyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDY3NzcyZTgxOTJhYWY3NjVjOTNjYTE0MTAxNzFkYTcxZTE2M2QzMzViMjZmNWM0ZDk2N2ZhNzgzMmM0ZjUyOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTczZmU1NDdkZTE0MWU4OTVjMWU4MjQ1ZTc1ZGE1NzYzYzZiZDk5MTNkZGI5NGUxZmM3NDgyMzA3OWUyNjM2MCJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L36",
+          "version": "repo-lines-v1:sha256:8e54e79299ad569dfe53557e093a405a6d5eeba2d1ed1679dd9caf9dfc8bbbea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a0465ed06d074a0daf796cb638e17e0e",
+      "statement": "Startup makes no model or GitHub network call: ProviderResolver only validates the configured shape and selects a provider/endpoint, while CreateChatClient constructs the OpenAI client and chat client per job, so a wrong-but-well-formed API key or model id fails inside a job run and not at boot.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L40-L52",
+          "version": "repo-lines-v1:sha256:fdbfdc30fe9a308796049837c06bd1bb8a6681b760658e6f02510d25180b956b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4Nzg0Y2VmNmRkMzA5MzNmMTAxMzUzY2NiMzEyMDZlOWEyNTNmZDg0MWYwMzM5NjNjYjJhN2JlYWYzNjQ3Y2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjJjNDJjZDE5YzZkMDNkODA4YzQ1MjcyMDU1MjgyNWI3ZWExYzViNDkxYjIxODUxMWNhYzc0MTVjZjlkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzZGU2YTk4NjU3ZTIxNmZlNzQ2YTAxMGRmM2MxMzY2YWE4ZWFlNTQ3N2MzMzIyMWMzNjdjODAzMTM4MmU3ZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1ZmViYTNiMWJhOWY3OTc0OTdkOGRhMGU3MDIxZjE4NGY1OTU1ZjE5MTA1YmRhNGNlMDRmZDRhNjUxYjM0ZGYifQ"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L42-L59",
+          "version": "repo-lines-v1:sha256:cd62f93d76974b9e90958724a069c482e00544d52b0f19b1fb4a896398a0044f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNjFjYmQ4MGIyNzFlNjQ4Njk4ZjdlMWE0YzgyZTlhZDg0ZDEwYWJlMDI5ODUwMmZhNzY5OGVmYWM4ZTFiYzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNWUwYWYzNzgwZmFjYTA4ZjdkN2IzY2NlZGExN2JiNGVkODhhMjE3OTY1ZWRiYmUyNDZjNTc1YWYwZmRlOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a153f708518f4b7a87747f3c8adf4a40",
+      "statement": "ProviderResolverTests pins the fail-fast contract at the unit level: it constructs ProviderResolver with Options.Create(config) to assert the missing-provider, duplicate-name, and empty-provider messages, and asserts that the generated ValidateSebastianConfig rejects a whitespace-only ApiKey while accepting a fully populated config.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L20-L77",
+          "version": "repo-lines-v1:sha256:720b87611f943fab2a0a5be79876d1ddf25591fcd89e1f8cad7aef93d41ebf2f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NmZjZTkwMjJhZGEzZDY5NzlmN2JjNzdmZTk1MzIxNzM0ZmZmZGZlNjhlOGNkZWMxNWY0MjlmNDIyZWRjMzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhMDU4MDRmYmQ4Njg5NzU4YjA1ZDM1MmQ2YzI3MzkzYjE4N2UyNmJiODliNTNjMDQ5YTA0N2MyNWUwMTc5ZjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_74ca4822420241b1bc6cbca7c2cfa332",
+      "statement": "The DI composition itself is untested: the test project references only xunit, the test SDK and coverlet (no ASP.NET Core test host), has no WebApplicationFactory and no integration test of Program.cs, and other suites construct Git and JobQueue directly, so removing the eager-resolution block, a hosted-service factory, or the WebhookEventProcessor registration would not fail any existing test.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L16-L18",
+          "version": "repo-lines-v1:sha256:e791aca545aabca93a7f57eca275f51da84a98207b0a2892fab736d61c12f2a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTQ5MmNkYzBkMDU5MDFlMzM3MTg3YTk3NDg4MTE2MWU5MjJhZGI2OTI0YmQ4N2Q4MmVlMjU0NGVhNGU1ZDI1OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzdhNTFkMmUzMzRmZDRhZDQ4NmRhMjQ0NDhhZjBmYzQyMzMxYTljMDIyMGRhNTY4MzViNTQ0ZWI1YzU1NjY3MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTc2YTA5NjJkNmZjN2Y4MWM5ZDhlMWVkMjU4ZmMzYzhhMjc1OWE2NTlmMmI4NmNjZDc1NTlmMmU2ZjJkNGEyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjAyNzQyYjkxYmNjNTkwM2M4NWU5OWYyZTZjNDVhMThjYTkxODVkZDBlZTE0ZTEzMDAxZGQwMWU5NGM1M2Y5ZCJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L10-L23",
+          "version": "repo-lines-v1:sha256:463880d4edc9d7252c4bd5acdd36070f7b51ea7a44a381cf60f9f319716b4e25:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkYmYxNTRiODU1YmFhZTdkZmYzZGJlZmY0OTRkMjk3NDNjMGViYjhhMTc2NWMwNWZmMGEyZTc4ZjFiYzcwN2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlOTk2NGRlNjdjMGIzYjM4ZjcwNGEyYmNlYjQwZjQ4MTQ4YTFiZjhlZjI5ZjRhYWMzYjEwZmU0NzJkNTgwM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlYTdmODk4MGM5MjJlMTU1YWJjNmEwYzRkMGM0YWJiMDBiOGQzZmVkMGIxODhlODkzYmJhYWRhOTZkMmVhMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NDQ2ZGI5YmNmZWFhYzA3MzA2NTAyY2MxMTQ2NTEzMTBhZDZmMDJhZmUzMTk0Zjk4MWI2MGY4OTI5MDIxMmUifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L41-L41",
+          "version": "repo-lines-v1:sha256:e6877522aeb1a94e12e186b3bf722b8f4878d0593fb4a08bb7ffd66a6391c3a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTY4Nzc1MjJhZWIxYTk0ZTEyZTE4NmIzYmY3MjJiOGY0ODc4ZDA1OTNmYjRhMDhiYjdmZmQ2NmE2MzkxYzNhNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTY4Nzc1MjJhZWIxYTk0ZTEyZTE4NmIzYmY3MjJiOGY0ODc4ZDA1OTNmYjRhMDhiYjdmZmQ2NmE2MzkxYzNhNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjE1NzM4YjczM2ViMzhlYWM1NmYxOWI4NDdjZGI3MzI3YjM5MzA5Mjk5OGZjMTVlMDVkM2I5ZWFlNzQ4NDFlMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzJiZGRmNGZiMWIwZTNmNGE4YTQyMzllMzg4M2RhODQwMTFlZThhOTBmMDk1ZjQwZjFmZDBkMWJhYzg1NTVlMyJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

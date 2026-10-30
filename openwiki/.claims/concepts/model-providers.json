@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:19a987782a4e07636e8fe04c3f2cde1c1d8aea04054ff3deb692ee0353823d36",
+  "claims": [
+    {
+      "id": "claim_a6ab2c78ad73481db040d9d4debb62be",
+      "statement": "ProviderResolver's constructor is the sole admission gate for the provider list: it throws InvalidOperationException for an empty Agent:Providers list, for a Name repeated case-insensitively, for an Agent:General:Provider value that matches no entry Name, and for an Endpoint that is not an absolute URI — in that fixed order, so only the first problem is reported.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L50",
+          "version": "repo-lines-v1:sha256:bb1476050eb1307edd00cd5c314f809db6a6f3937fc490c01caed6601f93a81e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWJjNmZlNDA3Zjg1OTQzMThiMTYxNDA4OTU2YTE2MjZlY2U2ZDEzMjg2Zjc5ZWE5ZjEwMGRiYTZhZGJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWJiOTNiY2FkMWY2ZjJmZTc3ZmZjNGJiN2Y3ZDlhZjEzYzEwMGE2OGM3ZGI1MTRhNWFlMDU2MjlkNzU1NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3MDMzNWE4ZDNiNGRhMTAyOGI5ODc0ZDNjODgyNDc2MWQxZGFhZTBiYjYwZDFiNmQ0MDc1N2RmMzc4NjQ5NTYifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L20-L55",
+          "version": "repo-lines-v1:sha256:526760ffd52bace0dba23e7f8f0ea99d861315b76499d1a0b93da5530a8e98df:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NmZjZTkwMjJhZGEzZDY5NzlmN2JjNzdmZTk1MzIxNzM0ZmZmZGZlNjhlOGNkZWMxNWY0MjlmNDIyZWRjMzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1NGI3YjcwYjgzZTUzYjhlZjBjNDZjZjQyNjRiMjIyOWUyY2M4NGRmZjFkOGZiNzMzMzBmYTE3MWIwOWQ4MjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_965650f36a1e428684bca77c69807084",
+      "statement": "Because Program.cs resolves ProviderResolver eagerly immediately after builder.Build(), every provider-configuration failure in the constructor aborts process startup instead of surfacing on the first webhook, while the resolver never contacts the endpoint so credential, model-id, and reachability problems can only fail later inside the first agent run.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L40-L44",
+          "version": "repo-lines-v1:sha256:b36b1b1c86bb9d607d883845b284904cc9c67fc6b38a5dc26ebd25b756eb0b42:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI2YmU0M2EwZWEyMWEyODA3YWZhMzI2MDM4MDQ0MGM1YzM0MTU5NTY5ZWMzMGRlYmZkYzlkM2QwOGIyZGE1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L59",
+          "version": "repo-lines-v1:sha256:fb16f54d06e7ea862da6375f0b4ed0d9086240de715a1ef1e14ec5119c1902a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWJjNmZlNDA3Zjg1OTQzMThiMTYxNDA4OTU2YTE2MjZlY2U2ZDEzMjg2Zjc5ZWE5ZjEwMGRiYTZhZGJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWJiOTNiY2FkMWY2ZjJmZTc3ZmZjNGJiN2Y3ZDlhZjEzYzEwMGE2OGM3ZGI1MTRhNWFlMDU2MjlkNzU1NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L63-L73",
+          "version": "repo-lines-v1:sha256:731d48a1012622f68a5d9d31c947e8e9b8d9f8a9ccc334b9fff2e2e7500d7c3e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjNDFlNzMxNDAzMTQzMjg5YzM2NTBiNWM4MGU4MDQyOTdlOGQ3OTkwM2JlYTc0ZmM5NWVmOTc0NGRlMTZkNTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkYjMzOWMxN2Q0Y2M1NGU3MGM0ZmNmZWNiNjExYmI5ZTdkMzYzZjI1YjE4ZTA5MjNhMWQzMDZjYzk1OTI0ZTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzOGYyOTgwNjhmZjNjMjI4YzZiNjQ3ZGIzOTYyMzk3NGNiMTlhOWI5ZTA3NDU2NTA5NjJjZDY2MTM5YWFkNDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5MTViOTM4NjM3YjNhY2RhNTI0NWNmMDcxOTgzYTg2MDA0MzU3NDA2MmQzOTVkMDBlNjAzNTUwNmNkMTQ0ZWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1dd42639a19a4a7eba7c272c2acc99c9",
+      "statement": "Provider selection matches Agent:General:Provider against provider Name with StringComparison.OrdinalIgnoreCase and takes the first match; the preceding case-insensitive duplicate-name check is what makes that first-match lookup unambiguous, and each check uses StringComparer.OrdinalIgnoreCase.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L30-L40",
+          "version": "repo-lines-v1:sha256:36f33bd6338a4cb050b1ff2fa6c48ab7dabc071069e9ea7fa1a68b1effa7956c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3MDdmMjk0ODQzZjUyY2E0MmY1ZTNhNGU3Yjk4MDM5ODM2YWEzNjVkMGZjMjIxMDBiMTUxZWU5Zjk4ZmE5YTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwNjY3MjVjZWQ4YzgwYzNhNzk0NDQzNzNlYzE2ODhjYmZjYmU1ZGVmMjk0MDA5ZGYyZDZiMjcxZDQ5MTNhYTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViN2UzZDFlNTYyYWNhNjJlY2VmNmU5N2NiMDQ5M2U1MWFjOTY3YTc3Zjk2ZWI3ZTcxNTY0YTk2MWMzYjUwZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkNGZiZjU1ODM2MWFmNjBkNWQ1NDQ3MjJjNjg0YmU1MTUwMGJhMDE1YmY3NjdhZjk5MzMxMzQ5YjNkZTU2N2EifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L30-L44",
+          "version": "repo-lines-v1:sha256:e6957683ae575f736320bdebbc516c2dde5d4f75bbc7f11495dc464586ef523f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzZDk4MmM0OTZlMzkxZjQyN2ViZDZjOGM2ZDkxYzJjOTU0YjkxYmViOTE5MzY1NTAyMjAzZjQ3NzE2Y2MyYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyOTYzZTZjMTIyZDFiMWM3OTRiMzExZjdmOTdmOTE1Y2FkOTJlYzQyYTBiOTc4MmNkNDIyYzYyYjkwNDRiMmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_04161858383147468e74fd7d7966ceb8",
+      "statement": "The optional Endpoint falls back to the constant https://api.openai.com/v1 only when it is null, since the expression is selected.Endpoint ?? DefaultEndpoint; an explicitly empty string therefore reaches Uri.TryCreate and fails as 'has an invalid endpoint' rather than using the default, and the URI check is shape-only with no scheme or HTTP restriction.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L15-L15",
+          "version": "repo-lines-v1:sha256:d93b1372e54dae5ac0eee952771ffdd89abcf9ff5b2ce8a9664a885bee8551b9:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDkzYjEzNzJlNTRkYWU1YWMwZWVlOTUyNzcxZmZkZDg5YWJjZjlmZjViMmNlOGE5NjY0YTg4NWJlZTg1NTFiOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDkzYjEzNzJlNTRkYWU1YWMwZWVlOTUyNzcxZmZkZDg5YWJjZjlmZjViMmNlOGE5NjY0YTg4NWJlZTg1NTFiOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTM3NmM3OTgyYzA0ZjVhNDdlZTJiOWZmZmNmMTA5NTM3ZGZmNmYyNWI5NmI5M2IyMDQ3MWEwNjA0MTg3M2NiNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjU2NzE0MjhhM2EzM2U5NDc5NTg5NTdjOWZkZDA2MTg1OWJjM2M1NWE1ZjYxOWUzOGUxOGQ2MTA3OGY0Y2RhMSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L42-L45",
+          "version": "repo-lines-v1:sha256:552fc1da95669583df86465de89cc269890d01013b09836e3412052e6d6a9b6c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGY2MWNiZDgwYjI3MWU2NDg2OThmN2UxYTRjODJlOWFkODRkMTBhYmUwMjk4NTAyZmE3Njk4ZWZhYzhlMWJjNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTE1ZTBhZjM3ODBmYWNhMDhmN2Q3YjNjY2VkYTE3YmI0ZWQ4OGEyMTc5NjVlZGJiZTI0NmM1NzVhZjBmZGU4ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzEzMmQ5NzI4OGQ0MjkwZTllMTQ0YTAzMGU3NTViZDlhYzJlYmE4Y2M2MTY5ZmFlZjBkN2Q1YmYyZWIzYzU0YSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1960e924814f4ebd8f5710e95b0f21dc",
+      "statement": "Agent:General:Model is a single process-wide scalar passed verbatim to OpenAIClient.GetChatClient(_model), so there is no per-role, per-provider, or per-job model selection; expressing a different model for another role would require changing CreateChatClient's signature or adding a second resolver.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L47-L58",
+          "version": "repo-lines-v1:sha256:10bc1e8435062e70694c07653902d9d79c4d08217a1becba00c5b77880752675:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4ZmFlMmMzYjJjYTRkODYzYTQ0NDdjZmU3NDNjYjMzZDFiMDUyYzg5ZjNiYWJhMzRhMzAxYzM0NDczMTAzYmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZjkzZGZkZTFiZjg3OGZlNDVjN2M5MmJmY2UxZjc4ZDhkOWRmZjBiYWViZTdkZGQ5ZjgyMmI4NTRiMGI0OWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkY2EzNzljNGIxNjAyM2ZiMjNjZWYxNDdjYmZlNGNmODU5NDljOGNiZGQ0Mjg2NDRhNjliZWY4ODVhOGI4ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTRkMDJhODEyMTk0NGQxNzZkMjY1ZTliYjljYzU5ZjZhYjg5MGJjYWRmOGFlZmRlYmRiYmI0ZjJlYTg0NDQifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L49-L56",
+          "version": "repo-lines-v1:sha256:39edca3e9b3330064a5affa4fd9e965e0e2f0ba3c92e784053b83a9cf473f55c:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2Q4ZjRhOWU4YWZjYmNjNzg2MmQ5NDNhOTdlNTU4NDM0OTUxNTRkM2I0MThiYjE3NWU1MmEwOTY3OGZjMzZlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTcyYzExOTRjMGU0MzA3Yzg0MWNiY2FhYmZiMjliMzkwYjcyZmE3ZDJjNTZmOWE0NDM4NGRmODYyOTU5MmEzYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjU3ZjBlOGI1Y2M0YTVmODI1ZDViOGJiMTdlN2Y1NGFjMWI0YmE1ZGRjYmUwYjZmZjg3ZGQxMjA4OGMyNDk1ZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c0d89f80ec0b492a85ed22a1f982baa5",
+      "statement": "CreateChatClient is a stateless factory over the three fields captured at construction: each call allocates a new OpenAIClient with an ApiKeyCredential and OpenAIClientOptions carrying only Endpoint, then adapts GetChatClient(_model) via AsIChatClient; the resolver is a process-wide singleton but the IChatClient is per job, and no retry, timeout, handler, or logging options are configured.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L40-L43",
+          "version": "repo-lines-v1:sha256:17345d4bffd2c1de6aa566b27a91133348207f6bae5b5587afceea8a707d5a09:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzg3ODRjZWY2ZGQzMDkzM2YxMDEzNTNjY2IzMTIwNmU5YTI1M2ZkODQxZjAzMzk2M2NiMmE3YmVhZjM2NDdjZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTAwNmExZGI1YjdhM2YwMmFjNTliMjhmOTViMDc0MmE4N2ExODFhNTM4YWI2ZDA4MTVhOTE2MTkwZTNhYWY3MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzNkZTZhOTg2NTdlMjE2ZmU3NDZhMDEwZGYzYzEzNjZhYThlYWU1NDc3YzMzMjIxYzM2N2M4MDMxMzgyZTdlMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWVkZDIxZjVhMWFkOTAxNjMwZTZkNzU3ZmE3NWY3ZTkyNWQ1YTAzOWFiNWMzMWQ1MTJiOWY4MWYwNDE0NjA0ZiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L52-L59",
+          "version": "repo-lines-v1:sha256:bc595070289738ebf3b629ae81ed584d0c2577d60d0d76f0f5817e517e5676e1:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjZjZmI2ZDUwM2RlNjAyNjhmNjk2YzIyOTcxMDMzZmMwMjU1MjBkYzAwMTQ3MzNjZWFhOGY2MDgyOWZlODAwZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzlkNmI0MWI0ZjllN2M5ZWRiZDEyN2I4OTU3NzljZjNlN2E0OTRhZjJmNTg3NzQ0OTA1NGJlOWFkZjVhMDM5NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3466a89e815f4266b62da345c0414c37",
+      "statement": "The disposal contract is defensive rather than guaranteed: IChatClient is not promised to be IDisposable, so ImplementSpec disposes the returned client inside a finally guarded by `is IDisposable`, nested within the await-using on the role so the client is released before the role and its shell are torn down, including on exception; nothing in the suite asserts that disposal reaches the underlying OpenAI HTTP pipeline.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L38-L60",
+          "version": "repo-lines-v1:sha256:57134e7d1172424ebf9d2cb7e47a8ddc37fb7614dd0ab339b4469bb3150239c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMDIwZWVjNThmYjU2ZDE0NWQ0YmRiM2Y0NGQ1NjQ3ZjgzZmQwNzg4Y2QzOGQ5OTYwNGQ4ZTU5MzhjODE3ODUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4NDlkYzc0YWUxMGYwMmRmN2U5M2ZmYzMzYjc0OTYwNWM0OTc1YmViMzIxNDM1ODc5MTVjNjc4ZDIxNWQ5ZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyZDQxNjZmMmFiZDQyMzU3MDI5NWM0OTNmYWIyYzhkYjBlNzFhZjg0NTIxNGNlN2MyYmVkMjNhYTQxZDFjZWQifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L9-L18",
+          "version": "repo-lines-v1:sha256:669a2d306424fd0f0682e67f896ed19c9c07d382268f3b32211ce31f73567864:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1ZmRjMzFmZWRlMjBiNDE4ZmE4NDBiOWE2ZDFhZjEzODk1ZGY0NGNjMjBmMDc2ZDdiMjM0N2VhNDcyMzhjZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1YzJjY2MwMWI3ZmYxM2U3YzI4MTkzOTNlNzgxZGU0ZGJmOTVjYzUzMmJlY2FiNjQ1ODYxY2M3NzJmM2ViZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9ae95735bc874dfa8a0d5d895d3d45f1",
+      "statement": "Blank or whitespace-only provider values never reach ProviderResolver: [Required] on strings plus [ValidateObjectMembers] on Agent and [ValidateEnumeratedItems] on Agent.Providers means the source-generated ValidateSebastianConfig rejects them when IOptions.Value is materialized, which the constructor triggers on its first statement — pinned by BlankApiKeyIsRejectedByGeneratedValidator, which flips a valid config to failing by setting ApiKey to a single space.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L35-L70",
+          "version": "repo-lines-v1:sha256:4e245fadd43843a0b009a080e3e9af6dcd71076a9803b7e8cce4764153d84895:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhNmQ4ZjBlZGQzYzRmODA2YjIxZmNlNDk2MzkyZDNjMGI5ZjJmYjExZWNkMWRhZjRiZTM0ZTQxOTNiNTg2NzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MjIyMDFiZWVlODZlNTRlNGQwNzExMjUxY2U5ZjkwM2Y5ZTNiNWMyY2JkMGQ2YzA2OTYzZWY4YzhhMTUxYjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViOGI0NmMyM2E3NWU4NGE0ZDdhMGE5ODJmMTAyMjAyYmExYzE5ZGI4OWFkYzE2ZTU4MmQxZDAxMjU2NjYyMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L57-L77",
+          "version": "repo-lines-v1:sha256:f0d95df3cd933a9f96bb529be2f42da3b7f45491596c0dde39ca3c0426e7ac4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4YjljODZlNjQxNmU1NGUyMTc1YjY1ZjA0MzQ4NzI2ZmYwOTgxNzAyOGU3ZDE4ZWU5NjlkNTUzYzhkYmVjOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhMDU4MDRmYmQ4Njg5NzU4YjA1ZDM1MmQ2YzI3MzkzYjE4N2UyNmJiODliNTNjMDQ5YTA0N2MyNWUwMTc5ZjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_da6b07eb9b9944fc8403bdabbbfb6581",
+      "statement": "Every element of Agent:Providers is validated, not only the selected one, because Agent.Providers carries [ValidateEnumeratedItems]; an unselected entry therefore still needs a non-blank Name and ApiKey to boot, but its Endpoint is never URI-checked since that check lives in ProviderResolver and applies only to the selected entry.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L38-L45",
+          "version": "repo-lines-v1:sha256:6dd4418b89bbefeb19a611da3d3d84b083073891a7f6286ddf5039db47b233f4:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjY0ODYyYzQ1Y2E5NzQ0OTRkODE3YmVkNWE3MjQyNjU2OWI1YjkxNjMwOWJiZDMyZGMwMWMyNGU5MTNkMjdlOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjkwM2JmZTU3NWZlMGU5MDFmYzlhMTAzZTA5YWFjODcxMDBhYmI1N2ZmMzY4ZjVkYTQxMWM1OTcxYzg2YTkxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzEzMmQ5NzI4OGQ0MjkwZTllMTQ0YTAzMGU3NTViZDlhYzJlYmE4Y2M2MTY5ZmFlZjBkN2Q1YmYyZWIzYzU0YSJ9"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L44-L67",
+          "version": "repo-lines-v1:sha256:0808b8fdce2ef3304a9707253d845dcf7fbb5e5139496ddce044e89544be0190:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNDM5ZGZlNzc4NjMyMGM0NjA3ZjIxODUyOTg0MTZhNDRjYTNhNTgzNDFhNjhlZGQ5MmVmMjMzMzljOGU0YzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3Yjc0Mjg1MmI5ZWU1Y2ViY2JmNzM3MzRmY2Y1ZmRhY2FhZTQ5MDYxZmRkMDhiNjMzMWNhYWRmMWZiZmEwNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5M2EwMGE3NzA5ZmY3OWFiM2QzYjY1ZjNmNjFjOTk4MGJjYWE5N2E0MzUyMTA2NDE3Y2E0NTA5Y2E4OGQ2ZjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e704a2c73259443c9611c2f996fdbf9a",
+      "statement": "The repository proves only an OpenAI-compatible abstraction — API key credential, overridable base URL, and a free-form model id used with the OpenAI client stack — and defines no per-vendor behavior: provider names are opaque selection labels, no code maps a name to a URL or header, and nothing at this layer implements cost, rate, or quota control.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L52-L59",
+          "version": "repo-lines-v1:sha256:bc595070289738ebf3b629ae81ed584d0c2577d60d0d76f0f5817e517e5676e1:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjZjZmI2ZDUwM2RlNjAyNjhmNjk2YzIyOTcxMDMzZmMwMjU1MjBkYzAwMTQ3MzNjZWFhOGY2MDgyOWZlODAwZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzlkNmI0MWI0ZjllN2M5ZWRiZDEyN2I4OTU3NzljZjNlN2E0OTRhZjJmNTg3NzQ0OTA1NGJlOWFkZjVhMDM5NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L58-L67",
+          "version": "repo-lines-v1:sha256:936d307533bbe6ca1222f3a75f397e4a602aca1cb641d7ab11bac9485a06047b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxYzZjNWRmYzhkYWIzNDAxYWM4NzNiOTlhNzEwODVlZmQxODQ0OTA2ZDA1NjUwOTZhN2FhZjk3ZDljODdlYmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwOTg2ZjM0M2QyOTFkMTcxNDIzODQwMWY1NzliNzkyYjYyMjcwNDM1NWI1NWNmZjA5YWNmZGIwYmMxNTZjMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5M2EwMGE3NzA5ZmY3OWFiM2QzYjY1ZjNmNjFjOTk4MGJjYWE5N2E0MzUyMTA2NDE3Y2E0NTA5Y2E4OGQ2ZjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_73aee9a3e0b14acc972ef047983f0fa9",
+      "statement": "ProviderResolverTests builds the resolver directly with Options.Create and never reaches the network: it pins the three exact constructor messages (empty list, duplicate name, missing provider) and only asserts NotNull on the created client, leaving the default endpoint constant, the invalid-endpoint message, the case-insensitive selection path, the model id actually passed to GetChatClient, and any disposal propagation unverified.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs#L9-L103",
+          "version": "repo-lines-v1:sha256:14fd8454e6f04d1c8e4605a157697fea4adcc3f4e7b8dbfcbc5cde2bbe6b12b8:eyJzZWxlY3RlZExpbmVDb3VudCI6OTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkOWUxMjU0NjQyNTU3NmQzZGVhZThjOWI5ZGJmMTI4ZDVkNmRkYWY1ZDdmZTg1NzkzNDkyN2RlZmZhM2I5ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1ZmRjMzFmZWRlMjBiNDE4ZmE4NDBiOWE2ZDFhZjEzODk1ZGY0NGNjMjBmMDc2ZDdiMjM0N2VhNDcyMzhjZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_465c3bea8fe84951b609638971146aa1",
+      "statement": "ProviderResolver is the only file in the agent layer that suppresses OPENAI001 alongside MEAI001, marking the OpenAI client surface as experimental and keeping that dependency isolated from the harness files that instead suppress MAAI001/MEAI001 — relevant because the build uses TreatWarningsAsErrors with AnalysisLevel=latest-all.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L6-L8",
+          "version": "repo-lines-v1:sha256:451ed2282f082648a65e830da5b412357adfe6e1c85e024b1be42944d5ad92d8:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI3ZjYxYzM0NjIwMGZjYWRlNjlhZTYwMDZjYzIzYTVlZTBmZTY2NzhkMGUzNGQzYzc1MTg5Zjc2OGRjZWM1OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzhlNTEwNDBlZTI4NzI4NzdhMjAyMmRmNWZiZWY1ZjRkYTJhMzAwNjk0Zjk0MDExYTU2YWU5MTc5YWE0Y2UyNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjdmYTYyY2IxOTUyYTlhZjQxNmFkODM5ZmYzZjM5ZmU5Y2I4YjljZTM5MGIyMjY2YmU1ZDFkMWI2NWI2YjJmOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTFmMDlhYzcxYWUxZjFlNWU1M2Q3MmJiYjZkNTRiMmM2M2JhYTNlZDI4NWM0MDY4ZDdlNWYyYmJlNWYxOGI2ZCJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L3-L4",
+          "version": "repo-lines-v1:sha256:61e2b4531e3ba7eeb26e9cdab92b08498f8892fc36fd4012c65691e7b6884c63:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDVkMjQ3OGUyNmI5YTNkNWM1ZGVjZTYxMjRlZDEzYTFiM2YzNWJkMDIzMTI0ZTNkZGNjZTEyYTYxMGE1YjAxNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmJhMDMwYzk3MmM2ZTIyZGQ4NDE2NTY3YWE0NTA4MGRhZWFkZTc4NmZjZWUwNDk5MmZlMzFiNjE4MTY1MzgxNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzg4YjM4NzA3ZGRhMzdkNzg2NWZiNWU2MTgzOWM0MTUyNjlkYTJlNDYyMDJjOGNjNmZlMDJmNzRhNTQ4ZDcxYyJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

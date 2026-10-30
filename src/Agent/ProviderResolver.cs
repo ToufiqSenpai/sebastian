@@ -20,25 +20,9 @@ internal sealed class ProviderResolver
 
     public ProviderResolver(IOptions<SebastianConfig> options)
     {
-        var agent = options.Value.Agent
-            ?? throw new InvalidOperationException("Agent configuration is missing.");
+        var agent = options.Value.Agent;
 
-        if (agent.General is null)
-        {
-            throw new InvalidOperationException("Agent.General configuration is missing.");
-        }
-
-        if (string.IsNullOrWhiteSpace(agent.Name))
-        {
-            throw new InvalidOperationException("Agent.Name is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(agent.General.Provider) || string.IsNullOrWhiteSpace(agent.General.Model))
-        {
-            throw new InvalidOperationException("Agent.General.Provider and Agent.General.Model are required.");
-        }
-
-        if (agent.Providers is null || agent.Providers.Count == 0)
+        if (agent.Providers.Count == 0)
         {
             throw new InvalidOperationException("At least one agent provider must be configured.");
         }
@@ -51,20 +35,9 @@ internal sealed class ProviderResolver
             throw new InvalidOperationException($"Agent provider '{duplicate.Key}' is configured more than once.");
         }
 
-        var matches = agent.Providers
-            .Where(provider => string.Equals(provider.Name, agent.General.Provider, StringComparison.OrdinalIgnoreCase))
-            .ToArray();
-        if (matches.Length != 1)
-        {
-            throw new InvalidOperationException(
-                $"Agent provider '{agent.General.Provider}' is not configured exactly once.");
-        }
-
-        var selected = matches[0];
-        if (string.IsNullOrWhiteSpace(selected.ApiKey))
-        {
-            throw new InvalidOperationException($"Agent provider '{selected.Name}' has no API key.");
-        }
+        var selected = agent.Providers
+            .FirstOrDefault(provider => string.Equals(provider.Name, agent.General.Provider, StringComparison.OrdinalIgnoreCase))
+            ?? throw new InvalidOperationException($"Agent provider '{agent.General.Provider}' is not configured.");
 
         if (!Uri.TryCreate(selected.Endpoint ?? DefaultEndpoint, UriKind.Absolute, out var endpoint))
         {

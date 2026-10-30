@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:37971582bad6d6a7a21a08bd7f8584ce8e0a8df86d415a4fbb54c26d91e4988a",
+  "claims": [
+    {
+      "id": "claim_1c6507c7558247a79a81e49e97d68ea8",
+      "statement": "`docs/PRD.md` is Indonesian-language intent documentation for a v0.1 draft, and the repository instruction in `AGENTS.md` makes source code and tests authoritative over briefs and docs, so PRD stages without code are roadmap rather than regressions.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L11-L12",
+          "version": "repo-lines-v1:sha256:8ca5bb1072a6d0f45c86d7adab2737c384361844ab3eb6dddde54fbac71c7547:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmNiM2Q0YTQ2NjliZGM3YTQwZDk4MDc3MzVkZjYwOGJmZTMxZDM4NjA2N2M5OTliNzUwYWFjNjMyYzFiNmQzMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmNiMzA1ZGNiMTRkY2I0MTUzZTFhM2YyNTk0NjVjZWFkYWRjOWIwNDRhNzkzZGE0MjdkMmM0M2QzYTA5ZDQ5MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWM5MGE3YjU5ZmEwNjFhOTU2YzE5MTIxOTkyYWQ4ZDFmOTk2ZGMwOGE3YjQ1ODhlYjJjYjk4MzU0YjdmMTU0ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjU1MjQ4YjYyZjU1MmY2Y2I2ZjcxMTA5YzgzY2E0OWZlOTU1MmU5NjYyYTBhZmNjZTdjNjY5YTJiYmEwZWMwYSJ9"
+        },
+        {
+          "resource": "repo://docs/PRD.md#L1-L8",
+          "version": "repo-lines-v1:sha256:c7d002cfe7df46ed9181a8fa8af83d74dfd6c13d1f76a57c26e23e2d20d9f78b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWM0Yzg1NDdlN2NkODg1NzZjNmYzZmMwNzkzNjk5YTY2NTliMDllYmE2N2ZlNzRlZjJmZTRiNTkxNGMzOTA1NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjUyZDcxMTEwM2Q1MGE0Mzc4MzBjNmZiY2QwNGZiNGJhYjQ5YTBmODJmNmQyNmQxYzc5MWM2ZTg0ODhkZDA5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTljNmU0YTkwYzdjNTEyODU3Yzg0OWUwMmVhMTM2MDIwZjFlZTJjM2NjNjg3ZWZmODg1ZjllYjU1NmIxMGEwMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c8e6f02c7ee74885a760d4f6329f7fdd",
+      "statement": "Intake implements one gate: an open issue labeled `feature` on an opened/labeled/edited/reopened action is the only input; a missing required section causes a comment plus close, and only an issue that also carries `ready-for-agent` is enqueued as an `ImplementSpec` job.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L102",
+          "version": "repo-lines-v1:sha256:0960ba62d40379940aa380a36542389dd6610658c2f1b38d5e95109ede33cfb1:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwNzdlMDhhMDQ2YjA5OGI2MTY3Mjg5ZDc1MGY0ODgzYmM1OTY1ZmYyOGI5ZDBkNTRkODhjNGU4YjkxYmFiOTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0a4d6a9c057644bb95be5ca23bf7505f",
+      "statement": "Spec validation runs before the `ready-for-agent` approval check and returns on failure, so a maintainer-approved issue with an empty required section is still closed as `not_planned`; the `ready-for-agent` label is only read from the event payload and never verifies which actor applied it or that the bot wrote it.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L54-L69",
+          "version": "repo-lines-v1:sha256:aaa1a90091654b124874d660e3879e50f4ceb9302da726deeff522dd808f6ba8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NzViNWU5NjdiYTI2MWNkYzMwYTg1MTNmOTIzNGVkMjA5ZDUzYmI3MjA4ZmNhNjdmMzU3MGM2ODkyMWEyODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxMjBjMTA3YjIwN2VhOTJkYzVjYjYzMzYzMTgzOWU0MzNjMWI4NWM5MWQ5YTE4MTNiZjIzMWU0NzAyZTM1ZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L61-L105",
+          "version": "repo-lines-v1:sha256:aa99cbd766b5437924316185fc25cae8e781379890405b45fb7261a29af86f4f:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3YTMwNjdkNzlkOGE4Yjg3NGJiNDdhMmUyZGY2YWE5MmQ4OWQ1ZmM4NWNiMDIxMmRlNjQxOGFhZGRiNTk4MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiZTAwYWY3ZWI4ZDhlOWQxZTE1YmFkMGI0Mzg5YzkzYzljYTgyMDZiMjcyNTE5YjA1MzAzYzI3NTEzZjBiMTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ZDA4ZDNkZjhiNTkyNmI1ZmQ2ZTllZjJkODIwOGQzNWFmYmZmN2Q3NDJhNGM3MzIzN2Q0NzNiMmJmYWQ4ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmNhNTZhYjI5NzRkMGY2ZWUwNDhmZWU0YTNiNmE3NTgyNzkzZGExZDFiN2EzODI3YWU0NGY0ZmQ5OWY3NDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5dd1cfca98fc45f9a43e159228981bdb",
+      "statement": "An issue labeled `bug` but not `feature` is ignored entirely, so no bug triage, `needs-triage` routing, or triage-trigger classification from the PRD exists in the code.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L20-L21",
+          "version": "repo-lines-v1:sha256:99506d63015f026c54dee072c553d3d081ce8367c4705315ca1daa8d18b5fdea:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGVmNDVjYTA1ODBmMWY0YWVhMjQ1NzYxMTE1ZDZlOWExZTQ3NmZhZjBlZDhjY2FiOWQ0NDQyYjUzZmM5YTllZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmRlMzhjZmQ3NDM2Y2FlYzg1NWJjYzc1MzNjY2FmNjM2YjJkOTQxMzRmN2VhYWNjNmNkNTQ1MzViYTFhZTdjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRhYmI1Zjc1MDE0ODdmY2YwNmFiZWUwYTA2ZWNhODUxNjY0YmU0MDJlNTQ2MmYzZjRhYmMxZDFjYzEyNWY1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjYzZTkyZWVjNTQ4YWRjOWY2MzQyNzAyYTIwNDZiMzIxM2JlNWQ1MWRhNTNhOTIzNjQyYzBhMzQ1MGQ3NDM2YyJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L38-L49",
+          "version": "repo-lines-v1:sha256:d61dcb3426034f20371d95425349bd4d0da39401ae794d4cab86010d734a08eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMmY1ZDU3MjE3Zjg0MDAxNDYxOTI0ZTY0YmQxOGM3YWQwNTdmMzNjZDMyZmMzNTNhMzdkZGUyODQyZGYwYTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1YmVhNDk1NmY1ZTAxODlkOGNhZDA0NWM1OTY2NmM3MmI0MjNhZTI4OTZhMDQ4YjU2NDgxMjQwOTE0ZWExMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiOTAwMzZmY2M3ZGQ5MWYyYWM1Y2ViYmY4NDQ3ZjY0MjQ1ZGU1NWEyYTFlMDlhY2I2OWRkYmZmZTgzNmVhMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6a2823ebbc8f4ec2b70796d560761611",
+      "statement": "`GitHubService` exposes exactly two write operations — post an issue comment and close an issue with state reason `Not_planned` — and no label, pull request, review, or merge operation, which makes the PRD's label transitions and PR creation stages unimplemented rather than mis-wired.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8bf525524ba64968888cb794971fe568",
+      "statement": "The git layer cannot publish: `Git` offers fetch, `merge --ff-only`, worktree add/prune, status, rev-parse, rev-list, remote get-url, and branch --show-current, with no commit, push, or PR primitive, and the agent shell deny-list blocks `git push|reset|clean|checkout --` and `gh` but does not block `git commit`, so \"no commit\" is prompt-enforced while \"no publish\" is denial-enforced.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L55-L65",
+          "version": "repo-lines-v1:sha256:5049ed3bbb0aa4dd41012e086287ad4453083a31676810c673c11db2e8b69745:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkNTA2Mjg0ZTgxYjFlODU0M2M1ZjQyNGViNjUxYTY5MDk5ZjcwNDRhNTE1OGY3NjhiNjA5YmJlNGNlZjdhZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjOWU2OWJiOTUzY2RhMGMyNWVjOGM1NTRkMTU2YzQzMmE5YTgxNmRhZjVjNzU2NGViYTRmMWRlNGFlNWMxYjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1OWU5MzZhMzBlMTRkNTY5NjNiZjdhYjRmNmM1OTBlMWRmNmFhMDg0MWMzZTVkNzhiODc0NDVkMTFiMGI0NzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlMjFlMjlmNGY5MDZlZjg5NjYxNTk1MGVhNWNjNmE1OTViZWU4YzMyMjRmN2EyN2JmOTcxZGQ4MjRkNGE5NGYifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L79-L93",
+          "version": "repo-lines-v1:sha256:ed5e9efb9797c7a6d183e9a6ec81cfe2b8805b1491f6bbaaf99b8ff740c8e0b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwNTU1NmMyYWNlNDM0YTVmOTRiZWEyMjczZmZiY2ZiMzM4NmQ4OTYyOTViOGIzMzhhMGVkNmZiZDBhOWUwY2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1OGRmMzRlMmYxZWFmMDI5MWE3OGFiNGVlOTM2ZTJkMjJlYmE2NjAyNDBjNTY5OTYwMGU1ZWJlNzY2ZWQ0N2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNDhmYzgzZDg4NGU4ZDI5YmU4NjA4MGY5MjY2M2RjNWYxMmI2OWMyMTdiNjMyNDY0Y2ExOTRjNDJkMjkxZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyOGI4ZWJmNWFjZWMwMzhkNDI4YzhjMjlkZDhkMzQwOTAxNTY5Y2ExOTI1YmRlMWM2MTFhMTA2Njk0ZTg1MjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ee4c7d4973204efabef4d01ab4c175c3",
+      "statement": "The implementation prompt tells the agent to treat the issue body as requirements, not add dependencies, not touch files outside the workspace, not run git/commit/push/create PRs, and to stop if the spec is ambiguous; the host verifies none of this afterwards and a successful run ends at a completion log containing the worktree path, short git status, and agent response text.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L112-L135",
+          "version": "repo-lines-v1:sha256:c85571a8ba32b1f7e032fbdd337cfc9bda85aba0246845878060389e5ecbd15b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmZmNkZTFhY2Y4Mzg5M2RiMDA0NTA2N2QxOTI2MDhhYTE2YmFjMTVmNDQ4MDdkMTJmNThmM2I4YzViOWYyMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzMGEyY2I4M2Y0NjY4NTA0MjkxZjYyY2NmMDQ4ZmVmMDhlOWNjZGIzYmU3N2I1NzBiYTAxMjcyNTg5ZDlkN2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L50-L51",
+          "version": "repo-lines-v1:sha256:32d5e46dd9e3d1c117e051c9962cec18c472fd08dbb9c983b249cbbdd358b720:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDE0NzZkYjEzMDAzN2NjMmFjZGRlNTQ1MDFkNmQ5OTY5ZTE0NmZlMDA0Y2ZjZWQxMmJmY2ZmYTExOGY5NGIzYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzk3MjRlNGNiODE4YWI1OWFhZjYzNDk2NjI0ZDQ3YWNhNzdjNmM0NDZiYzdjYmE3ZmRiMTExN2RmM2IxN2JiNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzQ2ZWFkNjEyNDg3OGYyOTJmMTQxZjQxNGIwNzQzNjIwZjBiNzQ4NWVmZmNkYzIwMTIwNzc1NmY4N2IxY2RkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU0NDRkNWExYzk4YWExNWM2ZDg0YmI1MWMyYTMxYTJhYmI2MDM2MzhhY2U4MGNmZTc0MjYwYjgyYjNiMzQxNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_68cd767133cf4d50a0a4520cad182cc7",
+      "statement": "The agent sandbox is the only guard at execution time: a `LocalShellExecutor` confined to the worktree with a scrubbed environment, a ten-minute command timeout, and a deny-list of destructive/network/git-publishing patterns, run with approvals disabled and execute mode — which also means a hostile issue body cannot read credentials from the agent's shell environment, the code-level answer to the PRD's prompt-injection risk.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L21-L72",
+          "version": "repo-lines-v1:sha256:85acf3228527072ecf2fae90b01191ec0e6b868744d725091ce4723b7a27e2ca:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkMDEzMjRhMjQ3MGI3ZjQ5NThhYTcwMDE5NjQ0MjMxMzM3NWJkMDRjNzY4YmJkYWU2NTBlZDJiYzk3OTk5M2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhZjBjODkwZWI5YjEyNGM3YjRlNzJkNzE4YWRlNTU0ZjVhOGI1Mjk5NTU3MDc5MTE4ZmQyOTM5YzUwNDY1OWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L25-L42",
+          "version": "repo-lines-v1:sha256:c346db72a1957c10bb46d148e1ccb9d0c092047f0cd98e1c1c5838079e156826:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2YjVmMGM1NjdkOWI5MGU2Mjc4YmM1OTYxMDFjZDQxMDlhNmZmNzkwMGY5OTQ5MmIzZGMxN2I2Zjk4MDExOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyMWJhZDg4NGZkMjllYTkyZDEyNGNhMDcwYjllZjA4YTJkNjdjMmI3NTZlMDE1MGZkMjQ1YjJkZjJjNzM3M2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwMDA0YTFmYmYzMjg3MmUzZTE0MjZiOGE2NmM1YzU4OTgwYmQzODhkNzBkMzZkMjQ3MzQ5MjIyNDYzMmIyZTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjNjM3MGE4NTgwMzg0NWJiNGQ5OTUzZTVkMzc4YmEwYTg4YjEyYWFhYTI5ZWYxZWNiZDY5YmZkMWYwOTFhYzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7dfb311d8eb84dba9baae9853ccc934b",
+      "statement": "Configuration carries no cost, budget, or rate-limit surface: `SebastianConfig` has only `GitHub` and `Agent` sections, and the agent section holds provider name, endpoint, api key, and model id, so the PRD's per-run and per-day cost ceilings have no code behind them.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L9-L67",
+          "version": "repo-lines-v1:sha256:03e295679fffe161fa5079a88fd4bdc92ca0ec0575eb4ba26c7c4f626514140e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4M2RiZmRlZDgxMzhmZWMwZmIwMjQzMDUyMjE3YzQwMzViZDJjZDk3ZTM0YTVjODZmYzhkMTkxMmNjODc4OGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMTk2NzZiMDViNGI5MGM5MjAzZmViMmUzM2FlM2NlZjdmYjIzY2U4MTI0NDhlNTU5NGNjM2Y3YjUzM2RiZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5M2EwMGE3NzA5ZmY3OWFiM2QzYjY1ZjNmNjFjOTk4MGJjYWE5N2E0MzUyMTA2NDE3Y2E0NTA5Y2E4OGQ2ZjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_52d1680e26e34d3bbe5ee35a8917e969",
+      "statement": "Only `IssuesEvent` and `PushEvent` are routed by the webhook processor; push deliveries synchronously call `Git.SyncMainAsync` inside the request, and every other event type — including pull request and issue comment events, which is where a `merge` command would have to arrive — falls through to the base processor and does nothing.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L117",
+          "version": "repo-lines-v1:sha256:157fae54eb39a767fcaa9562bc592d1cfa5a6be5dadf7c984f9a08e5a9cc7400:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZTAzNjk3YjVjMGRiZmZjMjVlZmE1ZDVjYjQ1NWM4Mjg4NjVhYmZmMzM5OTJkMTU1NDUzYzM4Y2NkZjQ1NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1OWE3MzFlZDZkYWJhNGExMDZjZjc1MWRlMDU5MmI2M2YwZWE3NzFkZTk1OTQ4ZjMxYzY0MDg1MzJjYTkzMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L23-L30",
+          "version": "repo-lines-v1:sha256:e0cc2820a6e6ec518ebc2689ed4b9be664abb03f6de3368a47464cadb3b345f2:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU2NTFhMzBmMTU1ZWMyYTNjMzJjZTkyNzRjMTIyNzUzOTZkMDZjMTdhMWFmN2EwNmRjMTQwOGYxNTU0ODA5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc4Njg4MTk1YThkZjNjNDU0ZGQ1ZTgzYmRhODI0YmM1YzA5NTg3NjcwNWMxOWRmZGVjZGY1ODBjZTdiZDA3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA3ZjBkMTU1ZTc2ZjRkNmJjOTRkNGZhMWRkMzgwMzkzYzRkYzg5Njc2NGE4OWE0MGFlOGVkYTk3ZjRlNjY5NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1f42918e281a4d31a3ee3738a0f9bb91",
+      "statement": "The public HTTP trust boundary is the configured webhook HMAC secret rather than an auth scheme: `Program.cs` maps `/health` and `MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` with no authentication middleware registered.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L46-L47",
+          "version": "repo-lines-v1:sha256:249f502f71258975f361ec1b9f2cf31d4bf21a5457c3cbcc4fab521eafecd282:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2b09dd2974ce4a02ac8ac26c461c92b2",
+      "statement": "The single-repository constraint is enforced by an owner/name cross-check against the parsed `origin` inside `PrepareWorkspaceAsync`, which throws instead of redirecting when the webhook's issue repository does not match the local clone.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L63-L78",
+          "version": "repo-lines-v1:sha256:7d83d0b129ee0864d8bcd7f643c7e1d56461ad1092180b6fd9f828870a877838:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxOTU5Y2Q4NmYwMTljY2FkNGFjOGNmZDRiYTA5MjNiMzY1NjUyYzI4NGIzNGI1ZTNkNjdmMDU0MjAyOWUwYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyNzZmNjQ5Y2E1MTI5NmMwMGI3OGQwN2Q5NDFiMGM4ZjkwMDE5YzI4OGQyMWQ0NWJmNDdmMmYwZWIzMWUwMjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyMTdlZWFiOWNhMzY0MDNlYzQwODRkZDMxODAxMGZiZDQ1OGZjYmRiODcwYzYwNjU4MGE5MDA3NzgzNjQ3ZmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3224ff0a2804ff2aad59d2b2ab56afa",
+      "statement": "`.archify/` contains design-time artifacts only: it is ignored by `.gitignore` (line 6) and by wiki tooling via `.openwikiignore`, and no source file references the path, so diagrams there describe intent rather than runtime behavior or a build dependency.",
+      "evidence": [
+        {
+          "resource": "repo://.gitignore#L6-L6",
+          "version": "repo-lines-v1:sha256:8c4c5fb77e24b72a2d8fc0ac94a5a3ae52eb042037ae0fde84839624ce487812:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGM0YzVmYjc3ZTI0YjcyYTJkOGZjMGFjOTRhNWEzYWU1MmViMDQyMDM3YWUwZmRlODQ4Mzk2MjRjZTQ4NzgxMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGM0YzVmYjc3ZTI0YjcyYTJkOGZjMGFjOTRhNWEzYWU1MmViMDQyMDM3YWUwZmRlODQ4Mzk2MjRjZTQ4NzgxMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjNhNjE2YjA0MjNiODI2MTI2YjI3ZjJmMWQ0OTQ4MzgyYmJkMDU0ZGQ1MWEwNGQ0ZWY2NGFjZGFmOWJlMzgzNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTU3ZjMyZDNjMDBjOTBmMjI4Zjk5M2UwNTQyYTQ2YmJjNTY3MDEyOGE2NWQwNmVhMDg4N2Y3ZWJmYWFiOTYzYyJ9"
+        },
+        {
+          "resource": "repo://.openwikiignore#L1-L6",
+          "version": "repo-lines-v1:sha256:01eccf31b39563dcb8382b2372d4d884dabd8de991489410f33a7285c99ce664:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDY3OGYzNzJkM2Y0ZTRlNzdhZGRjZjMyMjMwOWY5NGQ1YmU5NDkxMjFlMjBhNjMwNzAwY2QzMjdhZmIzMWJhMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDVmN2Y5YzFjMTE4ODljNTlmOTlkZDY0NDg3ODdkYWRlZWMxYjgwMTFiZDk3NTFiNjJkNTE3YWM3YTEwODkyMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzczZTRlOGRmODNmYWRiMjM2MTYxYmMzMDUxZmVjOWFlNmNmMjVhOTJhMzdmN2RjMmUxY2NhN2JiZGE4N2NmNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4082b3de91064835b8e51a43012e0f72",
+      "statement": "There is no automated coverage of the intake layer: the only tests pin spec-section validation and workspace preparation (worktree reuse, recreation after directory removal, rejection of dirty local `main`, rejection of a foreign repository), so adding an intake or GitHub-write stage requires adding its own tests.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L7-L65",
+          "version": "repo-lines-v1:sha256:dcf1bda3471d8b06a98367c87966f09afd434f30378f12a087bba5c78ca844e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2NGY5MTY3NmZiMTU1NTMxNTM1OWRhOGQ4NGRkM2Y0ZTVlMThiNTRlOTlkOTI4ZmQxNmRiYjBjNDNkNDcxN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L23-L35",
+          "version": "repo-lines-v1:sha256:93cf388b37f581347e09433b634307aba08db33e4de8141949902d33217a244b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwZDVlMzAwYTMyMWQ1MzQ2NTgyYjAyNDkzODFlMWUxN2IxYzZhMThiZTQ2M2ZhNTVhODc0OWI2OWE1NjRhMjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiZGE2ZmMxMmNjOTFkYjRiZWEzMWJkMTI1OTI3Mzg2NWQzZWUyODA5OGQ0MDk2Yzc3N2Q4NDZjM2M3MmMyZGQifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L18-L117",
+          "version": "repo-lines-v1:sha256:ea27371db2b791ca0ee55d9eabf464eb7864f1d8b624382573dfc7908f7e1823:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2N2MwYTBiMmNmNTZjNmZhZWMyNDY4MTM0YzM5NjBiODQ0NWE5MDI5NTQxMWEyYzZmMGVkYjBlNzRhOWM5ZWE5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0NDVjODJhOGM4MThjMzgzYTYwNTlkMDEyODYzZDE5MWFmNTQzNTA5Mzk4ZmMwMjVlNjg3MWRhNjY0MWZjYWNiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1NDk3ZTU5Nzk1MDYwY2M1MzZkYTgzYzhhNzkzM2M0OTY4ZDExMjIyYTU0OWNkMzQwMmUzMGM3OWM2MDA1MDcwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5ZmEyMWE3NGYzNjg5ODljNjZiMjM2YzA1OGEzZDA1MzgxOGM4NDk2NDVmZjhhZWU3NjgxMWU3ZTNiOWUxODMwIn0"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

@@ -44,12 +44,36 @@ public sealed class ProviderResolverTests
     }
 
     [Fact]
-    public void MissingApiKeyFails()
+    public void EmptyProvidersFails()
     {
         var config = CreateConfig();
+        config.Agent.Providers.Clear();
+
+        var exception = Assert.Throws<InvalidOperationException>(() => new ProviderResolver(Options.Create(config)));
+
+        Assert.Contains("At least one agent provider", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BlankApiKeyIsRejectedByGeneratedValidator()
+    {
+        var config = CreateConfig();
+        config.GitHub = new GitHubConfig
+        {
+            WebhookSecret = "secret",
+            AppId = 1,
+            PrivateKeyPath = "private-key.pem",
+            InstallationId = "1",
+        };
+        var validator = new ValidateSebastianConfig();
+
+        var valid = validator.Validate(null, config);
+        Assert.False(valid.Failed);
+
         config.Agent.Providers[0].ApiKey = " ";
 
-        Assert.Throws<InvalidOperationException>(() => new ProviderResolver(Options.Create(config)));
+        var invalid = validator.Validate(null, config);
+        Assert.True(invalid.Failed);
     }
 
     private static ProviderResolver CreateResolver() =>

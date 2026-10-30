@@ -1,0 +1,4 @@
+# Files
+
+- [GitHub App Authentication and Issue Writes](github-app-client.md) - How Sebastian authenticates outbound GitHub REST calls — the PEM path to RSA key to installation-token to Kiota request adapter chain wired in GitHubService — and the only two writes it performs, posting an issue comment and closing an issue as not_planned, with their exact payloads, failure semantics, and extension boundary.
+- [Webhook Intake and Event Routing](github-webhooks.md) - How Sebastian receives GitHub App deliveries — MapGitHubWebhooks with the configured secret, the only two WebhookEventProcessor overrides (IssuesEvent and PushEvent), the issue action/state/label gates and their silent-ignore branches, push handling that runs SyncMainAsync inside the request, and the per-branch logging that makes the routing observable.

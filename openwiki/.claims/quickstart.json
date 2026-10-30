@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:d56ce013411b365bb12bf9ce16233ba6e034979608619c83af5b211a5b476a86",
+  "claims": [
+    {
+      "id": "claim_d654d83e34c54288a0317bc22bad58d1",
+      "statement": "AGENTS.md instructs coding agents to treat source code and tests as authoritative and the generated openwiki/ pages as optional just-in-time context, and gates wiki retrieval on user request, unfamiliar architecture, or unresolved uncertainty after source inspection.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L5-L14",
+          "version": "repo-lines-v1:sha256:965b11a851738f08a591fcd7200331a525a9902e67b614ce6d86c6a4283402a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkYjQ2MDY2MGY0ZDUwYTI1YWNhNzc5NjEwMDJkMzk3MDVjNjQ2ZGMyNmE4YmZhNjZhZTZmNjkwOTU5YzY5NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiNTM5NTNiZmI3MmMxMjYyYmJhZTJlYWNhNzJjYWJmMWFmNDk5MjdhMGJiYTExNTdiMmQ1YmRiMjg1YzRiZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhZmI5NjA2ZjViMGQ4ZjYzNGIyNjAzNzhkNmVjZTI1M2I1YzE0NDdhOWJmMWQwNDkzNDk0NDBhOGI1ZWJmMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwODlkZjkzZjhiYTU3YTRkZGJmZDhmMDEzOTYyYzM5NzhjZTRkYjY4MTk5YzRkYTY2NjY0OWIwOTk2Y2VkYTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eb83669cc15d459ab4b6a3ab962e8283",
+      "statement": "Program.cs is the entire composition root: it binds and validates SebastianConfig on start, registers GitHubService, ProviderResolver, Git and JobQueue as singletons, exposes Git and JobQueue as hosted services through those same instances, registers GitHubWebhookProcessor via a factory as the WebhookEventProcessor, and maps exactly two endpoints — GET /health returning \"ok\" and MapGitHubWebhooks with the configured secret (the only inbound integration and the trust boundary).",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L11-L49",
+          "version": "repo-lines-v1:sha256:55c780b60958294912167d4df7ef03f84d978eb4acaf0f5d177a37bcbb41a099:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8b46f8d33de548ada7e9dd8d25afadca",
+      "statement": "Sebastian is pinned to a single repository: Git.StartAsync fails when the content root is not the git top level and throws when origin cannot be parsed into RepositoryIdentity, and PrepareWorkspaceAsync rejects an issue whose owner/repository does not match that parsed origin.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L68-L76",
+          "version": "repo-lines-v1:sha256:712da247a86982f2c86bbdbd1202f86af79b9c18b336672ba4953a640a490545:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FlYTJiZmZkYTMyYTBkMWMxY2FjMDYxZDJiODY5MGJhY2IzOGEzMmQ1NzM1ZTVkNGJiMGNmYWMxOWU3MDkwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQxYWE1ZDlmNzdmNTY5NTY5OTkxMjg0YmFlZTY0MTU2MjU5YTNkZmZhOWQ5YjBhYzg2NmI2ZmY4MzIwYmE3MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM5MGRkZTRiZjE2NzFhMDdhNDNlNGVjN2QwMTJkNjVhY2M3YWI3YTYwMDA1ODY0OGYyOGFiNWVhZTVjODY0MCJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L54",
+          "version": "repo-lines-v1:sha256:04743b75adf9aacca2db0a3dab0e92cd4445e827ee28e392050812fdb3b2eaf8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0480c8e2c5c14d3cbaad52fe48c5a87f",
+      "statement": "Webhook intake is the only entry point for work and forks at the spec gate: it accepts only Opened, Labeled, Edited and Reopened actions on an open issue carrying the case-insensitive `feature` label; empty required sections cause a comment plus a close as not_planned, and otherwise the presence of `ready-for-agent` is what constructs and enqueues an ImplementSpec job.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L105",
+          "version": "repo-lines-v1:sha256:3907686fe48b13846e8b4d70cac3c76da4f1786e1c7d533b58f982610a5f6678:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiZTAwYWY3ZWI4ZDhlOWQxZTE1YmFkMGI0Mzg5YzkzYzljYTgyMDZiMjcyNTE5YjA1MzAzYzI3NTEzZjBiMTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmNhNTZhYjI5NzRkMGY2ZWUwNDhmZWU0YTNiNmE3NTgyNzkzZGExZDFiN2EzODI3YWU0NGY0ZmQ5OWY3NDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7593194fd19349ff85b18558525975c2",
+      "statement": "Push deliveries bypass the job queue entirely: ProcessPushWebhookAsync logs the delivery and awaits git.SyncMainAsync inline within the webhook request, a deliberate documented shortcut that makes webhook response latency a constraint on intake changes.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L117",
+          "version": "repo-lines-v1:sha256:157fae54eb39a767fcaa9562bc592d1cfa5a6be5dadf7c984f9a08e5a9cc7400:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZTAzNjk3YjVjMGRiZmZjMjVlZmE1ZDVjYjQ1NWM4Mjg4NjVhYmZmMzM5OTJkMTU1NDUzYzM4Y2NkZjQ1NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1OWE3MzFlZDZkYWJhNGExMDZjZjc1MWRlMDU5MmI2M2YwZWE3NzFkZTk1OTQ4ZjMxYzY0MDg1MzJjYTkzMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_32258bacb9c04dcea1d714b46640fcc7",
+      "statement": "JobQueue is simultaneously the admission API and the background consumer: an unbounded channel, an OrdinalIgnoreCase in-flight key dictionary held from TryAdd until the job's finally block, MaxConcurrentJobs = 10 via Parallel.ForEachAsync, one async DI scope per job, and per-job catch blocks (including the suppressed CA1031) that log failures so one job cannot tear down the queue.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/IJob.cs#L1-L8",
+          "version": "repo-lines-v1:sha256:c6efef8d6c488f1c054421e8f6a73fb550698c8ab062c09d4e9ebeab72d00cb3:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTkwYTI1NzA4ZjcyMTQ3OGVjMmNiMDNlMjMyMDE3ZGQxNWY2ZTI1ZmYzMmFjNzI4NGE4NjYyODA1NjU2ZjM1OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L14-L79",
+          "version": "repo-lines-v1:sha256:795459051d4c73aa1f62a15a6ffb63b10f3bb7442bcc2bf248c46c99a1983015:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1NTY5OWEyZjkyZGZlODc5ZjdlODc1NDU4YTNlMzVmZjk5OTY2OTk4ZTRmYTU1OGE1OTk1MzFlNzdkM2Q0MzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4ZWQ3YmE2Njc1MDI5ZmYwODFjNTNhYjViYzRhZTg0NDdmMzk4NjYzOGRhOTVmOWRjNDNkYTQyMjQ3NGU2NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzM2MwZTI4ODQxZjc2MjQ3NWI4MjI5NTFkNGI2M2YzNTg3MzBjYmY4YWJjNjljZDRkODBkZmYwZjY3NDQ0YmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e586b30ef30a4b0bbed850022aece5ee",
+      "statement": "ImplementSpec is the only production IJob, keyed `{owner}/{repository}#{issueNumber}` (the queue's dedupe token); its RunAsync prepares the workspace, builds an ImplementationAgent role, obtains an IChatClient from ProviderResolver, runs a prompt session, logs the resulting git status and agent response, and disposes the chat client when it is IDisposable.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L26-L61",
+          "version": "repo-lines-v1:sha256:84fbbd97c9046d4c5378462dbfd6845c248875028dbcf308e0e0e34ca954c8b6:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhOWE0N2RmYjRjZTI0ZGRmMTkxOTFiZmQ5MDk3MGE0NzZlZGJiMjc4M2E2OWFlNTAyN2Y4ZmZmYzFkMmEzYzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3ZmZmZmZhMTMzOWYyZGI0Y2VjNWVjOGIzNDUzMWI5OWNmM2RlOTgwNzBjMjFkZTFhZjBkZTM4ZjRlOTVkZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4ZjZjM2I5MzFkNDIxZWRiNjE4MzBhMzBjYjc2Mzk1ZDg1OWVmNTc1NDZmYzA4OGZhZDFhMTlkZDdiZDMzNDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b5872892c2ba477c9beb1ecccbaabc8d",
+      "statement": "Workspace preparation is policy that lives in ImplementSpec, not Git: a static PrepareLock serializes it, it fetches origin, refuses to continue on any FindMirrorProblemAsync result, fast-forwards local main to origin/main, then uses `.sebastian/workspaces/<issueNumber>` on branch `sebastian/issue-<number>` — returning an existing worktree directory unchanged rather than recreating it, so prior uncommitted agent work survives.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L23-L110",
+          "version": "repo-lines-v1:sha256:86bbec1a3d390c1e3fc4ffd5af87da0c02c1829fe0e0b10e2528955fa5135dc9:eyJzZWxlY3RlZExpbmVDb3VudCI6ODgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkMDBiMjBiZTM3NzhhYjEwZmRlYjg5YjFjMmNhZjYwYmJlOGY1OWViY2FiMzQ3MDhkYmU3N2Y5ZDc0ODNhM2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5NTE5NjUxODhlOGY3MDM1ZGJmNGEwMTgwYzVjNzg1ZTM4YjA5MzFlMWQ3MjE3NTQwN2MzZjRkYmRlZDhlMzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhMDJiZjRjNjQ2ODhmYWM0MTNkNmI4ODgwOWFiOGFlNzgxNDE5ODZkYTUwMDRjNmY2YjIzY2JjNmI3OWE1NjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cb52206b2cc3444bae9a76dbce7f03cb",
+      "statement": "The agent layer separates fixed capability from per-run instruction: AgentRole.CreateAgent wraps an IChatClient with AsHarnessAgent over a Configure-provided options object, while ImplementationAgent.Configure sets static instructions, a single shell function built from a confined LocalShellExecutor (working directory confinement, clean environment, a regex deny-list blocking destructive, git push/reset/clean, gh and network commands, and a 10-minute timeout), filesystem file access with all approvals disabled, and disables file memory, web search, and any mode other than execute.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L9-L21",
+          "version": "repo-lines-v1:sha256:e2d2b6c0c99309c7dec3587883995176fc8a99bdd81cf401a4a77117dfd72565:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlODY0MDg1YzU3YmRlMThiMTFiMDQ5ODE1ZDUxNzJhNzljNjA1MjU3ODRjNjkwOTkxNWIyODJmMTkzZjJkNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZmExNWIzNjlkZTIxZjViNGRhYTUyMTY1ODVmNmQwODliNTk4ODJmNWVlN2QzNzljOTY2OGUyZjk0MWZhOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxYThmY2U0ZjQ2NTZiNTY4NTdjYWE3ZTA2ZTE5ZjdhOTUxZDM3NTBkODFhNGEwNjZlZWM2ZTg2N2QzY2QwMmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L14-L71",
+          "version": "repo-lines-v1:sha256:4c724d4b0c2a2ad70902e0c34ce9349376fe7aa5baa6800d7dea7a7845ed19cd:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViMjM1Mjg5MWZlMDJlNDgxOTI1NTBiN2E1Nzk3MDM0YzcxMzRhYWRkNWVhNjY1YjhhMzA1MjM2Y2JkZjkxM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5YzEzNTkwNjY1NjMyM2QxYzVlYTQxNjU0ZWU2NmFmYjU4NWFjZGNmYWVhY2ExMjFkNWUzMGJmMTkzZWVkZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0YTUzYzZmMWI1Y2E2OTE2OTdlM2Q0MmZmYWM5Yzc4NTQyYjc0MDgyODlmMmMxNmZkZDYyMTFhNGQ2ZmQ0YjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_55d3cc4d50854219b33f49334bd0022b",
+      "statement": "ImplementSpec.BuildPrompt frames the issue body as requirements that cannot override its own rules and forbids git commands, commits, pushes, pull requests, added dependencies, and edits outside the workspace — so a run's only product is uncommitted files in the worktree plus a log line.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L112-L135",
+          "version": "repo-lines-v1:sha256:c85571a8ba32b1f7e032fbdd337cfc9bda85aba0246845878060389e5ecbd15b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmZmNkZTFhY2Y4Mzg5M2RiMDA0NTA2N2QxOTI2MDhhYTE2YmFjMTVmNDQ4MDdkMTJmNThmM2I4YzViOWYyMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzMGEyY2I4M2Y0NjY4NTA0MjkxZjYyY2NmMDQ4ZmVmMDhlOWNjZGIzYmU3N2I1NzBiYTAxMjcyNTg5ZDlkN2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_153b3e999617416e85060c946669efb0",
+      "statement": "SyncMainAsync fast-forwards local main only for a non-deleted refs/heads/main: it fetches with prune, skips on a mirror problem, no-ops when already current, and otherwise merges --ff-only, swallowing InvalidOperationException and cancellation as warnings so a failed or slow sync never fails the caller.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L104-L151",
+          "version": "repo-lines-v1:sha256:9ec279195720fae6d2da9d58223b8b75341d212bc7128ed4b36ba72bcee0ae4e:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjg0NzU3MTcyNmQ4YjU1MmJlM2NkODM2ZGRiMjcwZGM5NGRjMGMxY2E4NDQ4ZDliYzU5YmY5OTZkNWQ5YzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2YTRlYTliNzU5NjQ1ZjY5MThhZjIzMzMyZDY4ZGFiODJmZWQyYzU5NDg4NGU4ZmVlYTBmNTQ5NmVmMTFiMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5MTEyYmIwNTNiMzA4NGExNjFkMzJiYzg1ODE3NzRjYWExNmZkNTQwZDNlZDgzZGVhNzdkYzcyNjcwM2NlMTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_53a33a77b53d4abbbf0a4dd5c4845bac",
+      "statement": "FindMirrorProblemAsync is the single source of the three mirror guards and their operator-facing messages: local main must be the checked-out branch, must have no uncommitted tracked changes, and must not be ahead of origin/main; otherwise the returned string is thrown by workspace preparation and logged as a skip by sync.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L153-L173",
+          "version": "repo-lines-v1:sha256:81b2daf69aaa09e46e0e9a8016e58c6eb4e7737508cfe5c23914a8c00198e6ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZTZhMGQ5YjBmZjlkMDgwZThmODM5MmM4NzQ2ZThjNGE5NWM2NWJiN2NjNTVhNmNhYWMzMjY0MTU1ZTEwYTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkOGM4ZDUyMmQzOWZiZmUyYjViNTliNTYzMzY5YzllYzliOTNjM2U5MGQzODRjZDhiNDE3MjE1Mjg4ODc5YjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4b36b64088ac4b03b52350d4eaf1438c",
+      "statement": "ProviderResolver resolves the model at construction: it rejects an empty provider list, rejects duplicate provider names (case-insensitive), selects the provider whose Name matches Agent.General.Provider case-insensitively, defaults a missing Endpoint to https://api.openai.com/v1, and CreateChatClient returns an IChatClient for Agent.General.Model from an OpenAIClient bound to that endpoint.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L15-L59",
+          "version": "repo-lines-v1:sha256:309ec44a05b31fb1152f99f87416a324c9884d67f8e1076b7858ce3fea5392f8:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5M2IxMzcyZTU0ZGFlNWFjMGVlZTk1Mjc3MWZmZGQ4OWFiY2Y5ZmY1YjJjZThhOTY2NGE4ODViZWU4NTUxYjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzNzZjNzk4MmMwNGY1YTQ3ZWUyYjlmZmZjZjEwOTUzN2RmZjZmMjViOTZiOTNiMjA0NzFhMDYwNDE4NzNjYjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b204ad334e9345ed999b362ee354066c",
+      "statement": "Build and test are two separate compilations with no solution file: tests/** is excluded from the web project, which enforces TreatWarningsAsErrors, AnalysisLevel=latest-all, PublishAot and InvariantGlobalization while the xunit test project inherits none of them, so `dotnet test tests/Sebastian.Tests/Sebastian.Tests.csproj` passing does not prove analyzer or AOT cleanliness of product code.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L5-L23",
+          "version": "repo-lines-v1:sha256:527d6390d0ab8da280e1ac4b5d51180de20bdcb3a082da54e0b17684ae03cfc9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkNWZhYjJjYmViMjMxY2Q1MWQxYmFlM2JkYmVjNzU0ZmY0ZjA1MGM5MzE4YTU5MmRhZTE3YjgyYzQzZTFkM2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1NzYwNDQ3MGMxZTllYzNkZDdjMzVmZDA0NWU2ZDEzNWIyODczN2I4MTljNWY3N2EwZTA3ZDQwMDllM2YwMDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5Y2I5MzFlNmVkMzBiODc2ZDIxNTIwZGRmNWFmMmE0MzNlNmVmMDZhYTBhZDkxNWE1ZGM5MGIyNmJiNDhiMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyNTVlM2FmZThhMmVkNGU2ZDAwZTMwNWFmM2UzMTk3YTI5NDU2Y2Q0NjFiMTVjNjBjNzYwOTQ4M2M4YzI0NzcifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj#L3-L23",
+          "version": "repo-lines-v1:sha256:4e16b9aa2ad845f6dc3fa1c43708d1383dc683f69b3171595fdf51a1ce1bd916:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3MDY5MmJkNGVkNzRjMjlkZTA1YzY5NWEwNTE3MGE0YzI0YThmMjY2N2Q1NWJjNWZmNzQ0MjU4ZTM3ZWY3ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlOTk2NGRlNjdjMGIzYjM4ZjcwNGEyYmNlYjQwZjQ4MTQ4YTFiZjhlZjI5ZjRhYWMzYjEwZmU0NzJkNTgwM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzNzMxZDU4NDMxMDZhMDZlMmYyMGY4N2FiY2Q5ZjM3OGUzODZhNTE5ZTM1ZTc0MjIyZWExMTI4YjFmOWZkMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NDQ2ZGI5YmNmZWFhYzA3MzA2NTAyY2MxMTQ2NTEzMTBhZDZmMDJhZmUzMTk0Zjk4MWI2MGY4OTI5MDIxMmUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

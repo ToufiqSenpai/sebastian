@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:50fadc2d3e29acaba14cabc4aeb139462b44da80bd584651e0295d1bb9c92bb8",
+  "claims": [
+    {
+      "id": "claim_68c0f691ec7f47e7ae1e90d95ad905f8",
+      "statement": "Sebastian applies three distinct failure policies by layer: host startup failures (repository identity, configuration validation, credential loading, provider resolution) throw and abort the host; the mirror sync path in Git.SyncMainAsync catches and logs without rethrowing; and exceptions inside a job surface as one Error log line from JobQueue while the loop continues. The intake GitHub write path has no catch at all, so its failures escape the webhook request.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L41-L79",
+          "version": "repo-lines-v1:sha256:5586c73a9a67e6eac401a825f74689d10d926114316da1f624b2b1be6b9ebfca:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkNjMwZmRlODg1NTA0YmY3YzBhMWE4MmVjYjZkMDljYTA1YzZhZTExNTJmZTRlM2NkODgwZjRkMzRhM2I2NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1NDhlNmRiZmYzZjMyODQ2ZDhhYzUzODM2Y2Y5ZjA5YTI1ZWU5NzU0MTA5YjJkYjNjMTk3ZWU3ZDhlYzczNTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzM2MwZTI4ODQxZjc2MjQ3NWI4MjI5NTFkNGI2M2YzNTg3MzBjYmY4YWJjNjljZDRkODBkZmYwZjY3NDQ0YmEifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L107-L151",
+          "version": "repo-lines-v1:sha256:05ef875c7ad6b67604a7f823634f5beca8f5f4dd5854f8fcb171ca2e25834ea2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2ZWM5ZWE4OTBmMWJlNjhhNmMyMzE0ZDA3NDM3MGU0ZmYwNTEyMDg1MTBmYTk5MTJlZDkwNjY1NWExZTFkNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhZTg0ZGZkOGU0NDIyZDE2OTEwZWUwYTc4ZWViYzIwOWNmMDM3NTY4ZDhjM2RmN2Y1Y2FjOTI5MWVjMzIyOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5MTEyYmIwNTNiMzA4NGExNjFkMzJiYzg1ODE3NzRjYWExNmZkNTQwZDNlZDgzZGVhNzdkYzcyNjcwM2NlMTEifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L54",
+          "version": "repo-lines-v1:sha256:04743b75adf9aacca2db0a3dab0e92cd4445e827ee28e392050812fdb3b2eaf8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L102",
+          "version": "repo-lines-v1:sha256:0960ba62d40379940aa380a36542389dd6610658c2f1b38d5e95109ede33cfb1:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwNzdlMDhhMDQ2YjA5OGI2MTY3Mjg5ZDc1MGY0ODgzYmM1OTY1ZmYyOGI5ZDBkNTRkODhjNGU4YjkxYmFiOTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_503e116af5334f50a10fb39e17291dbb",
+      "statement": "Git.EnsureRepositoryAsync enforces the process identity with CancellationToken.None and throws InvalidOperationException when the content root is not the git top level ('Sebastian must run from the repository root...') or when the origin remote does not parse via RepositoryIdentity.Parse ('Could not parse the origin remote URL.').",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L40-L54",
+          "version": "repo-lines-v1:sha256:d49009078aab2cac66c9694db993ff8886a75772e91084583bc594cbe995a535:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNDI0M2U1ZDc2YTZkYmFhMjY3NTgzNTQzZTc4NjRkYWEwODkwMGQ1YWY0MzkxOGRhNWM2MTRhMWFlZjBiNGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_95eabf886dc04ee0be88421d5107af5d",
+      "statement": "Program.cs resolves GitHubService and ProviderResolver eagerly after builder.Build(), so a missing or malformed PEM private key or an invalid provider configuration fails host startup rather than the first job.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L38-L44",
+          "version": "repo-lines-v1:sha256:f665e3c762718ad33463b72647381c4f9db854925d74eed4d5420391901133ca:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDE5MjlhMTc5NmMxYmFhYzgxZTc0ZGUyZGI2ODI1M2M1YWI2MmFiNDJmMWFlNTA4ZGRkY2UyYThjZTkyMWY4MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWU2ZGQ3YzVlMGVmZWQ2NDY4YzRkMzgyNmM0OWRhM2JhMmUxNGIwNTY2NjgzMGMwMzM0M2QxNjRkMjhmYmIwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L50",
+          "version": "repo-lines-v1:sha256:bb1476050eb1307edd00cd5c314f809db6a6f3937fc490c01caed6601f93a81e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWJjNmZlNDA3Zjg1OTQzMThiMTYxNDA4OTU2YTE2MjZlY2U2ZDEzMjg2Zjc5ZWE5ZjEwMGRiYTZhZGJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWJiOTNiY2FkMWY2ZjJmZTc3ZmZjNGJiN2Y3ZDlhZjEzYzEwMGE2OGM3ZGI1MTRhNWFlMDU2MjlkNzU1NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3MDMzNWE4ZDNiNGRhMTAyOGI5ODc0ZDNjODgyNDc2MWQxZGFhZTBiYjYwZDFiNmQ0MDc1N2RmMzc4NjQ5NTYifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L23-L38",
+          "version": "repo-lines-v1:sha256:918ac9ffdfb965cdb6c2cfc95cabe480f1e34a819d167361d3b1c3370247b38e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjIxYmUyMjAxZGMwMGUwZDI0NDVhMTg4ODdkOTFjNmQ5ZjVhY2UxZjdhODM4NjAzZjFlNzI3ZTFjNzI2YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZjY4Y2VlODdkMGMyZmRhYWI1NmU2YTk4ZDc1MzJlYzEzMWQwOTI4MDc5M2M5NzFjNDFkMDQzNGVkNmNhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYzAyYzVmMjc5YjM1ODlhNzhkMDM4ZWIzMDRjNmFkMmM4MWJlNmI5NWVkZWM3MjNiNWY5MjgxYmY2OTdhNjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_874ebc5656854cf088fd9b1693a31e07",
+      "statement": "The ten-second startup bound in Git.StartAsync covers only SyncMainAsync: EnsureRepositoryAsync runs all of its git commands with CancellationToken.None, so the repository identity checks are unbounded and can block host startup indefinitely.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L54",
+          "version": "repo-lines-v1:sha256:04743b75adf9aacca2db0a3dab0e92cd4445e827ee28e392050812fdb3b2eaf8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_66192028888d490ebbfc562002fc685b",
+      "statement": "Git.SyncMainAsync never throws: a non-null FindMirrorProblemAsync result logs LogSyncSkipped at Warning and returns, InvalidOperationException is caught and logged at Warning by LogSyncFailed, and OperationCanceledException (the ten-second bound or shutdown) is caught and logged at Debug by LogSyncCancelled. A push to any ref other than exactly refs/heads/main, or a branch deletion, returns before the try block and logs no skip.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L107-L151",
+          "version": "repo-lines-v1:sha256:05ef875c7ad6b67604a7f823634f5beca8f5f4dd5854f8fcb171ca2e25834ea2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2ZWM5ZWE4OTBmMWJlNjhhNmMyMzE0ZDA3NDM3MGU0ZmYwNTEyMDg1MTBmYTk5MTJlZDkwNjY1NWExZTFkNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhZTg0ZGZkOGU0NDIyZDE2OTEwZWUwYTc4ZWViYzIwOWNmMDM3NTY4ZDhjM2RmN2Y1Y2FjOTI5MWVjMzIyOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5MTEyYmIwNTNiMzA4NGExNjFkMzJiYzg1ODE3NzRjYWExNmZkNTQwZDNlZDgzZGVhNzdkYzcyNjcwM2NlMTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_15df3c1b6a6c428fa754f7e9f1ab12ae",
+      "statement": "FindMirrorProblemAsync is consumed with opposite policies by its two callers: Git.SyncMainAsync logs the problem as a Warning and continues so startup and push deliveries never fail, while ImplementSpec.PrepareWorkspaceAsync rethrows it as an InvalidOperationException so no agent starts on an unacceptable base.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L78-L86",
+          "version": "repo-lines-v1:sha256:d58869dfb51b549f616cff81809feec46d59c0a2a5660a893cc06c0da80fd8f1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTI3NmY2NDljYTUxMjk2YzAwYjc4ZDA3ZDk0MWIwYzhmOTAwMTljMjg4ZDIxZDQ1YmY0N2YyZjBlYjMxZTAyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGIzZjU2ZmIzM2YwMjJiYWJjYTNmM2ZjNTc5YzY5MzIyYzNiZTEwNGVlYWRiYmU2MDM1MGM2YmM4M2VlOGMxNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjMzYjEwNWU4MGE0MzgyNzc1YjA3ZWUwZDZjNzFmMWU0ODhlMjM5NDgzOWI0M2Q2M2ZlYWVhYjJkYjViNGQzZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWIwMzhkN2M5ZWU0M2M2YzFkNzM5MzI0M2U1ODk3NDVjNzk4ZDhlNDdlNzg1ODJhMjE3MzEwYTY5YjhiYWFlYiJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L124-L129",
+          "version": "repo-lines-v1:sha256:72f449acf8c56f038ec128feaab93220205d4c2cb7de7e9560b9d4073869514d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzJiZWU0ZDVmNGE5YzUzNmQzMzc5OTM3MzViMDUyMTMzNmFkZTExM2Q5M2I0YmQ4MzBlN2Y0OTg1YjMzMTBhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjFlZWU0NjQ3MzlhYWY4MmY3ZDBmOGI3OGRhNDg2ODFmNDQzY2RlZjViNjM2NWVmYzk3NDM0NWJiOThlZGQ1NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjhiZWFlMjFmMzFhNzIxOWQ0M2YwZjU0MDczZDIyNGRiZDVhMjMzZmFlMGZmY2UxMGU4MTU0NjgwZmE0ODlhOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2749b0689b644244a5865fe0faaf420f",
+      "statement": "Git.RunAsync creates every child git process with GIT_TERMINAL_PROMPT=0 so credential prompts fail fast, and on cancellation calls TryKill with entireProcessTree: true before rethrowing the OperationCanceledException, leaving the caller to decide the outcome.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L180-L230",
+          "version": "repo-lines-v1:sha256:532213264b2565e224e6b590ddf13173334aad5e35e1f72acc9ca36e2593c279:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhN2NhNzIyYzNlZTUzMTkwYTgxZGU0MzI3Y2ZhMmZhM2FmMWNkYTkzZDI0NDgwZmE3MTQzNDk3MjU5MTRmNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5YzQzYmZhYThjOGRiOGQxZWI3NWZhMmY5ZTliY2FkNGQxYmY4YTk1MDBiY2NkNzNkYjk3OTQwMmU0ZWU1YWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4MzcxZjFhOTk5MDEyNjU3ZDIwOGRlZDY4Y2E1ZDU4MGI2NjkxNzcwMDI1YWIyY2ZjMWI5MWY3ZWUwMTdjOTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d8d6802c158e458ca191debc34c4534f",
+      "statement": "TryKill guards only InvalidOperationException ('process already exited'), so any other Kill failure (for example Win32Exception) escapes the cancellation handler as a different exception type and is recorded by JobQueue's general catch as a job failure rather than being treated as shutdown cancellation.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L63-L69",
+          "version": "repo-lines-v1:sha256:5b84e82f4ccb6ada4ce8ca7da595cb6395a2aa5ac9cddbdfcdefc455dcd2efeb:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWM0MWU3MzE0MDMxNDMyODljMzY1MGI1YzgwZTgwNDI5N2U4ZDc5OTAzYmVhNzRmYzk1ZWY5NzQ0ZGUxNmQ1OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGRiMzM5YzE3ZDRjYzU0ZTcwYzRmY2ZlY2I2MTFiYjllN2QzNjNmMjViMThlMDkyM2ExZDMwNmNjOTU5MjRlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjM4ZjI5ODA2OGZmM2MyMjhjNmI2NDdkYjM5NjIzOTc0Y2IxOWE5YjllMDc0NTY1MDk2MmNkNjYxMzlhYWQ0MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDE4YmUwNmVmNzA0OWY0YTIwOTAxZTU0NzQzNWY2ZDFjZWM2OWFjNWQ2ZjU5NzRmZDJmMTdjOGQwYjRhY2MzNiJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L232-L245",
+          "version": "repo-lines-v1:sha256:d930cb82fb04554521fb5c81acbdc49406360b6c257acb1ce90b0458535219a2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1OTczNWE3YjM3N2JiMGY4ZWI1M2Y5MTUzYTliNTBjOWY4ODU3YTJlZDlkYWM2MDYzNDI2YTBmODg2MWVmZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4YzZlNjNkYzY0MjliM2YyY2FlMjdmYWIyYzgwNjhhYzg1ZTA1NjZmMDIwZmJhYmIzYTk2MTY4OGE3MjZmN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxNjE5MGY1ZTFhOWIzYjVjYzMzY2ZiZTFmMmFhMTlkNmUyMDkyNmEzNDlhMDNhMjc2NmNjYzE5NzRhOTRlYmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_845132d102b3474a9f789422a41bf375",
+      "statement": "ImplementSpec.PrepareWorkspaceAsync throws rather than degrading on three conditions - Git.Repository is null because the Git hosted service has not started, the issue owner/repository differ from the parsed origin, or FindMirrorProblemAsync returns a reason - and each throw prevents the agent from ever being constructed for that job.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L63-L110",
+          "version": "repo-lines-v1:sha256:d1adcc5d278f63232d4ed568e5782aa0cd3c69d10eee1cd5850c4d89195203fc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxOTU5Y2Q4NmYwMTljY2FkNGFjOGNmZDRiYTA5MjNiMzY1NjUyYzI4NGIzNGI1ZTNkNjdmMDU0MjAyOWUwYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhMDJiZjRjNjQ2ODhmYWM0MTNkNmI4ODgwOWFiOGFlNzgxNDE5ODZkYTUwMDRjNmY2YjIzY2JjNmI3OWE1NjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ea173275ad0447a795ae42a100a22129",
+      "statement": "ImplementSpec.RunAsync contains no catch block: cancellation and exceptions propagate out of preparation, the agent session, the agent run, and the trailing GetStatusAsync call, unwinding through the chat client disposal finally and the await-using role disposal before reaching JobQueue. LogCompleted is therefore a success-only record, so a run that fails after the agent responded produces no completion line despite leaving work in the worktree.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L134-L135",
+          "version": "repo-lines-v1:sha256:ea6cd1b17c509cf336822a997c7b7c67972107c332c584b8e6ebd246be79eb58:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODY3ODI1MTg0ZjI1YjM4YzEwODcyMjE5YzBjYTQ5NmM3YzVkZDk1ZmExMDk2ODc5N2Q1NThhZjcyZjk2Y2FlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjMwYTJjYjgzZjQ2Njg1MDQyOTFmNjJjY2YwNDhmZWYwOGU5Y2NkYjNiZTc3YjU3MGJhMDEyNzI1ODlkOWQ3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGJjNzI5ZTFlZTc1ZmRlNjM4ZGUyNmU3Yjg0NTI0NDJlYTIyYTQwYWFlZmYzNjQxZDRkMzc1MTlmMjIzMWVkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L28-L61",
+          "version": "repo-lines-v1:sha256:53f9fb148752070c9dbfbaa10f3d40be30a9d3a8cd1fe886893e5b3efe5a177c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4NzkyMzc4NDU2ZTAyODc4YWEwMjNiZjM0MjUzYzkyMzMyZDdkZTJjYmUzNmU1YmNiMDY1MThhNzcwNTVjNjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNjc0ZGU4ZGFmZTNhMDk2ZTQ5NWZkNTcwNTA3ZmFkNDg0ZTRjZWExY2NlM2I1M2I2YjE1NDc5ZjgzN2U0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4ZjZjM2I5MzFkNDIxZWRiNjE4MzBhMzBjYjc2Mzk1ZDg1OWVmNTc1NDZmYzA4OGZhZDFhMTlkZDdiZDMzNDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_df900003bdd9424d9ec51f6a72b8526e",
+      "statement": "JobQueue isolates each job with three clauses: a filtered catch (OperationCanceledException) when stoppingToken.IsCancellationRequested that swallows shutdown cancellations silently, a general catch that logs LogFailed at Error level with the message 'Job {Key} failed', and a finally that removes the in-flight key. A failed job is never requeued, gets no attempt count, and does not block its key.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L41-L82",
+          "version": "repo-lines-v1:sha256:f45a34a34cae6e11b500273221d2bac01f0738d8f1bd4eb8647c496e2203c122:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkNjMwZmRlODg1NTA0YmY3YzBhMWE4MmVjYjZkMDljYTA1YzZhZTExNTJmZTRlM2NkODgwZjRkMzRhM2I2NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyNDI2ZTg1NjE2N2MzYzIxZmNmMGY4YWZlMTAwZWNlMGUwZTE2ZDUzYTlkNzAyNGE5YjZjMDRlMzcwMTVkN2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1NDhlNmRiZmYzZjMyODQ2ZDhhYzUzODM2Y2Y5ZjA5YTI1ZWU5NzU0MTA5YjJkYjNjMTk3ZWU3ZDhlYzczNTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9f44697888ed42bda544aaedb4e65bfb",
+      "statement": "A failed job produces no GitHub-visible signal: ImplementSpec resolves Git, IOptions<SebastianConfig>, ProviderResolver and ILogger but never GitHubService, and the only two GitHub write operations (PostCommentAsync, CloseIssueAsync) are called exclusively from GitHubWebhookProcessor's invalid-spec path, so a job that fails leaves the issue sitting in ready-for-agent with an Error log line as its only evidence.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L28-L36",
+          "version": "repo-lines-v1:sha256:48e54d5c38dc112dbf2c5bf20845e3330966fc8e0a606bc5a624bf88cf72f2a7:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjg3OTIzNzg0NTZlMDI4NzhhYTAyM2JmMzQyNTNjOTIzMzJkN2RlMmNiZTM2ZTViY2IwNjUxOGE3NzA1NWM2MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdmM2VlMjc5NWVkNWVlYjUwOTEwZGRlYjhhZGZkNjc3ZGNiZTQwMjFmMDE4MTNiZDk0YjRmYTI4N2E5NjdiMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGI2NzRkZThkYWZlM2EwOTZlNDk1ZmQ1NzA1MDdmYWQ0ODRlNGNlYTFjY2UzYjUzYjZiMTU0NzlmODM3ZTRjYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzNkZTZhOTg2NTdlMjE2ZmU3NDZhMDEwZGYzYzEzNjZhYThlYWU1NDc3YzMzMjIxYzM2N2M4MDMxMzgyZTdlMiJ9"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L63-L82",
+          "version": "repo-lines-v1:sha256:61fd2ffce9308b6d2d577af4347ee4a46367ea92c77f5642f2a54f7bdf11d157:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDBjMjY1OWJjYTY3NmE3MmJiODFlNzU0MTAwZTMxYjhhYmY3MjExN2U5YWUxMmRiMDU2OTQ4ZGQ0YmQ5OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OTU2OTA4YmQzOTA5MjMzNDA5ZjdiZWU3ZDhhNWIzODQ0OGY5YjA0M2E1ZDA4ZWIxZTg5MWQ0ZDQyNDFlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMjQ5YTMxYmRjN2UyMWU0OGFjZTA2YjI3OTczY2YyM2Y1OGIwNzVkODU2MmQ0YzhhNGQ1ODRmYmQwNmE2YmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ca63e26f04345b3ae07dce777e082d8",
+      "statement": "The intake GitHub write path is unguarded and non-atomic: GitHubService has no logger, retry, idempotency key, or try/catch, and GitHubWebhookProcessor has no try/catch, so an SDK exception fails the webhook request; a partial success where the comment posts and the close fails leaves the issue open under a 'Closed: ...' comment, and a redelivery posts a duplicate comment because comment creation is not idempotent.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L17-L76",
+          "version": "repo-lines-v1:sha256:9e1f8e9728ad36332ebd16340c4129070220849bcd9002c90bf6aa7172113fb7:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2NjU3YTQyNjk5YWE1MzBjY2Q1NWZhYzE1MzI1NTJmZWYwODAwZWNiY2QyYzA1YmExMTBiMzQ1OGZhMWU5ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5M2RhN2Q5NzU4ZWQ1ZmMyOTdkNTIwNmEyMjZhMGUxNzk4MWEwNzQ5ZGM1YWIyNjE4Y2U2MDZjZjA1Y2ZlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L63-L82",
+          "version": "repo-lines-v1:sha256:61fd2ffce9308b6d2d577af4347ee4a46367ea92c77f5642f2a54f7bdf11d157:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDBjMjY1OWJjYTY3NmE3MmJiODFlNzU0MTAwZTMxYjhhYmY3MjExN2U5YWUxMmRiMDU2OTQ4ZGQ0YmQ5OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OTU2OTA4YmQzOTA5MjMzNDA5ZjdiZWU3ZDhhNWIzODQ0OGY5YjA0M2E1ZDA4ZWIxZTg5MWQ0ZDQyNDFlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMjQ5YTMxYmRjN2UyMWU0OGFjZTA2YjI3OTczY2YyM2Y1OGIwNzVkODU2MmQ0YzhhNGQ1ODRmYmQwNmE2YmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d044366920564d519a66f6d2cac9a63e",
+      "statement": "JobQueue.TryAdd returns false in exactly two situations - the key is already in flight, or the channel writer is completed by shutdown - never for capacity, because the channel is unbounded. The duplicate case is normal traffic: the processor logs only a Debug line and neither throws nor comments on the issue.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L16-L33",
+          "version": "repo-lines-v1:sha256:05b3c110a2220848ac558b01a8600b08fb71eb81182a724061ee2eaedf08205f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkNGI3NThlMmVkYTY1ZmQxNWM1OTA3N2Q5NTJjYTE2ZjhlODlkYzIxN2I4MThjYzliZDE4Y2U1MDZlNjU0NDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwZTgwNWM3MzdmZTUzNTAyZjU1YTgzOWMzZmIxOTI2MDU1N2E5OGU1ZTVkMzNhYjBjMzMzMGQyZDVmNzdlMmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZDM4MWRiMWQ0NmJmMzJiMzJiNTliMzQ5NTU1ZmUxNTNhODZkNGUwNzBlYmRmNTkxYmZlZmM0ZjIxY2M1NjcifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L84-L101",
+          "version": "repo-lines-v1:sha256:fdd2d4f2a8483fade318c2d81bd6a1e7c75efbaa56a6bd9229386427af16fbde:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5ea6708608f24b3587317188eecbfa93",
+      "statement": "A duplicate delivery is dropped rather than queued, and ImplementSpec captures the issue title and body as primary-constructor values at enqueue time, so an issue edit delivered while the job runs is discarded and the agent works from the pre-edit spec; picking up the edit requires another qualifying delivery after the current run finishes and releases the key.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L16-L26",
+          "version": "repo-lines-v1:sha256:1a955c1a404b4715afb46ca47f8d16922c87579032e0878eaa869a362c6a56c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5YzE4NDY0NzcxZDk3N2E0MjA5OTVmNmEwMmQwM2Q4Zjg1YTdhNmQ5ZjU3ZDcxMzc3MmZhODE1ODU4MzI2ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhOWE0N2RmYjRjZTI0ZGRmMTkxOTFiZmQ5MDk3MGE0NzZlZGJiMjc4M2E2OWFlNTAyN2Y4ZmZmYzFkMmEzYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxY2NlZjQ5YmI0Nzc4N2JhMzc3OGFlM2MxNjkyNjM1MGM0MGM0MzBmOWUzMDY4OTI5ZDkyOWY2YWM3NDM3NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5NGRiMDBhMjYzZmNjYTk4ZDlmNjNhMjA1ODVkZGM3NjcwNDIxMDc1MGM0NWJlZTA2NmI4ZDNhM2M0Y2I2YzQifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L70-L73",
+          "version": "repo-lines-v1:sha256:267e537b064ea4110efa0d4c7d076de97f79c28aa07e2534746ed65aaf40d4ee:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjhkNmJiYjIxM2FhNGNjYmRlZGZmMTZmYmJlMjVmOWIzZmNkMTlhZWUxM2JiYTc5MzdlYzQ2ZjUwMjM0NDIzNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGRiMzM5YzE3ZDRjYzU0ZTcwYzRmY2ZlY2I2MTFiYjllN2QzNjNmMjViMThlMDkyM2ExZDMwNmNjOTU5MjRlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNhMDAxNGJmMWUxMWFiN2UwYWYwOGI2ZGM2MmE4ZGFlNGVkNzQ1MTViNjIyMjFmMjU2NTgyYWQyZTk0YjdlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzkxNWI5Mzg2MzdiM2FjZGE1MjQ1Y2YwNzE5ODNhODYwMDQzNTc0MDYyZDM5NWQwMGU2MDM1NTA2Y2QxNDRlYSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L84-L93",
+          "version": "repo-lines-v1:sha256:a9e628988ce6af3a283997934c01abd935b46877b6f6eef3eca53eb97af74924:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiMDhhMGNkODMwYWE1MTNiYmJjNjVhMzk2YmY3NTk1NzhmOGRiYTBmMmZmNDRkNDU3YzU4MGQyMGM5Mzg3MTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5Y2E4NzU0MTFiZGY4MGRlMDZlMjM2ODcxYTM1YmUzYjNjMDg2ZWQyMTViNTM1NDIzODg4NGMwMDliYWVlM2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b29eb6e4942347389960af2645c05646",
+      "statement": "Restart semantics: the unbounded channel and the OrdinalIgnoreCase in-flight key set are the only memory-resident job state and both are lost on restart, there is no startup reconciliation of ready-for-agent issues, and worktree directories plus their uncommitted agent output survive on disk under .sebastian/workspaces. Because dedupe keys are in-memory only, a re-labeled or re-edited issue is admitted again immediately after a restart.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L46-L49",
+          "version": "repo-lines-v1:sha256:dbeb9fc3a90a3aa99843b7cbed5dd9b741954242b07111c34e19159e53353d1b:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzAyMWRhMjVlYTY0Y2EwODMzOTJjM2M1NmNjZTcwYTVhZWRlZmNlZTZiYTI1ODA2ZWRhYmYzMGEwN2QzODZkYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L88-L104",
+          "version": "repo-lines-v1:sha256:51fb2ed010c301c869f200f67b9353fe0a918306bc336b09de4a14e620da3533:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkMWY1YWExNzY2M2I0NmZiNDhkYTIwZDVkOTJiNzI1NmYxYzY3NjlmMjljMzk1YjgyZjI0MjRiMmI5N2ZkZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkNDllZTFjNDlmNjg4MjQwYzExNmJlNTZmYjgzNTA2YjQwYWQ4YjVhYTAxMGYwNDlhYjk5MjRmN2MzMDhiMjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjYjQ2MmNlNjQ1NTI0NzgyOTkzNjNhZGFiMzU4YTU0Zjg5YWRkYTFlNGZkNGFiMmE0YTk2YzNjOTRmMDZjM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyODE2OGIyYzZhOTZjYmVlMWVkOGE5Y2QzNzE4MzIwM2I0ZTFjNGE3ZDA3ZmRjNDM1MGY4NGQyOTU1YWFhOTcifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L16-L17",
+          "version": "repo-lines-v1:sha256:9997dc40cd3e7b3ee6af594dd779addd42a7cfdd179019ac29199c3e63881140:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ0Yjc1OGUyZWRhNjVmZDE1YzU5MDc3ZDk1MmNhMTZmOGU4OWRjMjE3YjgxOGNjOWJkMThjZTUwNmU2NTQ0MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTgzOTZiNmMxMjVhZmU2MjM4YmZjMTgxYjQxMzE5ZGFhNDVmOTFlNzY2ZWIzMzhjNmY4MjI3ZTJkNmQ4M2MzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTBlODA1YzczN2ZlNTM1MDJmNTVhODM5YzNmYjE5MjYwNTU3YTk4ZTVlNWQzM2FiMGMzMzMwZDJkNWY3N2UyYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjFlNjg4MmY2NjRmYTllZWJmZDk2M2EzZDY3MjU2Y2ZiNjhiNDM4NjQyMGMwYzcyYmZkNjcwNGQwNjI5YzVhMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1274295643294273924cc19508c86d6d",
+      "statement": "Worktree reuse makes a retry start from a stale base: PrepareWorkspaceAsync returns an existing .sebastian/workspaces/<issue> directory untouched, so the branch sebastian/issue-<n> is never re-pointed at the refreshed main and files from the previous run are not cleared. Only git worktree add -B (executed when the directory is missing) resets the branch, so removing the directory is the only way to reset a run.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L95-L104",
+          "version": "repo-lines-v1:sha256:1333daf78242ff1346e331f3cca90b72c1bcd8114847c8035043e18d62eb18cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1NTY4NzhkOTJkNjY1MDQyZmU1YmFiOWU0NzRhODkxYjA3NzZjMWZjZWY4YTRlOTI0OGJmN2MxNDE4NDFlY2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkNDllZTFjNDlmNjg4MjQwYzExNmJlNTZmYjgzNTA2YjQwYWQ4YjVhYTAxMGYwNDlhYjk5MjRmN2MzMDhiMjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMTVmMTk5ZmFlY2Q0MzE4YmYyODljNDIzNWFhMmZlMTdjZjNiMzM4ZmFhNjhmY2IzZjE1ODcxNDdiMzIyMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyODE2OGIyYzZhOTZjYmVlMWVkOGE5Y2QzNzE4MzIwM2I0ZTFjNGE3ZDA3ZmRjNDM1MGY4NGQyOTU1YWFhOTcifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L85-L93",
+          "version": "repo-lines-v1:sha256:acf45de8dd40b9ac3c494f32b181a35b6fa6cef1ec1dac9cd2e683777c390348:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWQ2MTM1Nzk2NGM1MGQzMTY0MDFlZTNlZmVhMzVhMmRkMDgzNjJjZTBjNzE3Y2NjMmIxZWQzYjYzNTFiNjQzMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjU4ZGYzNGUyZjFlYWYwMjkxYTc4YWI0ZWU5MzZlMmQyMmViYTY2MDI0MGM1Njk5NjAwZTVlYmU3NjZlZDQ3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZThhYTcxNmRjMjU2MDMyMWE0NGY4MTdlMjMwMjEwZDY5OGJmNjFmZjJiMzg5NDA0ZGM3M2ZiMDIyYzA0YzBjNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDI4YjhlYmY1YWNlYzAzOGQ0MjhjOGMyOWRkOGQzNDA5MDE1NjljYTE5MjViZGUxYzYxMWExMDY2OTRlODUyNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0a37cbfb76b44b58a02200733bf71ac3",
+      "statement": "JobQueue.StopAsync completes the channel writer and then delegates to the base class, which cancels the loop rather than draining it: new admissions return false with their key rolled back, buffered never-started jobs are abandoned while still holding their in-flight keys, and running jobs observe cancellation that neither catch logs because both are filtered on stoppingToken.IsCancellationRequested. Program.cs does not configure HostOptions.ShutdownTimeout, so the framework default bounds how long a cancellation-ignoring job can run.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L11-L49",
+          "version": "repo-lines-v1:sha256:55c780b60958294912167d4df7ef03f84d978eb4acaf0f5d177a37bcbb41a099:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L35-L79",
+          "version": "repo-lines-v1:sha256:c480ecc8edfca579c430edf5997575a6f03598fd5a08d2e923cdf99a740f0249:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjOGI3YjEyN2M4ODRhMjJiNzk5ZmJjM2Q0M2ZhMzNjNDAxZjNiNmI5NjFiMDE1YTY0NGE1OGQ4ZTg4YmFmMjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4MGVhYTY2ZTVlMzFjNjE1ODAyN2Q3NjQwYzdkYTRhMjNjNDhiNDM1NGQ1MWM1ZDk1YzExMDdkNDBhYTU2Y2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzM2MwZTI4ODQxZjc2MjQ3NWI4MjI5NTFkNGI2M2YzNTg3MzBjYmY4YWJjNjljZDRkODBkZmYwZjY3NDQ0YmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_08cd79916ce64f72af8b2f062e8ddfb4",
+      "statement": "The documented index.lock race is accepted by design: the static PrepareLock serializes only preparation against preparation, while the push-webhook SyncMainAsync takes no semaphore, so a concurrent 'git merge --ff-only' and 'git worktree add' can contend on .git/index.lock. Whichever process loses exits non-zero, failing that one job (or the webhook) while git's own locking keeps the repository consistent; the code states this in a shortcut comment rather than closing the race, which would block a webhook request behind up to ten job preparations.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L23-L24",
+          "version": "repo-lines-v1:sha256:0576f1b593e9868ab2b453e66c149e20168af01fd386b5f8b9e124a0220ee8c7:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQwMGIyMGJlMzc3OGFiMTBmZGViODliMWMyY2FmNjBiYmU4ZjU5ZWJjYWIzNDcwOGRiZTc3ZjlkNzQ4M2EzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTg4NGZmY2M4YjMxYjdjMWM3NmVmYzAxOGU1OWFlMmQ3OGJjMGUyYjEyMWIwYzhiZTJlNGEwODVjNmRkYmVlNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzk1MTk2NTE4OGU4ZjcwMzVkYmY0YTAxODBjNWM3ODVlMzhiMDkzMWUxZDcyMTc1NDA3YzNmNGRiZGVkOGUzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGI2NzRkZThkYWZlM2EwOTZlNDk1ZmQ1NzA1MDdmYWQ0ODRlNGNlYTFjY2UzYjUzYjZiMTU0NzlmODM3ZTRjYSJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L118-L119",
+          "version": "repo-lines-v1:sha256:c480724a19eaf2f3a590a2b8f817a3eebbed4a40faaa5c70e73dfee35d3b93dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjAwZjVmZmFjOWUyZmQwZDM1YTdkYzRiMzhhYzczYjMxNjVkMmQyYzIzYmQwNjM1MmQzZTM1YTBjZjE3YjlmZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQwODUzNmI3ZWE4ZDUzN2JiNGQzZTBhOTQyNThkZWJiZmM1ODMxN2QxOWZmNGYxZDM5ZjI2MGRlN2Y3NWEyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjMzOGZkMjgxZjEwNjQ3MjE4NDNkMzRmMDc4Y2NjMmM0Y2M2OTgzZTVjODJiZDgyYmVmOTkyNjFlZDA2Y2YyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWMxODhiNzRlMDY4NzFhODE5YmFiNWRiNzIyM2JhN2U0YzI3ZDdjYTZiZjk2YTk0MzVjMzExNjU0M2MzZDcwYiJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L117",
+          "version": "repo-lines-v1:sha256:157fae54eb39a767fcaa9562bc592d1cfa5a6be5dadf7c984f9a08e5a9cc7400:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZTAzNjk3YjVjMGRiZmZjMjVlZmE1ZDVjYjQ1NWM4Mjg4NjVhYmZmMzM5OTJkMTU1NDUzYzM4Y2NkZjQ1NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1OWE3MzFlZDZkYWJhNGExMDZjZjc1MWRlMDU5MmI2M2YwZWE3NzFkZTk1OTQ4ZjMxYzY0MDg1MzJjYTkzMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_da524eac6a4c4d12b9d52b82a2d4ad11",
+      "statement": "The test suite pins the failure policies that matter most but not the sync or shutdown paths: JobQueueTests' ContinuesAfterJobFailure proves a throwing job neither escapes the handler nor stops the loop, RejectsDuplicateKeyWhileJobRuns proves the key is held for the run and released in the finally, RunsAtMostTenJobsConcurrently proves the concurrency cap, and ImplementSpecTests' RejectsDirtyMain and RejectsForeignRepository prove two of the three preparation throws plus the two worktree reuse behaviors. Nothing covers SyncMainAsync, the JobQueue cancellation filters, admission after StopAsync, buffered-job abandonment, the intake GitHub calls, or the webhook processor.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L7-L65",
+          "version": "repo-lines-v1:sha256:dcf1bda3471d8b06a98367c87966f09afd434f30378f12a087bba5c78ca844e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2NGY5MTY3NmZiMTU1NTMxNTM1OWRhOGQ4NGRkM2Y0ZTVlMThiNTRlOTlkOTI4ZmQxNmRiYjBjNDNkNDcxN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L44-L90",
+          "version": "repo-lines-v1:sha256:c70440b121a7bb39d7492855548495d20564bed549034c157520b2ebca1c9ecf:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwZWE3NGJmNDU0OTJiNTUwMTZhOGQxOTI2MTBhMDI2NjkyMWE0MjY3M2RhMzQ5ZGQ5NDM5YmMwYTM5YzI3N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ZmJmYzA4ZWQwZjFkNjkyNDE3ODViY2E4YzI2ZjNkNTZiMDlmYzhhNzY0ZTM5MGI0MGEzZTM4NDlmMmM2OTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aa39fe42f310496aa85f3d42c341c9fa",
+      "statement": "Log levels make the diagnosis path asymmetric: the only Information-level outcomes in the whole pipeline are the arrival of a delivery, 'Started implementation', and 'Implementation completed'; every failure-to-progress outcome is lower - duplicate suppression, invalid-spec closure, and a cancelled mirror sync are Debug, and mirror problems or sync git failures are Warning - so at default verbosity an issue that never started cannot be told apart from one that was filtered before enqueue.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L134-L135",
+          "version": "repo-lines-v1:sha256:ea6cd1b17c509cf336822a997c7b7c67972107c332c584b8e6ebd246be79eb58:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODY3ODI1MTg0ZjI1YjM4YzEwODcyMjE5YzBjYTQ5NmM3YzVkZDk1ZmExMDk2ODc5N2Q1NThhZjcyZjk2Y2FlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjMwYTJjYjgzZjQ2Njg1MDQyOTFmNjJjY2YwNDhmZWYwOGU5Y2NkYjNiZTc3YjU3MGJhMDEyNzI1ODlkOWQ3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGJjNzI5ZTFlZTc1ZmRlNjM4ZGUyNmU3Yjg0NTI0NDJlYTIyYTQwYWFlZmYzNjQxZDRkMzc1MTlmMjIzMWVkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L81-L82",
+          "version": "repo-lines-v1:sha256:49bb67e77a7e4f7d5399141e31623eb8db5f3d34370e07ae31d9fbbbc89a4537:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjcyNWYzMDQzOTE5ZDk5ZjJkMzMwZTg2MWMyYzJlMzlhOGM2NTEyYzAzYmFhMzUxZDQ5ZDMzZDU2NmI5OTJiZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODI0MjZlODU2MTY3YzNjMjFmY2YwZjhhZmUxMDBlY2UwZTBlMTZkNTNhOWQ3MDI0YTliNmMwNGUzNzAxNWQ3YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L253-L272",
+          "version": "repo-lines-v1:sha256:e836f30383e33261328493e8239a6eb005f60f36e23b14e113d1e0121a8fdd79:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiOTZmNjU0NTgxMDUyNmFmZGJmYjk2NDI0ZmM3ODA2ZjIxM2FiYzQ2YTg4MTA5NGQxMDkxNGRjYjFiYjU4NTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiMWIwZGIxODdlOTI2ZTlkZTFlZGU5YTU1MWY4YjRlNmMzZjBiMGU5NTBlMDk0OWI3NmUxZWM1ODdmZTBmMDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI0NzhkNTQ0ODJjNGRhYjdjYTYyNzExMjI4ODA3OWVmMTkwMTljNTIwMzdiYTJiOWQxYzkxN2RhNjc3ZmVkZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L119-L132",
+          "version": "repo-lines-v1:sha256:f3978f79a40951518d88d6170356e2655860f60c8f7779651f4fba559541538a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NmUyNjg4MmJjYjZmMjcxYjk0ZTNiNDYwMDU3MTc3MDFjYWNjYTI1M2NkZGMyNDMxNDdlNDkyNWY4OTIzZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyM2NiYmZhMzdlOGY5NmMwN2FjNjM2MDllZWJjMThjZTRjMmUzZjgxNGRiYmUxMmNiMmEzMmE0OGI3NzY2N2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0NzRhM2RmY2VkZWJlYTlkNTc0N2Q0NDc4NmJjM2NlN2I2ZjhjOGY4MmE2NDllNWM1NDUxODQ4YzAzMmVkNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

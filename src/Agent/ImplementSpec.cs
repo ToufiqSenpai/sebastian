@@ -98,7 +98,7 @@ internal sealed partial class ImplementSpec(
                 return worktreePath;
             }
 
-            await git.RemoveWorktreeAsync(worktreePath, branch, cancellationToken).ConfigureAwait(false);
+            await git.PruneWorktreesAsync(cancellationToken).ConfigureAwait(false);
             await git.AddWorktreeAsync(worktreePath, branch, Git.BaseBranch, cancellationToken).ConfigureAwait(false);
 
             return worktreePath;

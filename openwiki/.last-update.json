@@ -1,0 +1,7 @@
+{
+  "updatedAt": "2026-10-30T14:24:26.047Z",
+  "command": "init",
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "status": "interrupted",
+  "language": "en"
+}

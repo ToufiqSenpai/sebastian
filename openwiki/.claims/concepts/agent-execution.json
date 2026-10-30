@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:a0e91053e7c9f3e6854e11b6d4a7f97cce57b79996d4a39998c4da4baf3adbbe",
+  "claims": [
+    {
+      "id": "claim_ff0c0f9bef144353a5e09fe4114b59bc",
+      "statement": "The agent layer separates capability configuration from task instruction: AgentRole/ImplementationAgent fix what tools and permissions exist and are identical for every run, while ImplementSpec.BuildPrompt produces the per-issue text describing what this run must do, so a behavior change must be routed to the role (capability) or the prompt (instruction) accordingly.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L112-L132",
+          "version": "repo-lines-v1:sha256:9b6800bf753ee018f2eebd3dcee9ccd4efcf2bf77182bbcb3f22dc77baa8ffb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmZmNkZTFhY2Y4Mzg5M2RiMDA0NTA2N2QxOTI2MDhhYTE2YmFjMTVmNDQ4MDdkMTJmNThmM2I4YzViOWYyMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMjdjNGIxM2QzMDQzMzE2MWU4NWVmNmIxN2UzYzdmMWYxNmZhNGY1NDc0ODQ4NzBlZWRkYjFhY2NmZTFlNDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxYWRlYWY0M2Y3OGRjNGQyMDQwMDM0NzA4MDk1NDU4ZDA4NzkyNWJlODk4OWU3N2M5ZmY0OWI1YTk1ZTU5MzEifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L25-L43",
+          "version": "repo-lines-v1:sha256:a17de34d51c5d01b8120048c640dfbc49059d0660d390d17ec609c9717ec7b12:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2YjVmMGM1NjdkOWI5MGU2Mjc4YmM1OTYxMDFjZDQxMDlhNmZmNzkwMGY5OTQ5MmIzZGMxN2I2Zjk4MDExOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwMDA0YTFmYmYzMjg3MmUzZTE0MjZiOGE2NmM1YzU4OTgwYmQzODhkNzBkMzZkMjQ3MzQ5MjIyNDYzMmIyZTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjMmE5NTQ3MTNlYTVkNGJlYzE0Yjk3ZDNjYjMyYjk2NzVkMjQyZmQ4YjdkODIzZWUxMGZkOGNhYmUyMWU3N2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a58d727bd12241489f747f4355bb9e29",
+      "statement": "AgentRole is an abstract class owning no resources: CreateAgent is exactly chatClient.AsHarnessAgent(CreateOptions()), CreateOptions builds a HarnessAgentOptions and delegates to the abstract Configure, and the internal CreateOptions overload exists as a test seam reachable through InternalsVisibleTo so a role's option graph can be asserted without a provider or session.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L25-L27",
+          "version": "repo-lines-v1:sha256:3159a2bd30178eac04b8fdc6a1064ad5ec21ce71fe5870c124ee79dcecf8af82:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NiZWJmYjQ2ZjEyOTkxYWU0ODhlZWRiMzQxNDAyOWFiMWY5ODA3Y2RjMDllZjA2ZjNkMTBhYzk2YjI4NmJlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkYzE1OWJiNTk3NDk4ZjUyMmU3OTM1YzgxMjE3YmVlMjc5NzI4NmUwM2Q2ZGVhZDZhZTFkNTI2MjVlN2U2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Q4NWJjOWE0NDYzNzE4ZDViMjE3MTkzMjA1YmU2ZmFkZDc0MTA2OTllNjBmMDA0MDE1MDllOWJlM2RlNjU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWNhZWQxNmFkMzlmMDEwMzZhMWY5NTI2NTZiOGJmMmUyNDdhMjI2NmY1NWM2OGVmNTAyOTA1OTRiZTU3ODEzOSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L9-L21",
+          "version": "repo-lines-v1:sha256:e2d2b6c0c99309c7dec3587883995176fc8a99bdd81cf401a4a77117dfd72565:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlODY0MDg1YzU3YmRlMThiMTFiMDQ5ODE1ZDUxNzJhNzljNjA1MjU3ODRjNjkwOTkxNWIyODJmMTkzZjJkNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZmExNWIzNjlkZTIxZjViNGRhYTUyMTY1ODVmNmQwODliNTk4ODJmNWVlN2QzNzljOTY2OGUyZjk0MWZhOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxYThmY2U0ZjQ2NTZiNTY4NTdjYWE3ZTA2ZTE5ZjdhOTUxZDM3NTBkODFhNGEwNjZlZWM2ZTg2N2QzY2QwMmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L12-L21",
+          "version": "repo-lines-v1:sha256:29aac6989fa0d704edfa4b748bb6a57a07db775632a77b0f2d692b1be6d9588a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlZGZhNTZiNzE3ZTYzNmJhMDc2MTgyZTQ0ZDYzZDczZDNhZGI0N2E3YTg2ZDQyZGRkNDIwMGU3OTBmZTE5YjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2NGJkNGIxNzA5MGIwMGI0NDBmZTQ0NTgyZDBhNGU3MjhmYjJjOGRjY2Y5ZTUzZjBkNDczYTJhZjFjMzY4YjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9b6d178771a24316b5cd8ff650dd6c97",
+      "statement": "ImplementationAgent.Configure defines the entire capability envelope: harness name from Agent:Name, fixed role Instructions, a single shell tool registered via _shell.AsAIFunction(requireApproval: false, name: \"shell\"), FileSystemAgentFileStore rooted at the worktree, both read-only and write file-tool approvals disabled, DisableFileMemory and DisableWebSearch true, default agent mode \"execute\", and one shell-backed AIContextProvider.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L25-L43",
+          "version": "repo-lines-v1:sha256:a17de34d51c5d01b8120048c640dfbc49059d0660d390d17ec609c9717ec7b12:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2YjVmMGM1NjdkOWI5MGU2Mjc4YmM1OTYxMDFjZDQxMDlhNmZmNzkwMGY5OTQ5MmIzZGMxN2I2Zjk4MDExOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwMDA0YTFmYmYzMjg3MmUzZTE0MjZiOGE2NmM1YzU4OTgwYmQzODhkNzBkMzZkMjQ3MzQ5MjIyNDYzMmIyZTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjMmE5NTQ3MTNlYTVkNGJlYzE0Yjk3ZDNjYjMyYjk2NzVkMjQyZmQ4YjdkODIzZWUxMGZkOGNhYmUyMWU3N2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9098e6f46126491ea74ae7f7433c65cc",
+      "statement": "The single shell tool and the ShellEnvironmentProvider share the same LocalShellExecutor instance, which is allocated in a field initializer at role construction rather than lazily, so constructing ImplementationAgent already allocates the executor and the two consumers observe the same shell state.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L23-L42",
+          "version": "repo-lines-v1:sha256:9160e98b778915e16973834d50b1854b0c368b5a5d8d26fcd901640965d57352:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ODMyZmZiM2ZlZDdkMDc5MGZjZTM3ZjgwZmVhMjUxNzg1NWJiMjkzZGZlOTRiNjU0ZTBkMjBhODllY2I5MDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyMWJhZDg4NGZkMjllYTkyZDEyNGNhMDcwYjllZjA4YTJkNjdjMmI3NTZlMDE1MGZkMjQ1YjJkZjJjNzM3M2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzYjU3NDk4ZTZkM2QyOWRlMDgzZTRjNzc5ZmZmZTc1MmMzZDViMGNkNzNmYWZjZTAzNWYxODY2YWFiZjNhNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjNjM3MGE4NTgwMzg0NWJiNGQ5OTUzZTVkMzc4YmEwYTg4YjEyYWFhYTI5ZWYxZWNiZDY5YmZkMWYwOTFhYzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5d2254ef51d74f03b5cc8dacbfd89a65",
+      "statement": "The shell sandbox is configured with the worktree as WorkingDirectory, ConfineWorkingDirectory and CleanEnvironment and AcknowledgeUnsafe all true, a 10-minute command Timeout, and an Environment dictionary containing only DOTNET_CLI_TELEMETRY_OPTOUT and DOTNET_NOLOGO, so the shell starts from a scrubbed environment that does not inherit host credentials such as API keys or tokens.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L21-L21",
+          "version": "repo-lines-v1:sha256:4d01324a2470b7f4958aa700196442313375bd04c768bbdae650ed2bc979993a:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQwMTMyNGEyNDcwYjdmNDk1OGFhNzAwMTk2NDQyMzEzMzc1YmQwNGM3NjhiYmRhZTY1MGVkMmJjOTc5OTkzYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQwMTMyNGEyNDcwYjdmNDk1OGFhNzAwMTk2NDQyMzEzMzc1YmQwNGM3NjhiYmRhZTY1MGVkMmJjOTc5OTkzYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGFmMGM4OTBlYjliMTI0YzdiNGU3MmQ3MThhZGU1NTRmNWE4YjUyOTk1NTcwNzkxMThmZDI5MzljNTA0NjU5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTAwMDRhMWZiZjMyODcyZTNlMTQyNmI4YTY2YzVjNTg5ODBiZDM4OGQ3MGQzNmQyNDczNDkyMjI0NjMyYjJlNiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L47-L71",
+          "version": "repo-lines-v1:sha256:274f389c5d44d3b09a21065f28f0df76d34cca9e15dd5e956aea39b0c7f418f3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0ZWQzZjFlYWFiODkyN2ZjZTUyN2U3MjRlYzUzNTRhYjI5M2ZjMzhlMDFmNTcyNzhjYzg1ZmMxNWQ0MWNkYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5YzEzNTkwNjY1NjMyM2QxYzVlYTQxNjU0ZWU2NmFmYjU4NWFjZGNmYWVhY2ExMjFkNWUzMGJmMTkzZWVkZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjMmE5NTQ3MTNlYTVkNGJlYzE0Yjk3ZDNjYjMyYjk2NzVkMjQyZmQ4YjdkODIzZWUxMGZkOGNhYmUyMWU3N2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f567e5b14c034cdaa11e8080b9b99c95",
+      "statement": "The shell policy deny-list blocks exactly: rm -rf, recursive Remove-Item, git push/reset/clean/checkout --, any gh invocation, curl/wget/ssh/scp/schtasks, Invoke-WebRequest and Invoke-RestMethod, Format-Volume/Clear-Disk/Initialize-Disk/Stop-Computer/Restart-Computer, and reg add/delete.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L55-L65",
+          "version": "repo-lines-v1:sha256:5049ed3bbb0aa4dd41012e086287ad4453083a31676810c673c11db2e8b69745:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkNTA2Mjg0ZTgxYjFlODU0M2M1ZjQyNGViNjUxYTY5MDk5ZjcwNDRhNTE1OGY3NjhiNjA5YmJlNGNlZjdhZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjOWU2OWJiOTUzY2RhMGMyNWVjOGM1NTRkMTU2YzQzMmE5YTgxNmRhZjVjNzU2NGViYTRmMWRlNGFlNWMxYjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1OWU5MzZhMzBlMTRkNTY5NjNiZjdhYjRmNmM1OTBlMWRmNmFhMDg0MWMzZTVkNzhiODc0NDVkMTFiMGI0NzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlMjFlMjlmNGY5MDZlZjg5NjYxNTk1MGVhNWNjNmE1OTViZWU4YzMyMjRmN2EyN2JmOTcxZGQ4MjRkNGE5NGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_08eaa641b53347468f6fc693aeda1530",
+      "statement": "Because every tool approval gate is disabled and AcknowledgeUnsafe is set, the shell deny-list is the only enforced guard in a run; and since it is an enumerated blocklist over a general-purpose shell it does not block non-destructive git subcommands such as commit, add, merge, branch, or stash, which are prohibited only by prose in the role instructions and task prompt.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L120-L128",
+          "version": "repo-lines-v1:sha256:c03cdf44ef892d384ed8a3c7d6c40f1059c4ac5cca5170b044cc71a98f114985:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDE1MmU5NDU5YjAyODBhZjk5N2ZmMTUwNDc3Njk0ZThlNDk3YzE5MmVhN2YwYzBmNWQzMTNkMDBmYWNiMTg3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWY2YzMyMTJlMmJjNzk0MWZkZGYwMmRlNzNhNmU2YWZjYWZlOTUxMjE2YjNlMjBmMjZmZWM5MTE3NzFhOWRlYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDBiNzcyZTYwZDIxYzE2NzYxYzdjNDgxNzM3MzE3YWI5NWU0ZmYyMDVlMTJiNDVkYmZlMzYyZDIxYmUwZTgxNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTg3Y2FjNzk1YzMxMWQ1Zjk0ODU4N2M3OTk5N2ZhNjE1NGQ0NTYyYWVjYTc5NTViMTBiNDM5N2M5ZGUxOTBlMiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L14-L19",
+          "version": "repo-lines-v1:sha256:3248885782ffaad365f742ab0744b2a506f39b4ee530cf6c1dc21b69221344c0:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIyMzUyODkxZmUwMmU0ODE5MjU1MGI3YTU3OTcwMzRjNzEzNGFhZGQ1ZWE2NjViOGEzMDUyMzZjYmRmOTEzYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWUyN2M0YjEzZDMwNDMzMTYxZTg1ZWY2YjE3ZTNjN2YxZjE2ZmE0ZjU0NzQ4NDg3MGVlZGRiMWFjY2ZlMWU0MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDRhNTNjNmYxYjVjYTY5MTY5N2UzZDQyZmZhYzljNzg1NDJiNzQwODI4OWYyYzE2ZmRkNjIxMWE0ZDZmZDRiOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjNiNTc0OThlNmQzZDI5ZGUwODNlNGM3NzlmZmZlNzUyYzNkNWIwY2Q3M2ZhZmNlMDM1ZjE4NjZhYWJmM2E0YiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L28-L65",
+          "version": "repo-lines-v1:sha256:a5b8487c87dab3e72cb7298f127f549169e7cace3a11ebca5b872ca08cd0279d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5ZTJiYWM4MzZjN2VjOGU2ODgwNjVkMmRjNTcxYzAxODcyYjIxM2Q5ZjRjYTI2NmI1ZGYzMjgyOThhYjIzMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjOWU2OWJiOTUzY2RhMGMyNWVjOGM1NTRkMTU2YzQzMmE5YTgxNmRhZjVjNzU2NGViYTRmMWRlNGFlNWMxYjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY5N2NkZjU0YjI4OTAyZTU3ZTRhNjBkOTU4YmVhY2U2ODg0YjhkNThhMzNmODhjNTAwZWVmZDk5ZjgxZWZlMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlMjFlMjlmNGY5MDZlZjg5NjYxNTk1MGVhNWNjNmE1OTViZWU4YzMyMjRmN2EyN2JmOTcxZGQ4MjRkNGE5NGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3f4b207858a840d38563ac5f7d5caac7",
+      "statement": "The 10-minute timeout bounds each individual shell command, not the agent run as a whole; the overall run has no timeout of its own and is bounded only by the cancellation token passed down from the job queue.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L45-L48",
+          "version": "repo-lines-v1:sha256:1b2aa045ec15907277e5fa15d2998a9823d358897925cea5fdb1282eb9ce181f:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2ViYTZiOTg5NGQ1YTc5MjJlYzE3ZmI3N2RjYzc4YzMyYTY1OTBiMDdlNzg5OWJjNTk0NDEyYmFhYTBmMWNlOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWY0MGQ1ZjZkN2I2NWYzNTdjYTE4Mjg5OTU3NmQ5MjIwMTk0ODAyYzI1MTViNjNkOWZlNGY3NGYxODkwMjk1ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2NmYTRmMDBlOWVlNjhkNjE0YzE2NzA3OTYxZDdkNDIzZmEzMDAzNTkxMDFiODhmMjVkODMwYjVlMjUwMjNmMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWFmYWI5ZDdhMzFhZjZmNWNkMWY1ZDZhODMyNTIwMWQzZDI3Y2YwNWQxYWM2YjhmMmUxNTQ3ZWNlZTEyZTQ5MyJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L21-L21",
+          "version": "repo-lines-v1:sha256:4d01324a2470b7f4958aa700196442313375bd04c768bbdae650ed2bc979993a:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQwMTMyNGEyNDcwYjdmNDk1OGFhNzAwMTk2NDQyMzEzMzc1YmQwNGM3NjhiYmRhZTY1MGVkMmJjOTc5OTkzYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQwMTMyNGEyNDcwYjdmNDk1OGFhNzAwMTk2NDQyMzEzMzc1YmQwNGM3NjhiYmRhZTY1MGVkMmJjOTc5OTkzYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGFmMGM4OTBlYjliMTI0YzdiNGU3MmQ3MThhZGU1NTRmNWE4YjUyOTk1NTcwNzkxMThmZDI5MzljNTA0NjU5ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTAwMDRhMWZiZjMyODcyZTNlMTQyNmI4YTY2YzVjNTg5ODBiZDM4OGQ3MGQzNmQyNDczNDkyMjI0NjMyYjJlNiJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L53-L74",
+          "version": "repo-lines-v1:sha256:3216d5d5b216e76c3c3f8d968d9c4fe2a0327d7af7aecd62eecd3dc1888c0aeb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjY2YzY2VlMmI0ZjA2ZGJhNGE1MjQzZmZmNWUwMjYzNDA4OWY1Yjg4ZmRiMGFmZTA4Y2ZlZDgwZDRkN2Q1YmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2ZTA1M2Q0MDhkY2IxMDMyYWQ2NjRlMzhlNDcwZTQ0NGUzYjQ5NWM3MmFiNjI2NzY5NjY4Yzk0NTNjMzIyNWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4OGU3Y2U3YjVhMDUyOWFkOTlmNjdlZDE3NTkzZTAzNWFiYjFlMDQwMGFmYWViN2MxYTRiNzNiOTk2NGFjNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxNDNjMzdkYzc3ZDEyMWMzNWZkMTRhYzk2MTEwMWM2ZDg4MDcxZWQ1YjlmNzY3N2ZlODRmZDJlY2RjMjFhNDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cc03591cbbb45039dfe6f15829ab9c1",
+      "statement": "Disposal ownership is split and enforced by nesting: ImplementSpec strands the role in an await using and disposes the per-job IChatClient in a finally guarded by an `is IDisposable` check, while ImplementationAgent implements IAsyncDisposable and disposes only its LocalShellExecutor; the HarnessAgent and the session created by CreateSessionAsync are never disposed or persisted, so every run starts with empty conversation state.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L35-L60",
+          "version": "repo-lines-v1:sha256:85ec316adc8c49c8692c7f5023466425d4e2adf1d79a046ff871655f06110832:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3ZGVmOWJiNmU0M2NlYjc1Y2M4MzM0NmI3ZTE3ZmQzNWIwNGI1ZTFjMzIxODQ2OTI2MjRkMTYyY2Q5NzhiZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3YzQ2MDgxYmE5MmI5NWVmM2UxZGUxMDg2MTdhYjA3MDJkOTc2Yjc4NmIzMTVkODllZjBiYjcwYzY3NTkzZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyZDQxNjZmMmFiZDQyMzU3MDI5NWM0OTNmYWIyYzhkYjBlNzFhZjg0NTIxNGNlN2MyYmVkMjNhYTQxZDFjZWQifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L45-L45",
+          "version": "repo-lines-v1:sha256:16a0b0b12e0a36467f12e379e04084959ec879d7f58026adbb74274a5ccb6406:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTZhMGIwYjEyZTBhMzY0NjdmMTJlMzc5ZTA0MDg0OTU5ZWM4NzlkN2Y1ODAyNmFkYmI3NDI3NGE1Y2NiNjQwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTZhMGIwYjEyZTBhMzY0NjdmMTJlMzc5ZTA0MDg0OTU5ZWM4NzlkN2Y1ODAyNmFkYmI3NDI3NGE1Y2NiNjQwNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzNmMWFiOWJmNTg0NzliY2M2MzMxZmEzNDFlMTkyODVmNjQyZjg1ZGYwYTk1NWU5YzU1NWZiZGNjMTAyNWYxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDQyYzEwNDkwMjY0YWE4NzRiYjRiOGE4YWY3ZjIyMDQ0MzVlNjdkN2Q1MGVhYTk4ZTUwOGNhYTNlODFjZTU0ZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e9e4502bf47d401e88753eddd8f7005e",
+      "statement": "A run publishes no artifacts: after RunAsync, ImplementSpec reads the worktree's short git status and emits one LogCompleted information message interpolating repository, issue number, worktree path, status, and the agent's full response text; there is no commit, push, pull request, or written output, so the uncommitted worktree is the only result.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L134-L135",
+          "version": "repo-lines-v1:sha256:ea6cd1b17c509cf336822a997c7b7c67972107c332c584b8e6ebd246be79eb58:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODY3ODI1MTg0ZjI1YjM4YzEwODcyMjE5YzBjYTQ5NmM3YzVkZDk1ZmExMDk2ODc5N2Q1NThhZjcyZjk2Y2FlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjMwYTJjYjgzZjQ2Njg1MDQyOTFmNjJjY2YwNDhmZWYwOGU5Y2NkYjNiZTc3YjU3MGJhMDEyNzI1ODlkOWQ3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGJjNzI5ZTFlZTc1ZmRlNjM4ZGUyNmU3Yjg0NTI0NDJlYTIyYTQwYWFlZmYzNjQxZDRkMzc1MTlmMjIzMWVkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L50-L51",
+          "version": "repo-lines-v1:sha256:32d5e46dd9e3d1c117e051c9962cec18c472fd08dbb9c983b249cbbdd358b720:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDE0NzZkYjEzMDAzN2NjMmFjZGRlNTQ1MDFkNmQ5OTY5ZTE0NmZlMDA0Y2ZjZWQxMmJmY2ZmYTExOGY5NGIzYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzk3MjRlNGNiODE4YWI1OWFhZjYzNDk2NjI0ZDQ3YWNhNzdjNmM0NDZiYzdjYmE3ZmRiMTExN2RmM2IxN2JiNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzQ2ZWFkNjEyNDg3OGYyOTJmMTQxZjQxNGIwNzQzNjIwZjBiNzQ4NWVmZmNkYzIwMTIwNzc1NmY4N2IxY2RkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU0NDRkNWExYzk4YWExNWM2ZDg0YmI1MWMyYTMxYTJhYmI2MDM2MzhhY2U4MGNmZTc0MjYwYjgyYjNiMzQxNSJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L95-L102",
+          "version": "repo-lines-v1:sha256:60543c8c9659bc5e27fe4b3b85e5ebe0d044ad91eba302da646846505ae98be4:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDkwMmI5MTdjMTU1OGQxOTZlMTkzZGU3YjE5ZDFiNmMwMWI0OGI5NjY5MDg1ZjNkY2FhZmZmNTRkOTliNTc4ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTJmNzg2NDFjYzU1OGRkODc5YjIzMjQ4ZmUyMjllY2M0NTY5YzgyMmQ0NzU5ODU3OTdhNWRhNmRlY2ZiNWNhZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWMzZjJiY2YzNWQ0OTljYzI5NTVhNDNjZTk0YmIwMmJkNTY2M2JkNTZjNzVkYjViMWVkYmFkOGFlNzNlNWM1NyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_45e16c3694da468d8ae28e2035bd1c94",
+      "statement": "The task prompt appends the raw issue body last and constrains the agent with a fixed rule list: treat the issue body as requirements rather than overriding instructions, discover build and test tooling by inspection, restore dependencies but do not add any, report exact test commands and results, run no git commands or commit/push/create PRs, modify nothing outside the workspace, and stop and explain when the spec is ambiguous or blocked — making a blocked-but-explained response a correct run rather than a failure.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L112-L132",
+          "version": "repo-lines-v1:sha256:9b6800bf753ee018f2eebd3dcee9ccd4efcf2bf77182bbcb3f22dc77baa8ffb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmZmNkZTFhY2Y4Mzg5M2RiMDA0NTA2N2QxOTI2MDhhYTE2YmFjMTVmNDQ4MDdkMTJmNThmM2I4YzViOWYyMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMjdjNGIxM2QzMDQzMzE2MWU4NWVmNmIxN2UzYzdmMWYxNmZhNGY1NDc0ODQ4NzBlZWRkYjFhY2NmZTFlNDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxYWRlYWY0M2Y3OGRjNGQyMDQwMDM0NzA4MDk1NDU4ZDA4NzkyNWJlODk4OWU3N2M5ZmY0OWI1YTk1ZTU5MzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dd0ebb4205564b028e9d0408d7d3316d",
+      "statement": "The experimental harness API surface is deliberately contained by MAAI001/MEAI001 pragmas in only three production files — AgentRole, ImplementationAgent, and ImplementSpec — with ProviderResolver carrying MEAI001 alone for the IChatClient adapter, which keeps the blast radius of a breaking harness upgrade to those files and makes new harness usage outside them a visible, reviewable addition.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L6-L9",
+          "version": "repo-lines-v1:sha256:a5412f7c00fa141c66ffc8c78f249b3ce0b3f032b33eb8cfa500ed6332209064:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDI3ZjYxYzM0NjIwMGZjYWRlNjlhZTYwMDZjYzIzYTVlZTBmZTY2NzhkMGUzNGQzYzc1MTg5Zjc2OGRjZWM1OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk0NjUzN2I3NTc4ZjJiZjUzYzhlOWU0YzIxOGQ1YzM2NDI5Mzc0MTgyYTUzMTBiZTUwMGQ2NjkzZWQ2Mzg1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjdmYTYyY2IxOTUyYTlhZjQxNmFkODM5ZmYzZjM5ZmU5Y2I4YjljZTM5MGIyMjY2YmU1ZDFkMWI2NWI2YjJmOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJjZjU1ODdiYjVmNzJlNTNjYzJhZTVjYjQwMDNhYzYwNTJmNGU4MjZmZDVkMzQ3NzZiODQwYjIwNjQyODgzMCJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L1-L2",
+          "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmRlZDkyZGZkYzE4N2RhNzNlMzdlOGU4NzQ3NTVkM2ZjNzIxNzgyZmQ4MGY0ZWU5MTYwOTg0MmU4OTNkNmU3YSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L4-L4",
+          "version": "repo-lines-v1:sha256:338ae40e9313bc8530f168ca04563ab5c8c1d8f088b8b7d04c9aabe363ed9b8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmI2YTVhMjAzMzNkMWNjNjcwNTQzNTE0NGRmZGRiODEyYTFjZmZkMWJhZjk2YmVhNDI1NTdhYTIyNTEwOTBiZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzg4YjM4NzA3ZGRhMzdkNzg2NWZiNWU2MTgzOWM0MTUyNjlkYTJlNDYyMDJjOGNjNmZlMDJmNzRhNTQ4ZDcxYyJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L1-L2",
+          "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWEwMzE1NDBkNDk4NzEwOGM4NjIxOWEwNmYwM2QzNTc3NmUwZmNhYjE4ZGRmYzE0MWRhMmU2YzM4NjcxNzM2YiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L1-L2",
+          "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWEwMzE1NDBkNDk4NzEwOGM4NjIxOWEwNmYwM2QzNTc3NmUwZmNhYjE4ZGRmYzE0MWRhMmU2YzM4NjcxNzM2YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2715239169de4064a305e49461d89981",
+      "statement": "AgentRoleTests pins the configuration envelope rather than agent behavior: CreateOptionsUsesConfigure proves a derived role's Name and Instructions flow through Configure, and ImplementationAgentConfiguresFileAccessAndShell asserts a non-null FileAccessStore, DisableWriteTools left false, exactly one AIContextProvider, and exactly one tool — so an accidental hardening that disables writes or drops the shell fails the suite.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L12-L35",
+          "version": "repo-lines-v1:sha256:d5d86f44cfc1526f74f6719421e706b836af0053ab59cb88c2c19258c785e677:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlZGZhNTZiNzE3ZTYzNmJhMDc2MTgyZTQ0ZDYzZDczZDNhZGI0N2E3YTg2ZDQyZGRkNDIwMGU3OTBmZTE5YjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiZGE2ZmMxMmNjOTFkYjRiZWEzMWJkMTI1OTI3Mzg2NWQzZWUyODA5OGQ0MDk2Yzc3N2Q4NDZjM2M3MmMyZGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b9c19ce1aa484bc8a0831a71f95ee42f",
+      "statement": "No test exercises a real agent run, a shell command through the executor, or the deny-list behavior, so changes to the shell options, the policy regexes, or the prompt are unverified by the suite.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L5-L23",
+          "version": "repo-lines-v1:sha256:785d1245a52483efed4ef29f4f46279346e3b3c1b45ec2cec3435eb72943c4e2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjNzNhYjY5ZmY3OGQzMjk0ZTMxNWI5NjQ5NTUyZjA5OWE3NmZmZDU2ODc3ZjNiNTk1YmU4N2Q3ODAyNmU3MzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyNTM1YThjOTRjMDIxNWM0ZjkzNTFlYWNmMThjOGZlZTFlNWM4ZDdiY2JkNjQyYTkwYmYzZTA2NzljMGRhY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2NGIzNzUwOTRiZTAyM2M3MDZmMGNlNmYwODM5YzJhZTdhMDYyM2E5YjBhZjIzNTE2MjZhNzMzYmQ0OTI4MDgifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L1-L45",
+          "version": "repo-lines-v1:sha256:a043b2835fb4c6577783201ce9f9ce41ed43fde0df0e1f1d5e800038b1cfe950:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhNmRkZjA0NGVmYmY2ZDJiMmEwNDYwNTgyMWY4NDg3MmI4NDJlNzdiNGFhZDMxZWFmMTkxY2EwNmI5OGU1MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

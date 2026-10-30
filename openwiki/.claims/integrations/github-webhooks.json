@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:dbadb21431ff64ac5af1ea8026846f1a26c808bef54d2678767b7c93bef4faeb",
+  "claims": [
+    {
+      "id": "claim_ce64284223ee468bb8f2f9708116bf42",
+      "statement": "Sebastian's only inbound integration is `app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` next to a `/health` endpoint; the host registers no authentication middleware, so the HMAC webhook secret (required, non-blank, read once from the `IOptions<SebastianConfig>` snapshot at composition time) is the sole trust boundary and rotating it requires a process restart.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L40-L49",
+          "version": "repo-lines-v1:sha256:f6acfc010c246b13e3f11efaa5c69474232b31deee26704acf7fab9c50859211:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyNmJlNDNhMGVhMjFhMjgwN2FmYTMyNjAzODA0NDBjNWMzNDE1OTU2OWVjMzBkZWJmZGM5ZDNkMDhiMmRhNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L20-L23",
+          "version": "repo-lines-v1:sha256:e123dab6cdb1b2e3651f5be4e60ca6304bd6ba67788beb61f0953b868b58a8d9:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGViNDg1YzkwNDhhNDJkMjZlNGJlMzBkMTQ2M2NlODI4OGVjMTc4NjMwYzMwZmM1YTg2ZDNhNWRhN2I5YTc3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjFlMzZmNGQ0MjdmZDQ0NGI4ZTZiNjI1ZmI3MTk3MmJlOTVkYzg3ZDFkMzZmM2EwMDk5N2E0ZDcxNmQ0NmVmMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDNmYTY5MDY0NDQzYmM0ZDcxMjg5ZDFiMmVhZDA4NGQyNjhlYTVmM2QxY2U2ZTdmMDE1ZTQzZjhiYjc3M2M1YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzQ4NjlkMGFjMDdmODAwYjhmYjg4MTY3NjViZTQ5NmY0YWQ3NWU1MjNkNTJmMDRlMTdlYzAwNzBkNjk1OTJjZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9ca360718da0419e8714835136562f2f",
+      "statement": "`WebhookEventProcessor` is registered through an explicit constructor-call factory rather than `AddSingleton<WebhookEventProcessor, GitHubWebhookProcessor>()` because `GitHubWebhookProcessor` is `internal sealed`; the factory also fixes the processor's four dependencies (`ILogger<GitHubWebhookProcessor>`, `GitHubService`, `JobQueue`, `Git`) at the registration site, so the processor is constructed on the first delivery rather than at boot.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L30-L36",
+          "version": "repo-lines-v1:sha256:ed7e5dd05c485dbdb7297e1f0147bc989d244ace5f55d048fb5d939c8af2ebe3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTkyM2VmZGE3NTk5YzBlZTQ5ZmI2OTJhZTE1NDJhN2FiODNmZmVkZDNkYTM2ZDllMzkzMDM1MWM5NWVlNTZjZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTU3YzFlZWJlMWM2NzNjNWQ5YWU0YmU2MThkMGY1MzM1ZjZjZWQ5ZmYxNzRjOTA3NzVmZDA4MTJhZWEyYmM2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTFjYmUyMzZiNjNiZjBjZjUxYjk2MzlmNGI5MTgzNWE3YjZjMTU3ODU4ZjkyYjYwZjk1MWE2ZWI1NjQxNDQxOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L14-L22",
+          "version": "repo-lines-v1:sha256:f2f44684ba0b245e36136fba1992b0945a8e1ae9f7adea3082e9a849657c1493:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjMwMGQ1NTg5MTQ2NGVhODU1YjVmMDkyYjNmZDQ4ZWFlMDYyNDk5YjZhMzQ2ZjAyOGQ2MDA4NTY2NDJlNDJkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjFjY2VmNDliYjQ3Nzg3YmEzNzc4YWUzYzE2OTI2MzUwYzQwYzQzMGY5ZTMwNjg5MjlkOTI5ZjZhYzc0Mzc1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTcyYWRiOWFkOGUxMGNhM2YzNTdlNGJhNWUxMDYzNGE4YjJjZWNiNWRhNTY4ODM3ODU2MmQ1OGZjZWM5NmIzMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_858b4528798f45e69b15a5197f759fd0",
+      "statement": "Sebastian overrides only the `IssuesEvent` and `PushEvent` handlers; every other GitHub event type reaches the base `WebhookEventProcessor` dispatch and produces no routing, queue call, or GitHub write, and neither event override calls `base`, so Sebastian's behavior is the whole behavior for those two events. `ProcessWebhookAsync` is overridden only to log each delivery before delegating to base dispatch.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L110",
+          "version": "repo-lines-v1:sha256:65b3e55540e160b53b904afdc6899554cc5200b779e809b45ceb1db056d61472:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJlMDM2OTdiNWMwZGJmZmMyNWVmYTVkNWNiNDU1YzgyODg2NWFiZmYzMzk5MmQxNTU0NTNjMzhjY2RmNDU0ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzJiZTk5MWUxOTc2NTViMzFhNWViZmZhZWY0ZTQyZTVhNWNiZDI2OTc2NTdkM2JhZjRlMzYzNmExMzVjYTFjYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODU5YTczMWVkNmRhYmE0YTEwNmNmNzUxZGUwNTkyYjYzZjBlYTc3MWRlOTU5NDhmMzFjNjQwODUzMmNhOTMzNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmRlYTMzM2FhYmI0ZDQ4ZTZhZmE3YTg1MzA3NzZiYmFkNmMwYTA2NjhhMmIwMjIzNDg1OTIxNDA3YTg3NzNkYSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L23-L30",
+          "version": "repo-lines-v1:sha256:e0cc2820a6e6ec518ebc2689ed4b9be664abb03f6de3368a47464cadb3b345f2:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU2NTFhMzBmMTU1ZWMyYTNjMzJjZTkyNzRjMTIyNzUzOTZkMDZjMTdhMWFmN2EwNmRjMTQwOGYxNTU0ODA5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc4Njg4MTk1YThkZjNjNDU0ZGQ1ZTgzYmRhODI0YmM1YzA5NTg3NjcwNWMxOWRmZGVjZGY1ODBjZTdiZDA3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA3ZjBkMTU1ZTc2ZjRkNmJjOTRkNGZhMWRkMzgwMzkzYzRkYzg5Njc2NGE4OWE0MGFlOGVkYTk3ZjRlNjY5NCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L36",
+          "version": "repo-lines-v1:sha256:9d158b43ff812f6fc8a90385fda1f3c43d90ec5154f91febe45168c0cad5a1c3:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTVkMTFiNjBkMTFkNDA0YzRhNTk5NjM0MzBlMDBiM2YyMGRiZmEyZmU1YTY3MTM2MjljZWQzNTg5ZTZkZGQ5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzJiZTk5MWUxOTc2NTViMzFhNWViZmZhZWY0ZTQyZTVhNWNiZDI2OTc2NTdkM2JhZjRlMzYzNmExMzVjYTFjYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjM2MWQwNmJmOTc0MDdlOTY4NjY1MTY5NzA3YzY5MzYyMGZiZGQwNWRjNmU2Y2YzMjJjNDU3N2NlNDJjNDBhMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTJmMWI2Nzg3YTA3ZTY5ZWFiNGI4MWQxYTM1MzQ0NWEzOWNhNzZmMGZmN2RkMzQ1ODJjZTA0MmJhZGU0MjVkMyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0981f35be2054792ae189ad323b7dcdb",
+      "statement": "The issues path gates twice before any work: the action must be one of `Opened`, `Labeled`, `Edited`, `Reopened`, and the issue must be `IssueState.Open` and carry a label named `feature` compared with `OrdinalIgnoreCase`; every other delivery returns with no log, no comment, and no state change, which is why `bug`-labeled issues are dropped and a closed issue can never be re-validated or re-queued by an edit.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L104-L105",
+          "version": "repo-lines-v1:sha256:a738bcc56ff2a6df6e42876fc9a2505ef09b6ec099f134d3c09da19ddd9c20bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmNiY2IxYTljMDEzYzIzODIwOGRmZjZhODk1MTZhNjZmNmE1NDc4NWE4N2MzYmJlMTM3OGZlYjk5MzcxM2JiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJlMDBhZjdlYjhkOGU5ZDFlMTViYWQwYjQzODljOTNjOWNhODIwNmIyNzI1MTliMDUzMDNjMjc1MTNmMGIxOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEyY2E1NmFiMjk3NGQwZjZlZTA0OGZlZTRhM2I2YTc1ODI3OTNkYTFkMWI3YTM4MjdhZTQ0ZjRmZDk5Zjc0MCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L20-L21",
+          "version": "repo-lines-v1:sha256:99506d63015f026c54dee072c553d3d081ce8367c4705315ca1daa8d18b5fdea:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGVmNDVjYTA1ODBmMWY0YWVhMjQ1NzYxMTE1ZDZlOWExZTQ3NmZhZjBlZDhjY2FiOWQ0NDQyYjUzZmM5YTllZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmRlMzhjZmQ3NDM2Y2FlYzg1NWJjYzc1MzNjY2FmNjM2YjJkOTQxMzRmN2VhYWNjNmNkNTQ1MzViYTFhZTdjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRhYmI1Zjc1MDE0ODdmY2YwNmFiZWUwYTA2ZWNhODUxNjY0YmU0MDJlNTQ2MmYzZjRhYmMxZDFjYzEyNWY1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjYzZTkyZWVjNTQ4YWRjOWY2MzQyNzAyYTIwNDZiMzIxM2JlNWQ1MWRhNTNhOTIzNjQyYzBhMzQ1MGQ3NDM2YyJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L38-L49",
+          "version": "repo-lines-v1:sha256:d61dcb3426034f20371d95425349bd4d0da39401ae794d4cab86010d734a08eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMmY1ZDU3MjE3Zjg0MDAxNDYxOTI0ZTY0YmQxOGM3YWQwNTdmMzNjZDMyZmMzNTNhMzdkZGUyODQyZGYwYTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1YmVhNDk1NmY1ZTAxODlkOGNhZDA0NWM1OTY2NmM3MmI0MjNhZTI4OTZhMDQ4YjU2NDgxMjQwOTE0ZWExMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiOTAwMzZmY2M3ZGQ5MWYyYWM1Y2ViYmY4NDQ3ZjY0MjQ1ZGU1NWEyYTFlMDlhY2I2OWRkYmZmZTgzNmVhMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2de31b5acf354db5a374bfd09ab15f32",
+      "statement": "After the action and state/label gates, a third guard returns silently when `Repository`, `Repository.Owner.Login`, or `Repository.Name` is null, while `Repository.FullName` falls back to the literal `\"unknown\"` for logging only — so a malformed payload is invisible in logs and never throws.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L51-L59",
+          "version": "repo-lines-v1:sha256:38669621bf3a55225922d2d2255820c6a78877f72ada40ffca4a7931dd280f26:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWFhY2VjMmI4ZGM3MjBlYTVmZGVjYzgwOTNiNDE0MmMwMWU5OGIyNTdjZmY2ZWY0ZWM1Mjg4N2ZiNjUwZGQ5NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2E5YjJkYzgxOTI5OGE0YWU0YTQxZmU2NWRmMGRkYjE1Y2U0MDY5NDc1OWRmZmU3ODg1ZjU2MWMwYzVjNTFiNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjMzOGZkMjgxZjEwNjQ3MjE4NDNkMzRmMDc4Y2NjMmM0Y2M2OTgzZTVjODJiZDgyYmVmOTkyNjFlZDA2Y2YyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzg5NTY5MDhiZDM5MDkyMzM0MDlmN2JlZTdkOGE1YjM4NDQ4ZjliMDQzYTVkMDhlYjFlODkxZDRkNDI0MWU0NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0422f79dc7674c3d8f02263ee24e9938",
+      "statement": "Spec validation is ordered before the `ready-for-agent` gate: when `SpecTemplateValidator.FindMissingSections` reports gaps the processor posts a comment naming the sections and then closes the issue as `not_planned` (two sequential GitHub writes inside the request) before returning, so a maintainer's approval never overrides the input contract, and validation re-runs on every later qualifying delivery.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L17-L41",
+          "version": "repo-lines-v1:sha256:1883b0558010252ee8588c775560236511c28e56bcf5901cf898755e140a4c8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MDU5NWI1N2EzM2VhNDY4MzJkN2Q0MWM0Yzg1NTcxYTAwZmMxNmQ4ZGJiMzg2ZThiZmFmNmNmNWE3ZmI5NzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0OTdlNTk3OTUwNjBjYzUzNmRhODNjOGE3OTMzYzQ5NjhkMTEyMjJhNTQ5Y2QzNDAyZTMwYzc5YzYwMDUwNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4NGZiYjIwOGUwOTcyMDY0NDhlZDczNmUwYmQ3NWQ2ZDE0MTAxMjEzYTk3NzFmNDk2NjJlNDI3YTJhOWNlZDMifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L61-L82",
+          "version": "repo-lines-v1:sha256:78635271a4a7118164476e63f1b054e79fb58ede914f997d88cd16bcc9b6b853:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3YTMwNjdkNzlkOGE4Yjg3NGJiNDdhMmUyZGY2YWE5MmQ4OWQ1ZmM4NWNiMDIxMmRlNjQxOGFhZGRiNTk4MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ZDA4ZDNkZjhiNTkyNmI1ZmQ2ZTllZjJkODIwOGQzNWFmYmZmN2Q3NDJhNGM3MzIzN2Q0NzNiMmJmYWQ4ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMjQ5YTMxYmRjN2UyMWU0OGFjZTA2YjI3OTczY2YyM2Y1OGIwNzVkODU2MmQ0YzhhNGQ1ODRmYmQwNmE2YmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b4f28eb067a7450c8bbf80a52bbcef82",
+      "statement": "A valid `feature` spec that also carries `ready-for-agent` is turned into `ImplementSpec(owner, name, issueNumber, title, body)` — a snapshot of the delivery payload — and handed to `JobQueue.TryAdd`, whose boolean is treated as informational: `true` logs `Started implementation` at Information, `false` logs `already running` at Debug, and neither path throws, comments, or retries; a valid spec without the label produces no action and no log at all.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L16-L26",
+          "version": "repo-lines-v1:sha256:1a955c1a404b4715afb46ca47f8d16922c87579032e0878eaa869a362c6a56c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5YzE4NDY0NzcxZDk3N2E0MjA5OTVmNmEwMmQwM2Q4Zjg1YTdhNmQ5ZjU3ZDcxMzc3MmZhODE1ODU4MzI2ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhOWE0N2RmYjRjZTI0ZGRmMTkxOTFiZmQ5MDk3MGE0NzZlZGJiMjc4M2E2OWFlNTAyN2Y4ZmZmYzFkMmEzYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxY2NlZjQ5YmI0Nzc4N2JhMzc3OGFlM2MxNjkyNjM1MGM0MGM0MzBmOWUzMDY4OTI5ZDkyOWY2YWM3NDM3NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5NGRiMDBhMjYzZmNjYTk4ZDlmNjNhMjA1ODVkZGM3NjcwNDIxMDc1MGM0NWJlZTA2NmI4ZDNhM2M0Y2I2YzQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L125-L129",
+          "version": "repo-lines-v1:sha256:df6224a60790a39e009d0a87c6a318045b72c2541e97e55289542b2d9fc9dd9e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJiM2UzNDMxN2Y3MWZjNWYyODhiYzkxMTViODZjZjUyNTUzZGU0ZjlkNWZhY2RlMDBjMGJiN2RmMzk5NTZmZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNThjYjhmMjY3NzJjMDQ0MjJiNjNhNzdmOTMxNGY3MDM5OWM0YTQwOWVlNDkyZDk5ZjA4MTVjZDViMThjMDM2MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTQwNjY4MTJiNzMyYWRjM2FlY2I4ZmIyZDJhOGEzYmI4NzIwYTYzZDhiNGM1ZWFmOGNhOTE4YTM2ZWJkZTBjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZjYjhhYWQwMzg1NDllODQxYmRkNDkzNzU5YTE1YTdkYTdlNGU0YzZkZGIyYjUyYTBkODUyMjk4NGUwZTdjNyJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L84-L101",
+          "version": "repo-lines-v1:sha256:fdd2d4f2a8483fade318c2d81bd6a1e7c75efbaa56a6bd9229386427af16fbde:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c1014e5a9287461a9ef44f6ec5f925bd",
+      "statement": "Push handling bypasses the job queue entirely: `ProcessPushWebhookAsync` logs every push (including branch pushes and deletions) and then awaits `git.SyncMainAsync(pushEvent.Ref, pushEvent.Deleted, cancellationToken)` inline in the request, with a `// shortcut:` comment acknowledging the latency tradeoff; the ref filter that makes non-`main` and deleted refs no-ops lives in `Git.SyncMainAsync` (`StringComparison.Ordinal` on `refs/heads/main`), not in the processor.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L104-L118",
+          "version": "repo-lines-v1:sha256:8b52ce24e47982da7d8bddf5ea65b3b7452da02aef14ea19ab1056d5bae313b6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjg0NzU3MTcyNmQ4YjU1MmJlM2NkODM2ZGRiMjcwZGM5NGRjMGMxY2E4NDQ4ZDliYzU5YmY5OTZkNWQ5YzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwMGY1ZmZhYzllMmZkMGQzNWE3ZGM0YjM4YWM3M2IzMTY1ZDJkMmMyM2JkMDYzNTJkM2UzNWEwY2YxN2I5ZmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2YTRlYTliNzU5NjQ1ZjY5MThhZjIzMzMyZDY4ZGFiODJmZWQyYzU5NDg4NGU4ZmVlYTBmNTQ5NmVmMTFiMjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzhmMzU5MTM2OTc3NjViNmEyMTlmZTlhNDFhOGFlN2NjNjQyZTY4MDY3MWQ3YjdmNDA3YTUwMzJkMjBkMzcifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L112-L116",
+          "version": "repo-lines-v1:sha256:224c3665e1da52a8809bf0eae377dc4c48233f4ae35cee7ada8b26b567d2bf82:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2VmNmMyZTNiODM5NTNjODE0NTZmZmI1MTk5MmJiZjMxY2U3NDU1YTZkZmMxOGYyODFjNmUzZTliMzVmYWU0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzgxMzFiYzQ4OWJiYWRiNWUxZmEwM2RmODczNmQ5MjkzOTEzM2U1Nzg3Njg2ZTg3ZTBlYzkxYmVlYTc0MGMwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTYxZjkyY2IyNjNmYmExMjU1Y2ZiNmYzMzFmNjA4ZDhhNjFhZDQ1ZjdjZDU1NDQ5MTk1MGNhZTA0MmVlNDZmMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTRhNzU1MTIwNmQ5Nzg3Mjc5NDZmZDI2OTdkNWM5ZWE4YTQ3MTRlZDk5MGI0ODliZDc3N2Q3YTc1NTlmNjE5OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_977c8bac4baf49b694735a47f53bbc50",
+      "statement": "The two handlers have opposite failure policies: `ProcessIssuesWebhookAsync` has no `try`/`catch`, so a failing comment or close escapes into the Octokit middleware and becomes a failed delivery GitHub may redeliver (re-posing the comment), while `PushWebhookAsync` inherits `Git.SyncMainAsync`'s swallow behavior that logs `InvalidOperationException` at Warning and `OperationCanceledException` at Debug and always acknowledges the delivery. The webhook push sync also has no timeout of its own, unlike the ten-second bounded startup sync.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L143-L150",
+          "version": "repo-lines-v1:sha256:a098a102352d17ad03f20f5607aa4c41a99a0165c44bdb2ac9175293381c7d8b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDg5YWQxYmJiYjgxYmI4NDM2NmIwNzRmNTRmYTQ5MGU1NjQ0MTVkYzEzNjc3ZTgzYjMwMTFkNDNlZDMzMjcyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDY3NzcyZTgxOTJhYWY3NjVjOTNjYTE0MTAxNzFkYTcxZTE2M2QzMzViMjZmNWM0ZDk2N2ZhNzgzMmM0ZjUyOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTczZmU1NDdkZTE0MWU4OTVjMWU4MjQ1ZTc1ZGE1NzYzYzZiZDk5MTNkZGI5NGUxZmM3NDgyMzA3OWUyNjM2MCJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L36",
+          "version": "repo-lines-v1:sha256:8e54e79299ad569dfe53557e093a405a6d5eeba2d1ed1679dd9caf9dfc8bbbea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L117",
+          "version": "repo-lines-v1:sha256:157fae54eb39a767fcaa9562bc592d1cfa5a6be5dadf7c984f9a08e5a9cc7400:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZTAzNjk3YjVjMGRiZmZjMjVlZmE1ZDVjYjQ1NWM4Mjg4NjVhYmZmMzM5OTJkMTU1NDUzYzM4Y2NkZjQ1NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1OWE3MzFlZDZkYWJhNGExMDZjZjc1MWRlMDU5MmI2M2YwZWE3NzFkZTk1OTQ4ZjMxYzY0MDg1MzJjYTkzMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L102",
+          "version": "repo-lines-v1:sha256:0960ba62d40379940aa380a36542389dd6610658c2f1b38d5e95109ede33cfb1:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwNzdlMDhhMDQ2YjA5OGI2MTY3Mjg5ZDc1MGY0ODgzYmM1OTY1ZmYyOGI5ZDBkNTRkODhjNGU4YjkxYmFiOTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_470131de88874eafaa83b4d1c2d283f4",
+      "statement": "Intake does not verify that the issue's repository matches the local clone: any repository's qualifying `feature` issue is enqueued, and the mismatch is detected later by `ImplementSpec.PrepareWorkspaceAsync`, which throws and lets `JobQueue` log `Job {Key} failed` at Error.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L71-L76",
+          "version": "repo-lines-v1:sha256:a75736fd9d81a055e5f4615f7e33ffa9ad72643a3d4f47d88d50329f5d9776b6:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWEzNGYwYjA4NmY5Y2JlMDAxMGJmMzdiMTRmZDllOWQwNTUzYmFkNGYyMDFkMWZmYjFiMGI3MTBmYWExNDM2ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzhkMTMwNWYxNjVkMDEzMjkxMTk4NzI2N2IzMWQyZjM2ZDkxNWE2OTVlOGQxOWVjMDk0YTBjNWY5Zjk2MTZkNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM5MGRkZTRiZjE2NzFhMDdhNDNlNGVjN2QwMTJkNjVhY2M3YWI3YTYwMDA1ODY0OGYyOGFiNWVhZTVjODY0MCJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L63-L73",
+          "version": "repo-lines-v1:sha256:731d48a1012622f68a5d9d31c947e8e9b8d9f8a9ccc334b9fff2e2e7500d7c3e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjNDFlNzMxNDAzMTQzMjg5YzM2NTBiNWM4MGU4MDQyOTdlOGQ3OTkwM2JlYTc0ZmM5NWVmOTc0NGRlMTZkNTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkYjMzOWMxN2Q0Y2M1NGU3MGM0ZmNmZWNiNjExYmI5ZTdkMzYzZjI1YjE4ZTA5MjNhMWQzMDZjYzk1OTI0ZTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzOGYyOTgwNjhmZjNjMjI4YzZiNjQ3ZGIzOTYyMzk3NGNiMTlhOWI5ZTA3NDU2NTA5NjJjZDY2MTM5YWFkNDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5MTViOTM4NjM3YjNhY2RhNTI0NWNmMDcxOTgzYTg2MDA0MzU3NDA2MmQzOTVkMDBlNjAzNTUwNmNkMTQ0ZWEifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L86-L93",
+          "version": "repo-lines-v1:sha256:e444e2559f1934ae7f3a21ee48790015c73cd34b441c6356d7657e26cc329d2d:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODljY2RmOTc1YmQzNmQyZjg5MWI4OTQ5YjQyNTM5MjUxMDRlNTgzYjBhNTFhYmI0N2VkNWI3Y2MwMmRjMzkyNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmIwOGEwY2Q4MzBhYTUxM2JiYmM2NWEzOTZiZjc1OTU3OGY4ZGJhMGYyZmY0NGQ0NTdjNTgwZDIwYzkzODcxNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWIyNDlhMzFiZGM3ZTIxZTQ4YWNlMDZiMjc5NzNjZjIzZjU4YjA3NWQ4NTYyZDRjOGE0ZDU4NGZiZDA2YTZiYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjljYTg3NTQxMWJkZjgwZGUwNmUyMzY4NzFhMzViZTNiM2MwODZlZDIxNWI1MzU0MjM4ODg0YzAwOWJhZWUzZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_79ca62c1d9384cda88befb1108432375",
+      "statement": "Logging is the only observability of routing decisions: `LogReceived` emits an Information line with the event type and header event for every delivery before dispatch, so a delivery that logs only that line was filtered, and the two explanatory branches (invalid spec, duplicate suppression) are the only ones emitted at Debug/Information — the silent returns and the valid-but-not-ready branch emit nothing.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L119-L133",
+          "version": "repo-lines-v1:sha256:c34d74f4567b202c2e4241bd5bfd1f419e1e9b7c9e08d9448ac93c41bee32d1f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NmUyNjg4MmJjYjZmMjcxYjk0ZTNiNDYwMDU3MTc3MDFjYWNjYTI1M2NkZGMyNDMxNDdlNDkyNWY4OTIzZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0NzRhM2RmY2VkZWJlYTlkNTc0N2Q0NDc4NmJjM2NlN2I2ZjhjOGY4MmE2NDllNWM1NDUxODQ4YzAzMmVkNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L23-L30",
+          "version": "repo-lines-v1:sha256:e0cc2820a6e6ec518ebc2689ed4b9be664abb03f6de3368a47464cadb3b345f2:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU2NTFhMzBmMTU1ZWMyYTNjMzJjZTkyNzRjMTIyNzUzOTZkMDZjMTdhMWFmN2EwNmRjMTQwOGYxNTU0ODA5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc4Njg4MTk1YThkZjNjNDU0ZGQ1ZTgzYmRhODI0YmM1YzA5NTg3NjcwNWMxOWRmZGVjZGY1ODBjZTdiZDA3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA3ZjBkMTU1ZTc2ZjRkNmJjOTRkNGZhMWRkMzgwMzkzYzRkYzg5Njc2NGE4OWE0MGFlOGVkYTk3ZjRlNjY5NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cfa7d6c3c33f42169bee8a755d633d8a",
+      "statement": "No test exercises `GitHubWebhookProcessor` or the endpoint — there is no webhook routing test and no `WebApplicationFactory` in the suite — so the routing policy is unpinned; what is pinned at the unit level is the delegated logic (the section contract via `SpecTemplateValidatorTests` and admission semantics via `JobQueueTests`), reachable because `Sebastian.csproj` grants `InternalsVisibleTo` to `Sebastian.Tests`.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L25-L27",
+          "version": "repo-lines-v1:sha256:3159a2bd30178eac04b8fdc6a1064ad5ec21ce71fe5870c124ee79dcecf8af82:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NiZWJmYjQ2ZjEyOTkxYWU0ODhlZWRiMzQxNDAyOWFiMWY5ODA3Y2RjMDllZjA2ZjNkMTBhYzk2YjI4NmJlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkYzE1OWJiNTk3NDk4ZjUyMmU3OTM1YzgxMjE3YmVlMjc5NzI4NmUwM2Q2ZGVhZDZhZTFkNTI2MjVlN2U2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Q4NWJjOWE0NDYzNzE4ZDViMjE3MTkzMjA1YmU2ZmFkZDc0MTA2OTllNjBmMDA0MDE1MDllOWJlM2RlNjU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWNhZWQxNmFkMzlmMDEwMzZhMWY5NTI2NTZiOGJmMmUyNDdhMjI2NmY1NWM2OGVmNTAyOTA1OTRiZTU3ODEzOSJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L18-L40",
+          "version": "repo-lines-v1:sha256:1f357d48f65a879796c246ffaa2297209f29193f087cb37fa364d6e50e502053:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0OTdlNTk3OTUwNjBjYzUzNmRhODNjOGE3OTMzYzQ5NjhkMTEyMjJhNTQ5Y2QzNDAyZTMwYzc5YzYwMDUwNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1Y2MzNGUwMDE5MzAyMTgwY2M3MzJmNDc1ZTkyMWEwOWVkNjU3NzNkNjllNzY2OTNhMjkxODIzN2E5ZTM5MzIifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L63-L90",
+          "version": "repo-lines-v1:sha256:eb63edd09b4ac41a41900e8037c8289557a833ddbc5926b4da6bf7e739064e04:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwZWE3NGJmNDU0OTJiNTUwMTZhOGQxOTI2MTBhMDI2NjkyMWE0MjY3M2RhMzQ5ZGQ5NDM5YmMwYTM5YzI3N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ZmJmYzA4ZWQwZjFkNjkyNDE3ODViY2E4YzI2ZjNkNTZiMDlmYzhhNzY0ZTM5MGI0MGEzZTM4NDlmMmM2OTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_61e165812e7741d5bb079d3b6533298a",
+      "statement": "Sebastian's only inbound integration is app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret) alongside a /health route; the secret is read once at composition time from GitHub:WebhookSecret (a [Required] string), so the HMAC trust boundary cannot be rotated without a process restart, and no authentication middleware exists anywhere in the host.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs",
+          "version": "repo-file-v1:sha256:bf440af4f366c77125b07d636c97b26453ed2d4102b659596e29100907e1f96d"
+        },
+        {
+          "resource": "repo://Program.cs#L40-L49",
+          "version": "repo-lines-v1:sha256:f6acfc010c246b13e3f11efaa5c69474232b31deee26704acf7fab9c50859211:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyNmJlNDNhMGVhMjFhMjgwN2FmYTMyNjAzODA0NDBjNWMzNDE1OTU2OWVjMzBkZWJmZGM5ZDNkMDhiMmRhNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L20-L24",
+          "version": "repo-lines-v1:sha256:10a7946a76345862f4de2eef8aaf7f83ee5c8bf0d0af5ca0761d6612a54bfb66:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGViNDg1YzkwNDhhNDJkMjZlNGJlMzBkMTQ2M2NlODI4OGVjMTc4NjMwYzMwZmM1YTg2ZDNhNWRhN2I5YTc3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDNmYTY5MDY0NDQzYmM0ZDcxMjg5ZDFiMmVhZDA4NGQyNjhlYTVmM2QxY2U2ZTdmMDE1ZTQzZjhiYjc3M2M1YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWMzMjBhN2Y5OWUzM2VmM2M5NDEwNTRlZTllMDAzMGVjOTMxODk1MGVmZWQzNWExYjY5MDZiMWNkYTMwNWQxOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8dd0d58275ce4a8587267ef2ce7a48db",
+      "statement": "GitHubWebhookProcessor is registered under the abstract WebhookEventProcessor via a factory lambda (not AddSingleton<TService, TImpl>) because the concrete type is internal and must stay out of reflection-based construction; its four dependencies — ILogger<GitHubWebhookProcessor>, GitHubService, JobQueue, and Git — are all root singletons, and this registration is a lazy singleton constructed on the first delivery, so a construction failure is a failed webhook request rather than a failed deployment (unlike GitHubService and ProviderResolver, which Program.cs resolves eagerly).",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L19-L28",
+          "version": "repo-lines-v1:sha256:18f8a3f5f75a746282936aa86706d377e9e6f5ecbc9ec222267e48f4ea9be623:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4ZDdlNzFlZjk0MjQ5OWZhYTRmYjFhYjZlNDVmMTUyNGZiNmJiZjVlNjA1NmUyZjM3NGE0YjNlZDEyMzQ2OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0ZDM4MzcwYzI2NDc4NGRmNjZjNjIwOGIwOWVjZDI1OTUwN2ZmOGY0MjBlZTE2N2NhMzIyZTA5N2JhNDU0NTIifQ"
+        },
+        {
+          "resource": "repo://Program.cs#L30-L44",
+          "version": "repo-lines-v1:sha256:948609f3b30854e1cd5161dd60d27761450ee3061332937c9a6dee58de37570b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5MjNlZmRhNzU5OWMwZWU0OWZiNjkyYWUxNTQyYTdhYjgzZmZlZGQzZGEzNmQ5ZTM5MzAzNTFjOTVlZTU2Y2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiNDUwYmViOTRlZjgyMmJhZmY2MmI1MzViZWE5MTY0NzY3NGQyM2M0MGFiZDc4MDA2YWE4OGQ3MzYxMjk2ZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxY2JlMjM2YjYzYmYwY2Y1MWI5NjM5ZjRiOTE4MzVhN2I2YzE1Nzg1OGY5MmI2MGY5NTFhNmViNTY0MTQ0MTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhM2Q2ZTMzNjYzYjMxMTk0YjIyMDU1NzMwMmJjNTQ3NzYxOTdjNjNkNGY4ZWQxNWJhNWVmOTk4ZjVkMzg0MDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cb81361e455040cb8fc26b5acbeaf2eb",
+      "statement": "The ProcessWebhookAsync override emits exactly one Information line, 'Webhook {EventType} ({Event})', for every signature-verified delivery before base dispatch, and that line carries no action, repository, issue number, or X-GitHub-Delivery id — so logs prove a delivery arrived and its model/header type but not what it concerned, and a redelivery is indistinguishable from a fresh event.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L119-L120",
+          "version": "repo-lines-v1:sha256:72b98243e845c24eaa3462444c15995506b49e9f6a1bb452f44439b72472e5d9:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjk2ZTI2ODgyYmNiNmYyNzFiOTRlM2I0NjAwNTcxNzcwMWNhY2NhMjUzY2RkYzI0MzE0N2U0OTI1Zjg5MjNlYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTMwZTE3MDJjNDgyNTUwYTdmYjA2N2JhMTFkMjkzN2Y3NTY1NGVjN2ZjYTk5NWE3YzgxMmVjYjM4OWZjNGIzMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTQ3NGEzZGZjZWRlYmVhOWQ1NzQ3ZDQ0Nzg2YmMzY2U3YjZmOGM4ZjgyYTY0OWU1YzU0NTE4NDhjMDMyZWQ2ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDQ4NGM4MGU4MjE1ODQ2OWE2MTJiNmE5MWY1NWFlZmU3ZjI3NjlmMzY1ZDQwM2Y5NmYxZjVhZDQ4MWY0MTFiOSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L23-L30",
+          "version": "repo-lines-v1:sha256:e0cc2820a6e6ec518ebc2689ed4b9be664abb03f6de3368a47464cadb3b345f2:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU2NTFhMzBmMTU1ZWMyYTNjMzJjZTkyNzRjMTIyNzUzOTZkMDZjMTdhMWFmN2EwNmRjMTQwOGYxNTU0ODA5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc4Njg4MTk1YThkZjNjNDU0ZGQ1ZTgzYmRhODI0YmM1YzA5NTg3NjcwNWMxOWRmZGVjZGY1ODBjZTdiZDA3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA3ZjBkMTU1ZTc2ZjRkNmJjOTRkNGZhMWRkMzgwMzkzYzRkYzg5Njc2NGE4OWE0MGFlOGVkYTk3ZjRlNjY5NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ec3f816902af4e52adb5995035900c2a",
+      "statement": "ProcessIssuesWebhookAsync short-circuits silently (no log, no comment, no state change) unless the action is exactly Opened, Labeled, Edited, or Reopened; additional silent guards require the payload issue's State to be Open with a 'feature' label (OrdinalIgnoreCase) and require Repository, Owner.Login, and Name to be non-null before the two GitHub writes can be called.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L104-L105",
+          "version": "repo-lines-v1:sha256:a738bcc56ff2a6df6e42876fc9a2505ef09b6ec099f134d3c09da19ddd9c20bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmNiY2IxYTljMDEzYzIzODIwOGRmZjZhODk1MTZhNjZmNmE1NDc4NWE4N2MzYmJlMTM3OGZlYjk5MzcxM2JiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJlMDBhZjdlYjhkOGU5ZDFlMTViYWQwYjQzODljOTNjOWNhODIwNmIyNzI1MTliMDUzMDNjMjc1MTNmMGIxOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEyY2E1NmFiMjk3NGQwZjZlZTA0OGZlZTRhM2I2YTc1ODI3OTNkYTFkMWI3YTM4MjdhZTQ0ZjRmZDk5Zjc0MCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L38-L57",
+          "version": "repo-lines-v1:sha256:488aef708ca4c2a7c7863b8c0d1af867f199b0ae5fa033d397905275df14e1bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMmY1ZDU3MjE3Zjg0MDAxNDYxOTI0ZTY0YmQxOGM3YWQwNTdmMzNjZDMyZmMzNTNhMzdkZGUyODQyZGYwYTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1YmVhNDk1NmY1ZTAxODlkOGNhZDA0NWM1OTY2NmM3MmI0MjNhZTI4OTZhMDQ4YjU2NDgxMjQwOTE0ZWExMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0ZDA4ZDNkZjhiNTkyNmI1ZmQ2ZTllZjJkODIwOGQzNWFmYmZmN2Q3NDJhNGM3MzIzN2Q0NzNiMmJmYWQ4ZWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ff79a530260748deb956be9e7cadedb7",
+      "statement": "In the issue path, SpecTemplateValidator.FindMissingSections runs and returns before the ready-for-agent check, so an issue already approved with ready-for-agent is still commented on and closed as not_planned when a required section is empty, and an invalid spec is never enqueued (the close path ends in a return).",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L61-L101",
+          "version": "repo-lines-v1:sha256:e178a651a0d69446fcba31675c1eb8e819c63cd505e1b5931608f4b1e4417585:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3YTMwNjdkNzlkOGE4Yjg3NGJiNDdhMmUyZGY2YWE5MmQ4OWQ1ZmM4NWNiMDIxMmRlNjQxOGFhZGRiNTk4MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ZDA4ZDNkZjhiNTkyNmI1ZmQ2ZTllZjJkODIwOGQzNWFmYmZmN2Q3NDJhNGM3MzIzN2Q0NzNiMmJmYWQ4ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8e184cca2cc4495db8aa8205d4d7fa35",
+      "statement": "A complete spec issue carrying 'feature' and 'ready-for-agent' becomes an ImplementSpec job built from the webhook payload's title and body (never re-fetched), and the boolean from JobQueue.TryAdd is informational only: true logs Information 'Started implementation for {Repository}#{Number}', false logs Debug 'Implementation already running for {Repository}#{Number}' with no throw and no comment.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L125-L132",
+          "version": "repo-lines-v1:sha256:1ddf02a691db1fb469da0c572913ded0674ab7ca577a4ba66290d54eea40e0ce:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJiM2UzNDMxN2Y3MWZjNWYyODhiYzkxMTViODZjZjUyNTUzZGU0ZjlkNWZhY2RlMDBjMGJiN2RmMzk5NTZmZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIzY2JiZmEzN2U4Zjk2YzA3YWM2MzYwOWVlYmMxOGNlNGMyZTNmODE0ZGJiZTEyY2IyYTMyYTQ4Yjc3NjY3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTQwNjY4MTJiNzMyYWRjM2FlY2I4ZmIyZDJhOGEzYmI4NzIwYTYzZDhiNGM1ZWFmOGNhOTE4YTM2ZWJkZTBjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L84-L101",
+          "version": "repo-lines-v1:sha256:fdd2d4f2a8483fade318c2d81bd6a1e7c75efbaa56a6bd9229386427af16fbde:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d78e8632a55f41c6a8ffc668af65d6a8",
+      "statement": "Both gate labels are read-only const filters ('feature' and 'ready-for-agent', matched OrdinalIgnoreCase via HasLabel); the processor never writes a label and never verifies which actor applied one, so the entire state transition into agent work is enforced by humans.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L104-L105",
+          "version": "repo-lines-v1:sha256:a738bcc56ff2a6df6e42876fc9a2505ef09b6ec099f134d3c09da19ddd9c20bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmNiY2IxYTljMDEzYzIzODIwOGRmZjZhODk1MTZhNjZmNmE1NDc4NWE4N2MzYmJlMTM3OGZlYjk5MzcxM2JiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJlMDBhZjdlYjhkOGU5ZDFlMTViYWQwYjQzODljOTNjOWNhODIwNmIyNzI1MTliMDUzMDNjMjc1MTNmMGIxOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEyY2E1NmFiMjk3NGQwZjZlZTA0OGZlZTRhM2I2YTc1ODI3OTNkYTFkMWI3YTM4MjdhZTQ0ZjRmZDk5Zjc0MCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L20-L21",
+          "version": "repo-lines-v1:sha256:99506d63015f026c54dee072c553d3d081ce8367c4705315ca1daa8d18b5fdea:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGVmNDVjYTA1ODBmMWY0YWVhMjQ1NzYxMTE1ZDZlOWExZTQ3NmZhZjBlZDhjY2FiOWQ0NDQyYjUzZmM5YTllZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmRlMzhjZmQ3NDM2Y2FlYzg1NWJjYzc1MzNjY2FmNjM2YjJkOTQxMzRmN2VhYWNjNmNkNTQ1MzViYTFhZTdjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRhYmI1Zjc1MDE0ODdmY2YwNmFiZWUwYTA2ZWNhODUxNjY0YmU0MDJlNTQ2MmYzZjRhYmMxZDFjYzEyNWY1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjYzZTkyZWVjNTQ4YWRjOWY2MzQyNzAyYTIwNDZiMzIxM2JlNWQ1MWRhNTNhOTIzNjQyYzBhMzQ1MGQ3NDM2YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_853085d971814ce991c74313428908ae",
+      "statement": "Only ProcessIssuesWebhookAsync and ProcessPushWebhookAsync are overridden; every other GitHub event type (pull_request, issue_comment, ping, workflow_run, and the unhandled issue actions) reaches the base processor's dispatch after the delivery log line and produces no side effect, which is why no command surface such as a merge command exists.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L110",
+          "version": "repo-lines-v1:sha256:65b3e55540e160b53b904afdc6899554cc5200b779e809b45ceb1db056d61472:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJlMDM2OTdiNWMwZGJmZmMyNWVmYTVkNWNiNDU1YzgyODg2NWFiZmYzMzk5MmQxNTU0NTNjMzhjY2RmNDU0ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzJiZTk5MWUxOTc2NTViMzFhNWViZmZhZWY0ZTQyZTVhNWNiZDI2OTc2NTdkM2JhZjRlMzYzNmExMzVjYTFjYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODU5YTczMWVkNmRhYmE0YTEwNmNmNzUxZGUwNTkyYjYzZjBlYTc3MWRlOTU5NDhmMzFjNjQwODUzMmNhOTMzNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmRlYTMzM2FhYmI0ZDQ4ZTZhZmE3YTg1MzA3NzZiYmFkNmMwYTA2NjhhMmIwMjIzNDg1OTIxNDA3YTg3NzNkYSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L23-L36",
+          "version": "repo-lines-v1:sha256:3cf1b67654ac3dfecb7fb99cc9f1c7baa46fe34b3884e6c1903a5e56a2747d14:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlNjUxYTMwZjE1NWVjMmEzYzMyY2U5Mjc0YzEyMjc1Mzk2ZDA2YzE3YTFhZjdhMDZkYzE0MDhmMTU1NDgwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyYmU5OTFlMTk3NjU1YjMxYTVlYmZmYWVmNGU0MmU1YTVjYmQyNjk3NjU3ZDNiYWY0ZTM2MzZhMTM1Y2ExY2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3ODY4ODE5NWE4ZGYzYzQ1NGRkNWU4M2JkYTgyNGJjNWMwOTU4NzY3MDVjMTlkZmRlY2RmNTgwY2U3YmQwNzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyZjFiNjc4N2EwN2U2OWVhYjRiODFkMWEzNTM0NDVhMzljYTc2ZjBmZjdkZDM0NTgyY2UwNDJiYWRlNDI1ZDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_30911234b2854139b5a20aa5681d9250",
+      "statement": "The three issue guards log nothing by design — the delivery line already records arrival, rejected traffic dominates at installation scope, and a skip is not an error — with the consequence that at the default Information level the only visible intake outcomes are 'a delivery arrived' and 'implementation started'; the invalid-spec closure and the duplicate-key rejection are Debug only.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L125-L132",
+          "version": "repo-lines-v1:sha256:1ddf02a691db1fb469da0c572913ded0674ab7ca577a4ba66290d54eea40e0ce:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJiM2UzNDMxN2Y3MWZjNWYyODhiYzkxMTViODZjZjUyNTUzZGU0ZjlkNWZhY2RlMDBjMGJiN2RmMzk5NTZmZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIzY2JiZmEzN2U4Zjk2YzA3YWM2MzYwOWVlYmMxOGNlNGMyZTNmODE0ZGJiZTEyY2IyYTMyYTQ4Yjc3NjY3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTQwNjY4MTJiNzMyYWRjM2FlY2I4ZmIyZDJhOGEzYmI4NzIwYTYzZDhiNGM1ZWFmOGNhOTE4YTM2ZWJkZTBjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L38-L57",
+          "version": "repo-lines-v1:sha256:488aef708ca4c2a7c7863b8c0d1af867f199b0ae5fa033d397905275df14e1bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMmY1ZDU3MjE3Zjg0MDAxNDYxOTI0ZTY0YmQxOGM3YWQwNTdmMzNjZDMyZmMzNTNhMzdkZGUyODQyZGYwYTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1YmVhNDk1NmY1ZTAxODlkOGNhZDA0NWM1OTY2NmM3MmI0MjNhZTI4OTZhMDQ4YjU2NDgxMjQwOTE0ZWExMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0ZDA4ZDNkZjhiNTkyNmI1ZmQ2ZTllZjJkODIwOGQzNWFmYmZmN2Q3NDJhNGM3MzIzN2Q0NzNiMmJmYWQ4ZWEifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L99-L99",
+          "version": "repo-lines-v1:sha256:9680af72eeb27156b0cafd441b47c7426058b4dfbce1c19d57435618324eb5fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY4MGFmNzJlZWIyNzE1NmIwY2FmZDQ0MWI0N2M3NDI2MDU4YjRkZmJjZTFjMTlkNTc0MzU2MTgzMjRlYjVmYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTY4MGFmNzJlZWIyNzE1NmIwY2FmZDQ0MWI0N2M3NDI2MDU4YjRkZmJjZTFjMTlkNTc0MzU2MTgzMjRlYjVmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRmZGJhMjU5N2M2ODhmODBmN2RiZmU0M2U1MjI2ODU5NjFjOTRiYzA2ZDVmMWIxZTViZmI5MmRkN2UwOTRmOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmYzZTM3ZjY3OWNkNjY3MDJiNzFmM2Y5OGQ3YjJiNjJlMDAwYTMzYWRiNDg5MTU0N2M2NmE5MmQ0MTI0YjE3OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a0d2f077e46f4fa99e7c92717170ce20",
+      "statement": "The invalid-spec path performs two sequential, non-idempotent GitHub writes (PostCommentAsync then CloseIssueAsync with state_reason not_planned) with no try/catch and no delivery-id dedupe, so a redelivered 'open with missing sections' payload passes the payload-state guard again and posts a second comment and a second close attempt; a failure on the comment leaves the issue untouched while a failure on the close leaves a comment on an open issue.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L63-L82",
+          "version": "repo-lines-v1:sha256:61fd2ffce9308b6d2d577af4347ee4a46367ea92c77f5642f2a54f7bdf11d157:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDBjMjY1OWJjYTY3NmE3MmJiODFlNzU0MTAwZTMxYjhhYmY3MjExN2U5YWUxMmRiMDU2OTQ4ZGQ0YmQ5OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OTU2OTA4YmQzOTA5MjMzNDA5ZjdiZWU3ZDhhNWIzODQ0OGY5YjA0M2E1ZDA4ZWIxZTg5MWQ0ZDQyNDFlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMjQ5YTMxYmRjN2UyMWU0OGFjZTA2YjI3OTczY2YyM2Y1OGIwNzVkODU2MmQ0YzhhNGQ1ODRmYmQwNmE2YmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_222bf7aa76c846c9a6d2f1e68646c8e0",
+      "statement": "ProcessPushWebhookAsync logs Information 'Push {RefName} on {Repository}: {Before} -> {After}' and then awaits git.SyncMainAsync(pushEvent.Ref, pushEvent.Deleted, cancellationToken) inline inside the request, under a documented 'shortcut: synchronous fetch in the webhook; move to a background queue if delivery latency becomes a problem' comment — making push handling the only git work on a request thread and the webhook response time a real constraint for anything added to intake.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L117",
+          "version": "repo-lines-v1:sha256:157fae54eb39a767fcaa9562bc592d1cfa5a6be5dadf7c984f9a08e5a9cc7400:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZTAzNjk3YjVjMGRiZmZjMjVlZmE1ZDVjYjQ1NWM4Mjg4NjVhYmZmMzM5OTJkMTU1NDUzYzM4Y2NkZjQ1NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1OWE3MzFlZDZkYWJhNGExMDZjZjc1MWRlMDU5MmI2M2YwZWE3NzFkZTk1OTQ4ZjMxYzY0MDg1MzJjYTkzMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L122-L123",
+          "version": "repo-lines-v1:sha256:9d96f748a4d0bf4c8180357629a86e53cafcd24e3260d70ac4026c6d1657ca69:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTZmNzZjMTU5ODg4NjM0MDE0YTYxMDg2NDE0OTdkMDA2NzhkMjA5ODU2NDc1MmI1YzVmMmUxZWRkMmJhYWMyMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWIzYzkwYmMzYWE4OTNhOThiYWI2MzgxNzg0YjU0Zjk4Yzk1YTc2NGQ1YjUxMDBiNzI3ZTQ4NTBmMmMzZjZhYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDVjNjEyYzgzMTUzYzU4MjdhMzMzZjc0OGIwMzAzYjY5MmJhOGQ2NjJjYzFhY2UwNTljNThlMjM0MDQ0YTE4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWFmNDVlNDA3MWUzYTRiNzc5ODk2ZDNjNWRlZTY5MDBjZWNhNjg1OTBiOTUzOTllNDFlZWVhZmM1NmE2NjgxMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6a3f1fdfd4274d258da129f79d2c8492",
+      "statement": "The push-triggered SyncMainAsync is a ref filter first: it returns before invoking any git command when the push was a deletion or the ref is not exactly refs/heads/main (Ordinal), so pushes to sebastian/issue-<n> and other branches produce an Information log line with no mirror update.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L107-L116",
+          "version": "repo-lines-v1:sha256:9b79c84e6523df98d8405b4754d0c11e8a37f43e07851066b9d222ec5be347d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2ZWM5ZWE4OTBmMWJlNjhhNmMyMzE0ZDA3NDM3MGU0ZmYwNTEyMDg1MTBmYTk5MTJlZDkwNjY1NWExZTFkNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhZTg0ZGZkOGU0NDIyZDE2OTEwZWUwYTc4ZWViYzIwOWNmMDM3NTY4ZDhjM2RmN2Y1Y2FjOTI5MWVjMzIyOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkMTFhNjc1OWUwZWMzMGIwMmNmY2JmNmFmOThmZGU0MDNiZDBiNGFiOGZkYTRiZWI2NjcxYzJmNDVlYTc3YWQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L112-L116",
+          "version": "repo-lines-v1:sha256:224c3665e1da52a8809bf0eae377dc4c48233f4ae35cee7ada8b26b567d2bf82:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2VmNmMyZTNiODM5NTNjODE0NTZmZmI1MTk5MmJiZjMxY2U3NDU1YTZkZmMxOGYyODFjNmUzZTliMzVmYWU0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzgxMzFiYzQ4OWJiYWRiNWUxZmEwM2RmODczNmQ5MjkzOTEzM2U1Nzg3Njg2ZTg3ZTBlYzkxYmVlYTc0MGMwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTYxZjkyY2IyNjNmYmExMjU1Y2ZiNmYzMzFmNjA4ZDhhNjFhZDQ1ZjdjZDU1NDQ5MTk1MGNhZTA0MmVlNDZmMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTRhNzU1MTIwNmQ5Nzg3Mjc5NDZmZDI2OTdkNWM5ZWE4YTQ3MTRlZDk5MGI0ODliZDc3N2Q3YTc1NTlmNjE5OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c7e3ea543d4416a96b9b8cb062432ff",
+      "statement": "A push-triggered sync cannot fail the webhook request because SyncMainAsync catches InvalidOperationException (logged Warning, 'Local main sync failed') and OperationCanceledException (logged Debug, 'Local main sync cancelled'); the processor itself has no try/catch, so any other exception type thrown from the sync or from a GitHub write propagates out of the handler as a failed request, and JobQueue is the only error-isolating boundary in the process (downstream of intake).",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L143-L151",
+          "version": "repo-lines-v1:sha256:9f35d3d313b00eb901d3e7e6ec45fc0f8ffce8dbc90c8c7703a14dc4a234b112:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDg5YWQxYmJiYjgxYmI4NDM2NmIwNzRmNTRmYTQ5MGU1NjQ0MTVkYzEzNjc3ZTgzYjMwMTFkNDNlZDMzMjcyMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDY3NzcyZTgxOTJhYWY3NjVjOTNjYTE0MTAxNzFkYTcxZTE2M2QzMzViMjZmNWM0ZDk2N2ZhNzgzMmM0ZjUyOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTkxMTJiYjA1M2IzMDg0YTE2MWQzMmJjODU4MTc3NGNhYTE2ZmQ1NDBkM2VkODNkZWE3N2RjNzI2NzAzY2UxMSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L117",
+          "version": "repo-lines-v1:sha256:bb2d3069884f479ec04acc3cc5cd7fd8bd94e0e27dcd0d5c66c99c4681e17450:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a4f84163427d4324a7b5ca5f65dfe37b",
+      "statement": "The webhook call site of SyncMainAsync is unbounded: unlike Git.StartAsync, which runs the same sync under a linked CancellationTokenSource with CancelAfter(TimeSpan.FromSeconds(10)), the push handler passes only the request cancellation token, so a slow git fetch --prune origin adds its full duration to the delivery response and a client disconnect cancels the fetch with a Debug-only log.",
+      "evidence": [
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L36",
+          "version": "repo-lines-v1:sha256:8e54e79299ad569dfe53557e093a405a6d5eeba2d1ed1679dd9caf9dfc8bbbea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L115-L116",
+          "version": "repo-lines-v1:sha256:2afd8447f58141b2a4f89fe04ccf130eda84b3312d3636553d0c90193b4b1425:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk0MzRkYjc0YmFjMGRiNTU3MzhhODdhYzZkYmRlNDlkMTgwNTYzNWZlMmRiMGY2YzZiMjU4MmFmZTkwOTYxNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzgxMzFiYzQ4OWJiYWRiNWUxZmEwM2RmODczNmQ5MjkzOTEzM2U1Nzg3Njg2ZTg3ZTBlYzkxYmVlYTc0MGMwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTM4MGRkMWViYTZiMjY3MjFkMDFhNWNkZmQ2Nzc3NjZmZGJjMTUyYWIzMDkwOTg2OWFmNGVjMmE4ZmZlN2ViZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTRhNzU1MTIwNmQ5Nzg3Mjc5NDZmZDI2OTdkNWM5ZWE4YTQ3MTRlZDk5MGI0ODliZDc3N2Q3YTc1NTlmNjE5OSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_07e0e6e4384a4fdaaf68fa9caa0918a9",
+      "statement": "The payload repository is never cross-checked at intake: the processor comments on and closes whichever issue a delivery names, and the owner/repository match against the parsed origin remote is enforced only later, in ImplementSpec.PrepareWorkspaceAsync, for the implementation path.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L63-L77",
+          "version": "repo-lines-v1:sha256:dcdd571985d159d7f7dfa348fb751841bebafa793d2c3bcd6bfbb5e54319e489:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxOTU5Y2Q4NmYwMTljY2FkNGFjOGNmZDRiYTA5MjNiMzY1NjUyYzI4NGIzNGI1ZTNkNjdmMDU0MjAyOWUwYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhYjBiZjczMmJiNzM0NmJlNmRhN2NiNzI0MmYwYTdlYzQ3Mjc1YTc1MDM3NzAyNDM0OGQwY2ZjZGEwYzhjMTMifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L51-L78",
+          "version": "repo-lines-v1:sha256:0049575289d56ca14e86394888ad78269597a363b0eacbc2f7a1c075dcc18e5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYWNlYzJiOGRjNzIwZWE1ZmRlY2M4MDkzYjQxNDJjMDFlOThiMjU3Y2ZmNmVmNGVjNTI4ODdmYjY1MGRkOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmMDIzZDM1NDE5YTM2MGQ1ZWY1ZjViZDMxYzRiYjI5NTQ2NzIyMGVkOTg3YTIyZDM4ZDM4ZTBjYjQwYWIzYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlYmQ0MzMxYzA2MDgwYTAxMDM2NThjYzM3MDA1MzhkZGEyZTg5NTNjODJkZDQ0NWU3ZTk1ODI3NDk5MjdhOWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_518d77769f3c47f7aaa09d8e15f5ef64",
+      "statement": "No test exercises GitHubWebhookProcessor: the suite has no WebApplicationFactory, no integration test of Program.cs, and no reference to the processor, so the action list, label comparisons, silent returns, validation-before-approval ordering, and inline push sync rest on review alone; the nearest coverage pins its dependencies — SpecTemplateValidatorTests for the section contract and JobQueueTests for duplicate-key rejection — and adding a processor test requires first introducing a seam, because the class takes concrete GitHubService, Git, and JobQueue singletons.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L14-L18",
+          "version": "repo-lines-v1:sha256:32beb1f13edbb310eef430a4ad12eecbf5d5fac92c974d925fd8eb3a1f3b308f:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjMwMGQ1NTg5MTQ2NGVhODU1YjVmMDkyYjNmZDQ4ZWFlMDYyNDk5YjZhMzQ2ZjAyOGQ2MDA4NTY2NDJlNDJkYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTY0ZDJlMWEyZTA2YjRhOGI2MzIxNzZhYjgzNGVlMWE2N2YyNDRmZmUwYzhkYzZiMzBkMGY3Zjk4NzA0ZDg1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjFjY2VmNDliYjQ3Nzg3YmEzNzc4YWUzYzE2OTI2MzUwYzQwYzQzMGY5ZTMwNjg5MjlkOTI5ZjZhYzc0Mzc1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmEyMTA5N2UwOTdiNzFjMzAyYzk2YWRhZmE4YjQzMzRlMmQwMjcwNGFkYmYxMjU1NzVkYmYzMjViZmU2MmMxNyJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs",
+          "version": "repo-file-v1:sha256:c7e86a05b935c84ca843636bcaea2806bd2b7997c6009b110c693bb4f39a1f15"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L63-L90",
+          "version": "repo-lines-v1:sha256:eb63edd09b4ac41a41900e8037c8289557a833ddbc5926b4da6bf7e739064e04:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwZWE3NGJmNDU0OTJiNTUwMTZhOGQxOTI2MTBhMDI2NjkyMWE0MjY3M2RhMzQ5ZGQ5NDM5YmMwYTM5YzI3N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ZmJmYzA4ZWQwZjFkNjkyNDE3ODViY2E4YzI2ZjNkNTZiMDlmYzhhNzY0ZTM5MGI0MGEzZTM4NDlmMmM2OTIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}

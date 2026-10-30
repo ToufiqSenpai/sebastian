@@ -23,6 +23,23 @@ public sealed class ImplementSpecTests
     }
 
     [Fact]
+    public async Task RecreatesWorktreeWhenDirectoryWasRemoved()
+    {
+        using var repository = TestRepository.Create();
+        var git = repository.CreateGit();
+        await git.StartAsync(CancellationToken.None);
+        var spec = new ImplementSpec("owner", "repo", 1, "First", "Body");
+
+        var first = await spec.PrepareWorkspaceAsync(git, CancellationToken.None);
+        TestRepository.RunGit(repository.Work, "worktree", "remove", "--force", first);
+
+        var second = await spec.PrepareWorkspaceAsync(git, CancellationToken.None);
+
+        Assert.Equal(first, second);
+        Assert.True(Directory.Exists(second));
+    }
+
+    [Fact]
     public async Task RejectsDirtyMain()
     {
         using var repository = TestRepository.Create();

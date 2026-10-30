@@ -5,7 +5,6 @@ tests/**/bin/
 tests/**/obj/
 .archify/
 
-# Secrets — jangan pernah di-commit
 .env
 .env.*
 !.env.example
@@ -16,3 +15,6 @@ appsettings.Development.json
 *.key
 *.snk
 *.user
+
+# Agents
+.agents

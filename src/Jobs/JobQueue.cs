@@ -1,5 +1,6 @@
 namespace Sebastian.Jobs;
 
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,19 +13,23 @@ internal sealed partial class JobQueue(
 {
     private const int MaxConcurrentJobs = 10;
 
-    private readonly Channel<(IJob Job, TaskCompletionSource Done)> _channel =
-        Channel.CreateUnbounded<(IJob Job, TaskCompletionSource Done)>();
+    private readonly Channel<IJob> _channel = Channel.CreateUnbounded<IJob>();
+    private readonly ConcurrentDictionary<string, byte> _inFlight = new(StringComparer.OrdinalIgnoreCase);
 
-    public Task Add(IJob job)
+    public bool TryAdd(IJob job)
     {
-        var done = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        if (!_channel.Writer.TryWrite((job, done)))
+        if (!_inFlight.TryAdd(job.Key, 0))
         {
-            done.SetException(new InvalidOperationException("Job queue is not accepting jobs."));
+            return false;
         }
 
-        return done.Task;
+        if (!_channel.Writer.TryWrite(job))
+        {
+            _inFlight.TryRemove(job.Key, out _);
+            return false;
+        }
+
+        return true;
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
@@ -45,14 +50,14 @@ internal sealed partial class JobQueue(
                     MaxDegreeOfParallelism = MaxConcurrentJobs,
                     CancellationToken = stoppingToken,
                 },
-                async (item, cancellationToken) =>
+                async (job, cancellationToken) =>
                 {
                     try
                     {
                         var scope = services.CreateAsyncScope();
                         await using (scope.ConfigureAwait(false))
                         {
-                            await item.Job.RunAsync(scope.ServiceProvider, cancellationToken).ConfigureAwait(false);
+                            await job.RunAsync(scope.ServiceProvider, cancellationToken).ConfigureAwait(false);
                         }
                     }
                     catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -60,11 +65,11 @@ internal sealed partial class JobQueue(
                     }
                     catch (Exception exception)
                     {
-                        LogFailed(exception, item.Job.Key);
+                        LogFailed(exception, job.Key);
                     }
                     finally
                     {
-                        item.Done.TrySetResult();
+                        _inFlight.TryRemove(job.Key, out _);
                     }
                 }).ConfigureAwait(false);
         }

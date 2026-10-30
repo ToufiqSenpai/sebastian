@@ -27,7 +27,7 @@ public sealed class JobQueueTests
                     await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
                     _ = Interlocked.Increment(ref completed);
                 });
-            _ = queue.Add(job);
+            Assert.True(queue.TryAdd(job));
         }
 
         Assert.True(SpinWait.SpinUntil(() => Volatile.Read(ref started) == 10, TimeSpan.FromSeconds(10)));
@@ -48,20 +48,65 @@ public sealed class JobQueueTests
         using var queue = new JobQueue(services, NullLogger<JobQueue>.Instance);
         await queue.StartAsync(CancellationToken.None);
 
-        var failed = queue.Add(new TestJob("fail", _ => throw new InvalidOperationException("boom")));
-        var completed = queue.Add(new TestJob("ok", _ => Task.CompletedTask));
+        var failed = new TestJob("fail", _ => throw new InvalidOperationException("boom"));
+        var completed = new TestJob("ok", _ => Task.CompletedTask);
 
-        await failed;
-        await completed;
+        Assert.True(queue.TryAdd(failed));
+        Assert.True(queue.TryAdd(completed));
+
+        await failed.Completion;
+        await completed.Completion;
+
+        await queue.StopAsync(CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task RejectsDuplicateKeyWhileJobRuns()
+    {
+        using var gate = new SemaphoreSlim(0);
+        using var services = new ServiceCollection().BuildServiceProvider();
+        using var queue = new JobQueue(services, NullLogger<JobQueue>.Instance);
+        await queue.StartAsync(CancellationToken.None);
+
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var running = new TestJob("same", async cancellationToken =>
+        {
+            started.SetResult();
+            await gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        });
+
+        Assert.True(queue.TryAdd(running));
+        await started.Task;
+        Assert.False(queue.TryAdd(new TestJob("same", _ => Task.CompletedTask)));
+
+        gate.Release();
+        await running.Completion;
+
+        var again = new TestJob("same", _ => Task.CompletedTask);
+        Assert.True(SpinWait.SpinUntil(() => queue.TryAdd(again), TimeSpan.FromSeconds(10)));
+        await again.Completion;
 
         await queue.StopAsync(CancellationToken.None);
     }
 
     private sealed class TestJob(string key, Func<CancellationToken, Task> run) : IJob
     {
+        private readonly TaskCompletionSource _completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
         public string Key => key;
 
-        public Task RunAsync(IServiceProvider services, CancellationToken cancellationToken) =>
-            run(cancellationToken);
+        public Task Completion => _completion.Task;
+
+        public async Task RunAsync(IServiceProvider services, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await run(cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                _completion.TrySetResult();
+            }
+        }
     }
 }

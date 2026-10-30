@@ -87,25 +87,10 @@ internal sealed partial class Git : IHostedService
         string branch,
         string startPoint,
         CancellationToken cancellationToken) =>
-        RunAsync(["worktree", "add", path, "-b", branch, startPoint], cancellationToken);
+        RunAsync(["worktree", "add", "-B", branch, path, startPoint], cancellationToken);
 
-    public async Task RemoveWorktreeAsync(
-        string worktreePath,
-        string branch,
-        CancellationToken cancellationToken)
-    {
-        await TryAsync(["worktree", "remove", "--force", worktreePath], cancellationToken).ConfigureAwait(false);
-
-        if (Directory.Exists(worktreePath))
-        {
-            Directory.Delete(worktreePath, recursive: true);
-        }
-
-        await TryAsync(["worktree", "prune"], cancellationToken).ConfigureAwait(false);
-        await TryAsync(["branch", "-D", branch], cancellationToken).ConfigureAwait(false);
-
-        LogWorktreeRemoved(worktreePath);
-    }
+    public Task PruneWorktreesAsync(CancellationToken cancellationToken) =>
+        RunAsync(["worktree", "prune"], cancellationToken);
 
     public async Task<string> GetStatusAsync(string worktreePath, CancellationToken cancellationToken)
     {
@@ -191,18 +176,6 @@ internal sealed partial class Git : IHostedService
         IReadOnlyList<string> arguments,
         CancellationToken cancellationToken) =>
         (await RunAsync(arguments, cancellationToken).ConfigureAwait(false)).Trim();
-
-    private async Task TryAsync(IReadOnlyList<string> arguments, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await RunAsync(arguments, cancellationToken).ConfigureAwait(false);
-        }
-        catch (InvalidOperationException)
-        {
-            // Best-effort cleanup command.
-        }
-    }
 
     private async Task<string> RunAsync(
         IReadOnlyList<string> arguments,
@@ -297,7 +270,4 @@ internal sealed partial class Git : IHostedService
 
     [LoggerMessage(Level = LogLevel.Debug, Message = "Local main sync cancelled")]
     private partial void LogSyncCancelled();
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "Cleared previous worktree at {Path}")]
-    private partial void LogWorktreeRemoved(string path);
 }

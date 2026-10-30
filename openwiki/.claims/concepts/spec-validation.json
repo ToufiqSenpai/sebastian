@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:736547d9b8e3cd3856249c20324f1706f7d8f175df2b9ed626ef9c59f2b0a30c",
+  "claims": [
+    {
+      "id": "claim_b1071aaa4f6e45db92b21a886af00487",
+      "statement": "The spec validation gate runs only for issues that are open and carry the `feature` label, and only for the `opened`, `labeled`, `edited`, and `reopened` issue actions; every other action, state, or label combination returns silently with no log, comment, or state change — the PRD's per-label bug validation and bug routing have no implementation in code.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PRD.md#L36-L44",
+          "version": "repo-lines-v1:sha256:6c1389d501e0eca1005e21498f7e115590d49f4349b6eb9dbfbf0b6b8d33321e:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2Q2OWQxMmE3OGFkMzcxMDUyMDBkZWFiYWU3NDcyMmQ3NDliZTA1MWQ5M2I4NzQ0NDQxNTA3YjNkNTZkYWRmNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWU0YTJlYzE0NGFmMmJhMTMyMjI1NjJhZDlhMWM0OTI4MjJiOGE4NzZkNDAyOWY1MDI5MjY5OTlhZDRhMjkzYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmMzYjA3YzhhYmE4M2UxMTkxNDQ1NGUyODc4OTU4MGQyNjM4ZTM0ZjFjYTM4NzU2MjdlMjZlOTQyZmViMmEwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzU4ZDVlZWZjMDI4MWFhMjhmZDg1N2ZmNWNjMzI5NDQxMDg3NjliMmNiZDdhZmQ5MTBkNzAxNWZmZWI1ZGUwNSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L104-L105",
+          "version": "repo-lines-v1:sha256:a738bcc56ff2a6df6e42876fc9a2505ef09b6ec099f134d3c09da19ddd9c20bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmNiY2IxYTljMDEzYzIzODIwOGRmZjZhODk1MTZhNjZmNmE1NDc4NWE4N2MzYmJlMTM3OGZlYjk5MzcxM2JiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJlMDBhZjdlYjhkOGU5ZDFlMTViYWQwYjQzODljOTNjOWNhODIwNmIyNzI1MTliMDUzMDNjMjc1MTNmMGIxOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEyY2E1NmFiMjk3NGQwZjZlZTA0OGZlZTRhM2I2YTc1ODI3OTNkYTFkMWI3YTM4MjdhZTQ0ZjRmZDk5Zjc0MCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L49",
+          "version": "repo-lines-v1:sha256:64cd89c45f7399cfb2e43ec37f99f605b9bbae1ae09c44f78ab261cc8ea8e253:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiOTAwMzZmY2M3ZGQ5MWYyYWM1Y2ViYmY4NDQ3ZjY0MjQ1ZGU1NWEyYTFlMDlhY2I2OWRkYmZmZTgzNmVhMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_689a0c9e977a4690b2302cc2ee3768c0",
+      "statement": "SpecTemplateValidator requires exactly seven markdown sections — Problem Statement, Solution, User Stories, Tech Stack, Implementation Decisions, Testing Decisions, Out of Scope — declared as an ordered static array, so the missing-section list (and therefore the names in the closure comment) follows declaration order rather than document order.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L6-L15",
+          "version": "repo-lines-v1:sha256:f211dda27615f8c1308aa6dd59da8a5ecf356051b77bef200547b0b3cd6f22e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZTI0NWQxOWRmOTNhMmVlMmUxMzJkZTJiNDU1MTkyYzk3NzJiNzlkNGFiZGIyYTBmMWU0ZWZjZmNiZDE2NGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5NTkyODBmNjE1NmMxZjY1MWI1MjJiMWIxODYxNjNiNjZkYjQ1YWRiZmE5YmM2NzFiZWQwNzM1MjllZWMxZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFiOWI2ZTJiMzUyNzI1OTI0ODg2YjNkOTYwZWQ3MzMyZmU4MjQ4NGNiMWE3MjU2NGJiMjFhNDYzZTFkMjZhMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzNzk5N2ZkNTY2MDA0ODQ4NTI2YWM3MjBiMzE4Zjk4NmQwNzU5ZjIzMDQxZjc4ZjI4ZTg0ZmEzNTFkNmE2MmYifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L61-L66",
+          "version": "repo-lines-v1:sha256:fe4037cdb4a15965470da7d5afc96a1df404c98d238f21ab6be3a0198428b843:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDdhMzA2N2Q3OWQ4YThiODc0YmI0N2EyZTJkZjZhYTkyZDg5ZDVmYzg1Y2IwMjEyZGU2NDE4YWFkZGI1OTgwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2I1MDdhNjA5MjcwOGRkZWM0ZGYwNDU5MzE5NThjMTc2Yjc5ZmU1ZGM2NzNkYjBkYzI1YjM2MzVhOTY2ODNhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTRkMDhkM2RmOGI1OTI2YjVmZDZlOWVmMmQ4MjA4ZDM1YWZiZmY3ZDc0MmE0YzczMjM3ZDQ3M2IyYmZhZDhlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTdkMGE0NTA3ZDE3YTVkY2JiMTQ5NjkwODc2YzAyOTVlZjQ4OGUzYWRhZWYxMWI5NTBmYWMzZGRlZjU1N2I0YiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f1368a3892fd4bd0bb5c5526c1cb70cd",
+      "statement": "FindMissingSections is a line scanner, not a markdown parser: it splits the body on '\\n', trims each line, opens a section only on a line starting with the literal '## ', records the trimmed remainder as the section name, and marks that section filled on the first line that is not empty content — with case-insensitive set membership so heading casing is irrelevant and any single non-empty line counts as content.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L17-L41",
+          "version": "repo-lines-v1:sha256:1883b0558010252ee8588c775560236511c28e56bcf5901cf898755e140a4c8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MDU5NWI1N2EzM2VhNDY4MzJkN2Q0MWM0Yzg1NTcxYTAwZmMxNmQ4ZGJiMzg2ZThiZmFmNmNmNWE3ZmI5NzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0OTdlNTk3OTUwNjBjYzUzNmRhODNjOGE3OTMzYzQ5NjhkMTEyMjJhNTQ5Y2QzNDAyZTMwYzc5YzYwMDUwNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4NGZiYjIwOGUwOTcyMDY0NDhlZDczNmUwYmQ3NWQ2ZDE0MTAxMjEzYTk3NzFmNDk2NjJlNDI3YTJhOWNlZDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5f5037f0535d4467a9a7b6c0ad29f4e7",
+      "statement": "Empty content is defined as an empty (or whitespace-only, post-trim) line, a line starting with `<!--`, or a line equal to `_No response_` case-insensitively; content before the first `## ` heading is discarded because no section is open yet, and a null body therefore reports all seven sections missing.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L32-L46",
+          "version": "repo-lines-v1:sha256:280b02627ddb7589ebfb5388a39449ca6201a14a46c93248c95ecc0a23a61630:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4YzU2MjEyY2FhOGY3YmRkYTRlMjVhNWE5ODA5YmUyYWFiMzBiN2QzZjcxYTFhMmJiNTc3ODRlMGQ0MmRjZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlODE1YTFkNGY4YTIzNjIxZDIyMmJmZDg2NzExNzViZGJjZDAwNjE4ZTYyNmNlZDg2NzFlYTIxYjE2YTEzY2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwZDk0NmI2YWE3OWY4Njk1MmQxODMyYmEwYjNkYmMyZmM5MDZjOTQ4OGNlOTE0MDlmNzM1NzhiMWFhMjZhZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L114-L118",
+          "version": "repo-lines-v1:sha256:30ae2abbcc4ae64c742fd8c8d84f27df9678742556c86851ae1aa42cc7a83e2c:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjdjMGEwYjJjZjU2YzZmYWVjMjQ2ODEzNGMzOTYwYjg0NDVhOTAyOTU0MTFhMmM2ZjBlZGIwZTc0YTljOWVhOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGI5OTlkNzA4NzA0NDY3NDk4MTRhZThmNDQ3YzQ2MjY1MmJlNmIwYjI4OTYxMmVjZTc3NjYzNjNmYWVmNzM5ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzY3ODI3NDAzMWRjNjg5NTA4MDcwMjA4MjUzM2Q0OTVmZTNiYTBiMTlkNGZmYmUzMmM4NGI3OWJhNzkwMDQ4MiJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L34-L68",
+          "version": "repo-lines-v1:sha256:55a34cd2b02fd90cfa49fe5192186cdba8a5ca5e4502db2720ed686fcbb8dbfc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhOTQzNDg5YmQyYWJiOWQyMmQxY2FhOWRiMjg1MDkyZjVjNzRjZWY1NDVmNzUxYjNmNDAwYWQyNjQ3YzNhN2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4YzJlNjQ3MzY2ZWQ3ZWQ5MzZiODJjYzgwZDczZDViOWQwZjE1MmZkMTI2NzI4ZWNkNzcyY2ViNjRmM2JkZWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_53c9a470d81a46eeb223f35f3970882a",
+      "statement": "The parser's line-scanning approach means only the opening line of a multi-line HTML comment is ignored (continuation lines count as content), fenced code blocks are not tracked so a `## ` line inside a fence is read as a real heading, and headings with one hash or three hashes do not open a section — whitespace only body content before the first heading is dropped.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L22-L38",
+          "version": "repo-lines-v1:sha256:508ec0821d6e8fb5312b54856ab040331a4272c470c457789e38c1dc3c552c4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyZmU2NTg2OGE0OGQyNWI3OTE4MjdkYmRkZWNiZGQyYTZiMGVmZDFiYzIzNmVmMWRjYmZhMjAyYzYwNDk1NzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIwZGY4NTIwMDQzMDIwMjlkOTFkZjQ2NmNlOTQ4ZGU3OWUxOWExMTg2NWVjZTY1NGJmNWU0OWVkNDQwNzZiY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyYmRmNzg0MGYzNGRjZjAyYTQ0ZDZiNzE5MDNmMDg3Y2FlNGM4MjUxZWYzOGVkZTY5NWMzZmZmNjIzYzUwZWMifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L86-L103",
+          "version": "repo-lines-v1:sha256:db68c0d10eafc36191a269a4941bdf8153d6756ab72d40471079ae8d31d769a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ2MzU0YjEzZjJlOWI5ZTk3ZWQ3ZWZlOGVkM2JiNjhkOWNiNzc4YWIwYTZkNWIyNzJiNTliNzQwMGIyMzI4NWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YWQyNjcxMmQ5YzYwMGZmMTRhYTg0ZDJjMTNhY2YwMGRiMjk1M2RhODA1NjBhOTYzYzE3ODMzMWQzYzIxOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2309d68d7fa42c2beb09aa4b65801cf",
+      "statement": "An invalid spec is handled by a fixed, ordered, uncaught pair of GitHub writes — PostCommentAsync with the body `Closed: the spec is missing required sections: <names>.` and then CloseIssueAsync which sets state closed with state_reason not_planned — followed by a Debug log and a return that prevents enqueueing; a failure in either call propagates out of the webhook handler instead of being swallowed.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
+          "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L131-L132",
+          "version": "repo-lines-v1:sha256:64560b01a75711a84e70d05d67b98f135910ac93d133c377fe3bd68a23e90579:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmZkYzc1YWRlY2NhYjQ5ODllODVmYjdlYjhhZDA2ZTM4ZjU2YjliYmQ2MzNlMjBjMjJkOTRkMTA5YWEyZGZkMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIzY2JiZmEzN2U4Zjk2YzA3YWM2MzYwOWVlYmMxOGNlNGMyZTNmODE0ZGJiZTEyY2IyYTMyYTQ4Yjc3NjY3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTY4MjI1OWJmNTAwN2U5YTE2N2ZjZDc5Y2I4ZGRkNjY1YmE0NjA4ZTMyZDkzYjMyNTc4NDczMjkyYmZmMTcwYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L63-L81",
+          "version": "repo-lines-v1:sha256:062bc5641f5d7259ea2fe436c2371a85b55a9b03c5fa824ef718db8beffd4353:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDBjMjY1OWJjYTY3NmE3MmJiODFlNzU0MTAwZTMxYjhhYmY3MjExN2U5YWUxMmRiMDU2OTQ4ZGQ0YmQ5OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjMTBkODc1YTIxNTU4NmI1OThjMzU0NjY2NzUzNzQ2Y2U5YzM3NmM2ZjFhYzY0NzVkYTY0N2Q2MTYwNjI5ZjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OTU2OTA4YmQzOTA5MjMzNDA5ZjdiZWU3ZDhhNWIzODQ0OGY5YjA0M2E1ZDA4ZWIxZTg5MWQ0ZDQyNDFlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyYmIzMzhjM2YxM2RlNWI0MmU5MGI4YzBjZTcxZWQ5ZmFhZGMxM2UyOGQ5Njc2NTlkMzk3ZWIyMDg0N2NiZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aea4e7fef4774d91af54e2b8fcb1c8d8",
+      "statement": "Section validation outranks maintainer approval: the missing-section check and its return execute before the `ready-for-agent` check in the same handler, so an already-approved issue is still closed as not_planned when a required section is empty, and a closed issue can only re-enter the gate through a reopened or re-label delivery.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L61-L84",
+          "version": "repo-lines-v1:sha256:a57948c10663a578d18d72e516e22dbad6c120563b09eff77bf6134d4475ed9b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3YTMwNjdkNzlkOGE4Yjg3NGJiNDdhMmUyZGY2YWE5MmQ4OWQ1ZmM4NWNiMDIxMmRlNjQxOGFhZGRiNTk4MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ZDA4ZDNkZjhiNTkyNmI1ZmQ2ZTllZjJkODIwOGQzNWFmYmZmN2Q3NDJhNGM3MzIzN2Q0NzNiMmJmYWQ4ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwOTZiNGVjZDE0MDhmMThlMjY5YmJlODcxNDJlYmFiMjU2ZDBjZDI0YjBhZWYzNTg4NjIzNTc1ZTE0ZGNlYjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_159e231ac68145669c7ba7f9b95ea03f",
+      "statement": "A complete spec that also carries `ready-for-agent` is turned into an ImplementSpec job built from the webhook payload's title and body and offered to JobQueue.TryAdd, with admission logged at Information and a duplicate-key rejection logged only at Debug — the processor neither throws nor comments when admission is refused.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L19-L33",
+          "version": "repo-lines-v1:sha256:ba0f76edd864f71ce38a2db8b2159144715200e8ede38475b8bafb3c23ea67f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4MDQzYWNkOTY2ZTFkM2ZjMDhhOWY0NDVkMTE2ZDM0Mjc3ZTU1Y2Q3MzQ0N2Y2ZmE3ZDQ5MDVmNTM4MGY3ZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhYzgzNWM5MzQ5ZDI5ZWM3ZjVlMjI5ODE3MTkxZmYzMzA4NjI2Nzg1OWI0NmNkZTc3NDcwNjNkNDNhZTcyNDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZDM4MWRiMWQ0NmJmMzJiMzJiNTliMzQ5NTU1ZmUxNTNhODZkNGUwNzBlYmRmNTkxYmZlZmM0ZjIxY2M1NjcifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L125-L129",
+          "version": "repo-lines-v1:sha256:df6224a60790a39e009d0a87c6a318045b72c2541e97e55289542b2d9fc9dd9e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJiM2UzNDMxN2Y3MWZjNWYyODhiYzkxMTViODZjZjUyNTUzZGU0ZjlkNWZhY2RlMDBjMGJiN2RmMzk5NTZmZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNThjYjhmMjY3NzJjMDQ0MjJiNjNhNzdmOTMxNGY3MDM5OWM0YTQwOWVlNDkyZDk5ZjA4MTVjZDViMThjMDM2MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTQwNjY4MTJiNzMyYWRjM2FlY2I4ZmIyZDJhOGEzYmI4NzIwYTYzZDhiNGM1ZWFmOGNhOTE4YTM2ZWJkZTBjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZjYjhhYWQwMzg1NDllODQxYmRkNDkzNzU5YTE1YTdkYTdlNGU0YzZkZGIyYjUyYTBkODUyMjk4NGUwZTdjNyJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L84-L101",
+          "version": "repo-lines-v1:sha256:fdd2d4f2a8483fade318c2d81bd6a1e7c75efbaa56a6bd9229386427af16fbde:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_02a87f1912e74f10b209ef32b21257ff",
+      "statement": "The required-section array is a documented duplicate of the `<spec-template>` headings in skills/to-spec/SKILL.md (which also applies the `feature` label when publishing), and nothing tests that coupling — so renaming a heading in either place, adding a required section, or dropping one silently breaks intake or weakens the gate without any build or test failure.",
+      "evidence": [
+        {
+          "resource": "repo://skills/to-spec/SKILL.md#L17-L73",
+          "version": "repo-lines-v1:sha256:c17211da139832d9569cc78b6f46674388f34bb9a187ce534cb9e83226c964cb:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlMmE0NTkwZGJjMGI0ZDVjOGMxMWUzNjg3MWY5ODA5MmU5YmYwMTUwZjBhMWFiNjJkZmFkOWVjZWI2Zjk5ZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3ZWExMThiMjg1OWY0OTBlZmRiMzhjZjAyZGMzMmU2OWI4MDgzYjljY2U4NGUwYjYxNzMxODQ4MTY1NjE2NTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzN2VjYjliNjY4ZGY0ZjNiYjI2NGI0ZjYzN2RmZWI4OTQxOGY2YTliYThlZTcyYTJiNzRjNDEzYTQ2ZjVmMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L5-L15",
+          "version": "repo-lines-v1:sha256:2b89dcdd8da4b4e51b8ccf81f933447094cbc36d1f8dfea71e80865608cb5b77:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlYjc2YTc1MDFiMTg5MDkyZGIwZGUyNTBiZDZjZWYzNTUxY2VlZWJkYmMyYzAxNzcyMDlkODEyZDk0NzkzMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5NTkyODBmNjE1NmMxZjY1MWI1MjJiMWIxODYxNjNiNjZkYjQ1YWRiZmE5YmM2NzFiZWQwNzM1MjllZWMxZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzZTQ0MTAxYzU1YmJhYTkwODRjOWViZjJiOTE4MDk5OTM1NWE1NjY5NWU4NzA0YjU5YmE5NmY2ODYxMGQ0ODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzNzk5N2ZkNTY2MDA0ODQ4NTI2YWM3MjBiMzE4Zjk4NmQwNzU5ZjIzMDQxZjc4ZjI4ZTg0ZmEzNTFkNmE2MmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ac9d4f8c6b8241f696d8d4c285f7e43b",
+      "statement": "SpecTemplateValidatorTests pins the validator's contract against its own copy of the seven section names — complete spec, absent heading, blank section, `_No response_`, HTML-comment-only section, lowercase headings, CRLF bodies, ignored subheadings and extra sections, optional Further Notes, and null body — but no test exercises GitHubWebhookProcessor, so the guards, ordering, comment text, close reason, and enqueue path rest on review alone.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L7-L118",
+          "version": "repo-lines-v1:sha256:a522e16ab9af19bcbb9a97b57ea73b0c743c224180fbb244109aa01955c700cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjN2UyNDVkMTlkZjkzYTJlZTJlMTMyZGUyYjQ1NTE5MmM5NzcyYjc5ZDRhYmRiMmEwZjFlNGVmY2ZjYmQxNjRiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3M2ZiYWZkNDY0ODUwNjg0MTNkYzNhMDllNDJmYjdkNmI4MzAzMTc0OTJhZjM0ZDczMmFiYmVhZDc2ZWM1MmUwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjNjc4Mjc0MDMxZGM2ODk1MDgwNzAyMDgyNTMzZDQ5NWZlM2JhMGIxOWQ0ZmZiZTMyYzg0Yjc5YmE3OTAwNDgyIn0"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-30T13:26:24.015Z"
+  }
+}
