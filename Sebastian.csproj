@@ -12,7 +12,7 @@
     <IlcOptimizationPreference>Size</IlcOptimizationPreference>
     <!-- Reflection binding is not AOT-safe; generated binder needs non-required properties (CS9035). -->
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
-    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**;Sebastian.Windows/**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="GitHub.Octokit.SDK" Version="0.0.31" />

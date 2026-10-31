@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Sebastian.Windows (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Sebastian.Windows (Unpackaged)": {
+      "commandName": "Project"
+    },
+    "Sebastian.Windows (Unpackaged, Devtools)": {
+      "commandName": "Project",
+      "commandLineArgs": "--devtools"
+    }
+  }
+}
