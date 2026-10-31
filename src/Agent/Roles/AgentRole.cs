@@ -8,6 +8,8 @@ using Microsoft.Extensions.AI;
 
 internal abstract class AgentRole
 {
+    internal const string Persona = "You are Sebastian, an autonomous coding agent.";
+
     public HarnessAgent CreateAgent(IChatClient chatClient) =>
         chatClient.AsHarnessAgent(CreateOptions());
 
@@ -15,6 +17,13 @@ internal abstract class AgentRole
     {
         var options = new HarnessAgentOptions();
         Configure(options);
+
+        var role = options.ChatOptions?.Instructions;
+        options.ChatOptions ??= new ChatOptions();
+        options.ChatOptions.Instructions = string.IsNullOrWhiteSpace(role)
+            ? Persona
+            : $"{Persona}\n\n{role}";
+
         return options;
     }
 

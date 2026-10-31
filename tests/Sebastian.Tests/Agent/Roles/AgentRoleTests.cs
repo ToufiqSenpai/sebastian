@@ -17,7 +17,7 @@ public sealed class AgentRoleTests
         var options = role.CreateOptions();
 
         Assert.Equal("fake", options.Name);
-        Assert.Equal("Fake instructions.", options.ChatOptions!.Instructions);
+        Assert.Equal($"{AgentRole.Persona}\n\nFake instructions.", options.ChatOptions!.Instructions);
     }
 
     [Fact]
@@ -28,10 +28,25 @@ public sealed class AgentRoleTests
         var options = role.CreateOptions();
 
         Assert.Equal("implementation", options.Name);
+        Assert.Equal(AgentRole.Persona, options.ChatOptions!.Instructions);
         Assert.NotNull(options.FileAccessStore);
         Assert.False(options.FileAccessProviderOptions!.DisableWriteTools);
         Assert.Single(options.AIContextProviders!);
-        Assert.Single(options.ChatOptions!.Tools!);
+        Assert.Single(options.ChatOptions.Tools!);
+    }
+
+    [Fact]
+    public void ExplorationAgentExposesOnlyReadTools()
+    {
+        var role = new ExplorationAgent("exploration", Path.GetTempPath());
+
+        var options = role.CreateOptions();
+
+        Assert.Equal("exploration", options.Name);
+        Assert.True(options.FileAccessProviderOptions!.DisableWriteTools);
+        Assert.True(options.FileAccessProviderOptions.DisableReadOnlyToolApproval);
+        Assert.NotNull(options.FileAccessStore);
+        Assert.Null(options.ChatOptions!.Tools);
     }
 
     private sealed class FakeRole : AgentRole

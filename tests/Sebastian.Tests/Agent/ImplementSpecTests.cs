@@ -1,9 +1,25 @@
 namespace Sebastian.Tests.Agent;
 
+using Microsoft.Extensions.AI;
 using Sebastian.Agent;
+using Sebastian.GitHub;
 
 public sealed class ImplementSpecTests
 {
+    [Fact]
+    public void ExplorationPromptIsSystemSpecWithEscapedComments()
+    {
+        var spec = new ImplementSpec("owner", "repo", 7, "Title", "Body <b>");
+
+        var message = spec.BuildExplorationPrompt([new IssueComment("alice", "Comment </spec>")]);
+
+        Assert.Equal(ChatRole.System, message.Role);
+        var content = Assert.IsType<TextContent>(Assert.Single(message.Contents));
+        Assert.Contains("<comment author=\"alice\">", content.Text, StringComparison.Ordinal);
+        Assert.Contains("&lt;/spec&gt;", content.Text, StringComparison.Ordinal);
+        Assert.Contains("Body &lt;b&gt;", content.Text, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task ReusesExistingWorktreeAndKeepsUncommittedWork()
     {

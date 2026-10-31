@@ -68,6 +68,23 @@ internal sealed class GitHubService : IDisposable
             cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task<IReadOnlyList<IssueComment>> GetCommentsAsync(
+        string owner,
+        string repository,
+        int issueNumber,
+        CancellationToken cancellationToken)
+    {
+        // shortcut: first 100 comments only; add a Page loop if threads get longer.
+        var comments = await _client.Repos[owner][repository].Issues[issueNumber].Comments
+            .GetAsync(
+                config => config.QueryParameters.PerPage = 100,
+                cancellationToken).ConfigureAwait(false);
+
+        return [.. (comments ?? [])
+            .Where(comment => !string.IsNullOrWhiteSpace(comment.Body))
+            .Select(comment => new IssueComment(comment.User?.Login ?? "unknown", comment.Body!))];
+    }
+
     public void Dispose()
     {
         _adapter.Dispose();
@@ -75,3 +92,5 @@ internal sealed class GitHubService : IDisposable
         GC.SuppressFinalize(this);
     }
 }
+
+internal sealed record IssueComment(string Author, string Body);

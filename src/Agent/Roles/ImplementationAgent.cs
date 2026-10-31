@@ -11,14 +11,7 @@ internal sealed class ImplementationAgent(
     string name,
     string workspacePath) : AgentRole, IAsyncDisposable
 {
-    private const string Instructions =
-        """
-        You are Sebastian's implementation agent. Implement the requested change in the workspace.
-        Work carefully, keep changes minimal, and verify with the repository's own tests.
-        Never run git commands, commit, push, or create pull requests.
-        """;
-
-    private static readonly TimeSpan CommandTimeout = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan CommandTimeout = TimeSpan.FromMinutes(3);
 
     private readonly LocalShellExecutor _shell = CreateShell(workspacePath);
 
@@ -27,7 +20,6 @@ internal sealed class ImplementationAgent(
         options.Name = name;
         options.ChatOptions = new ChatOptions
         {
-            Instructions = Instructions,
             Tools = [_shell.AsAIFunction(requireApproval: false, name: "shell")],
         };
         options.FileAccessStore = new FileSystemAgentFileStore(workspacePath);
@@ -58,8 +50,7 @@ internal sealed class ImplementationAgent(
                 @"\bRemove-Item\b.*-Recurse",
                 @"\bgit\s+(push|reset|clean|checkout\s+--)\b",
                 @"\bgh\s+",
-                @"\b(curl|wget|ssh|scp|schtasks)\b",
-                @"\bInvoke-(WebRequest|RestMethod)\b",
+                @"\b(ssh|scp|schtasks)\b",
                 @"\b(Format-Volume|Clear-Disk|Initialize-Disk|Stop-Computer|Restart-Computer)\b",
                 @"\breg\s+(add|delete)\b",
             ]),
@@ -67,6 +58,6 @@ internal sealed class ImplementationAgent(
             {
                 ["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1",
                 ["DOTNET_NOLOGO"] = "1",
-            },
+            }
         });
 }

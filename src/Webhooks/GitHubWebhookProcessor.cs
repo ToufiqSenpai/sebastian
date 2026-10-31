@@ -57,6 +57,13 @@ internal sealed partial class GitHubWebhookProcessor(
         }
 
         var repositoryName = repository.FullName ?? "unknown";
+
+        if (!IsLocalRepository(git.Repository, owner, name))
+        {
+            LogForeignRepository(repositoryName);
+            return;
+        }
+
         var issueNumber = (int)issuesEvent.Issue.Number;
         var missingSections = SpecTemplateValidator.FindMissingSections(issuesEvent.Issue.Body);
 
@@ -101,6 +108,11 @@ internal sealed partial class GitHubWebhookProcessor(
         }
     }
 
+    internal static bool IsLocalRepository(RepositoryIdentity? local, string? owner, string? name) =>
+        local is not null &&
+        string.Equals(owner, local.Owner, StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(name, local.Name, StringComparison.OrdinalIgnoreCase);
+
     private static bool HasLabel(Issue issue, string name) =>
         issue.Labels?.Any(label => string.Equals(label.Name, name, StringComparison.OrdinalIgnoreCase)) ?? false;
 
@@ -109,12 +121,23 @@ internal sealed partial class GitHubWebhookProcessor(
         PushEvent pushEvent,
         CancellationToken cancellationToken = default)
     {
-        var repositoryName = pushEvent.Repository?.FullName ?? "unknown";
+        var repository = pushEvent.Repository;
+        var repositoryName = repository?.FullName ?? "unknown";
+
+        if (!IsLocalRepository(git.Repository, repository?.Owner?.Login, repository?.Name))
+        {
+            LogForeignRepository(repositoryName);
+            return;
+        }
+
         LogPushReceived(repositoryName, pushEvent.Ref, pushEvent.Before, pushEvent.After);
 
         // shortcut: synchronous fetch in the webhook; move to a background queue if delivery latency becomes a problem.
         await git.SyncMainAsync(pushEvent.Ref, pushEvent.Deleted, cancellationToken).ConfigureAwait(false);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Ignored webhook for {Repository}: not the local repository")]
+    private partial void LogForeignRepository(string repository);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Webhook {EventType} ({Event})")]
     private partial void LogReceived(string eventType, string? @event);
