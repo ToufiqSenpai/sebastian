@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:df97c3237e6c737306bc85ae3521a33bd4ee3b798b44bac0b5091a6ea1885e9d",
+  "pageVersion": "sha256:b01c3efd54520b56eed0e429e83d56522ec2127293ce71100850d1f597889ef1",
   "claims": [
     {
       "id": "claim_2e8dc71dbadf4022b9d06b476ddd55dd",
       "statement": "The host exposes exactly two HTTP endpoints: an unauthenticated /health returning \"ok\", and the GitHub webhook endpoint mapped by MapGitHubWebhooks with the secret taken from configuration; no authentication middleware is registered, so the HMAC webhook secret is the only trust boundary.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L46-L47",
+          "resource": "repo://Program.cs#L49-L50",
           "version": "repo-lines-v1:sha256:249f502f71258975f361ec1b9f2cf31d4bf21a5457c3cbcc4fab521eafecd282:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
         },
         {
@@ -21,7 +21,7 @@
       "statement": "Git and JobQueue are each registered as a singleton and then exposed as a hosted service via a factory resolving that same singleton, so the IHostedService and the injected collaborator are one instance rather than separate objects.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L22-L28",
+          "resource": "repo://Program.cs#L25-L31",
           "version": "repo-lines-v1:sha256:fee6b797141bf852590d80f4cd28e8c4a88741a28993832cdc533e698c3f3f89:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWYxYzBhMWYyMTViMWM3NDU1NDQyYjRiN2I1Yzk2YzM2MmZlM2RhYWExZjg0YzdkOThlNmM2OGNmYTVkNGE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNThkN2U3MWVmOTQyNDk5ZmFhNGZiMWFiNmU0NWYxNTI0ZmI2YmJmNWU2MDU2ZTJmMzc0YTRiM2VkMTIzNDY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzU5OGNkYTZkMjBkOWQ2NjAxZDY1NjViNDI1M2I4ZjFlMmFkMDg2NDI3NDZhYmYyZDNhMTc0ZmJiMjA5MzFmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjRkMzgzNzBjMjY0Nzg0ZGY2NmM2MjA4YjA5ZWNkMjU5NTA3ZmY4ZjQyMGVlMTY3Y2EzMjJlMDk3YmE0NTQ1MiJ9"
         }
       ]
@@ -31,7 +31,7 @@
       "statement": "Startup deliberately differs by collaborator: GitHubService and ProviderResolver are resolved eagerly right after the host is built so missing credentials or provider configuration fail startup, whereas the git startup sync is best-effort and bounded to ten seconds so a missed push webhook cannot prevent the app from starting.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L42-L44",
+          "resource": "repo://Program.cs#L45-L47",
           "version": "repo-lines-v1:sha256:c929e30b2209c342f3a1782e8af22f55dd8f0bbbdd57b6997d044e750f1f5eee:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE0NjAxMTMzZmMzN2RiOTQ1MGZmZjU1YjZmODJkYzQ0MzcxZDkwZjY4MzdkYWZjYTc1ODVlZDkwNDBkNWMyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGQ0NGViZTFkYzE3Y2I5ZDgyMTgzZTU5ZWRiZTI1MGFhNWE4MmFkNDdkM2NiOTRhZmJmYTMyYmIxMDZhNjJhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
         },
         {
@@ -197,10 +197,42 @@
           "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
         }
       ]
+    },
+    {
+      "id": "claim_7399308d298b408ab97b8eabe2e145a6",
+      "statement": "Program.cs registers six collaborators whose effective lifetimes are: GitHubService, ProviderResolver, Git, and JobQueue as singletons, WebhookEventProcessor as a singleton factory over the internal GitHubWebhookProcessor, and SebastianConfig options as a validated-on-start singleton; Git and JobQueue are additionally hosted services resolved from the same singleton instance.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L16-L39",
+          "version": "repo-lines-v1:sha256:c02b1233231012dd3f3c3c0a02cf1492d8bc949d2c690fe5b8b2caf52466af85:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyZjk0ZTMzZGNjYTcwOTRmNjYzMmQ5YzM0N2MxNGUwZjIyNzIxNGI3MDM1OWQ2YTY0NzcyYmE5MTc5ZTc1ZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1N2MxZWViZTFjNjczYzVkOWFlNGJlNjE4ZDBmNTMzNWY2Y2VkOWZmMTc0YzkwNzc1ZmQwODEyYWVhMmJjNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNiMGQwMGViYjMwNTVhOGQyZjA5NjVlYzNkNTkyOTVmMmJmOTMzNWI3MGI5NjI4NjI1NjBmY2E1ZGUwOTYxZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8eba4651996f40c099d0c81f68625f62",
+      "statement": "GitHubService and ProviderResolver are eagerly resolved immediately after builder.Build() so missing GitHub App credentials or provider configuration fail the start, while WebhookEventProcessor stays a lazy singleton constructed on the first delivery so a construction failure surfaces as a failed webhook request rather than a failed deployment.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L33-L39",
+          "version": "repo-lines-v1:sha256:ed7e5dd05c485dbdb7297e1f0147bc989d244ace5f55d048fb5d939c8af2ebe3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTkyM2VmZGE3NTk5YzBlZTQ5ZmI2OTJhZTE1NDJhN2FiODNmZmVkZDNkYTM2ZDllMzkzMDM1MWM5NWVlNTZjZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTU3YzFlZWJlMWM2NzNjNWQ5YWU0YmU2MThkMGY1MzM1ZjZjZWQ5ZmYxNzRjOTA3NzVmZDA4MTJhZWEyYmM2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTFjYmUyMzZiNjNiZjBjZjUxYjk2MzlmNGI5MTgzNWE3YjZjMTU3ODU4ZjkyYjYwZjk1MWE2ZWI1NjQxNDQxOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiJ9"
+        },
+        {
+          "resource": "repo://Program.cs#L41-L47",
+          "version": "repo-lines-v1:sha256:f665e3c762718ad33463b72647381c4f9db854925d74eed4d5420391901133ca:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDE5MjlhMTc5NmMxYmFhYzgxZTc0ZGUyZGI2ODI1M2M1YWI2MmFiNDJmMWFlNTA4ZGRkY2UyYThjZTkyMWY4MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWU2ZGQ3YzVlMGVmZWQ2NDY4YzRkMzgyNmM0OWRhM2JhMmUxNGIwNTY2NjgzMGMwMzM0M2QxNjRkMjhmYmIwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ProviderResolver.cs#L21-L50",
+          "version": "repo-lines-v1:sha256:bb1476050eb1307edd00cd5c314f809db6a6f3937fc490c01caed6601f93a81e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWJjNmZlNDA3Zjg1OTQzMThiMTYxNDA4OTU2YTE2MjZlY2U2ZDEzMjg2Zjc5ZWE5ZjEwMGRiYTZhZGJmYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMWJiOTNiY2FkMWY2ZjJmZTc3ZmZjNGJiN2Y3ZDlhZjEzYzEwMGE2OGM3ZGI1MTRhNWFlMDU2MjlkNzU1NTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3MDMzNWE4ZDNiNGRhMTAyOGI5ODc0ZDNjODgyNDc2MWQxZGFhZTBiYjYwZDFiNmQ0MDc1N2RmMzc4NjQ5NTYifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L23-L38",
+          "version": "repo-lines-v1:sha256:918ac9ffdfb965cdb6c2cfc95cabe480f1e34a819d167361d3b1c3370247b38e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjIxYmUyMjAxZGMwMGUwZDI0NDVhMTg4ODdkOTFjNmQ5ZjVhY2UxZjdhODM4NjAzZjFlNzI3ZTFjNzI2YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2ZjY4Y2VlODdkMGMyZmRhYWI1NmU2YTk4ZDc1MzJlYzEzMWQwOTI4MDc5M2M5NzFjNDFkMDQzNGVkNmNhMWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYzAyYzVmMjc5YjM1ODlhNzhkMDM4ZWIzMDRjNmFkMmM4MWJlNmI5NWVkZWM3MjNiNWY5MjgxYmY2OTdhNjYifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

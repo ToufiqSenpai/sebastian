@@ -1,11 +1,8 @@
 ---
 type: build-and-style-conventions
 title: Code Conventions and Build Constraints
-description: The conventions a change must respect in Sebastian — warnings-as-errors with latest-all analyzers, AOT-safe code paths and the generated config binder, per-rule experimental-API pragmas and justified suppressions, internal-by-default types with InternalsVisibleTo for tests, primary constructors, source-generated LoggerMessage logging, and the meaning of `// shortcut:` comments.
+description: The gates a change must pass before it compiles in Sebastian — warnings-as-errors with latest-all analyzers, PublishAot and the AOT-safe patterns it forces (source-generated config binder, LoggerMessage logging, factory registrations), per-rule experimental-API pragmas and justified suppressions, internal-by-default types with InternalsVisibleTo for tests, primary constructors, and the meaning of `// shortcut:` comments.
 tags: [conventions, build, analyzers, aot, trimming, logging, project-structure, code-style]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
@@ -19,6 +16,8 @@ sources:
     resource: repo://src/Agent/Roles/AgentRole.cs
   - id: openwiki-source-12def67a8b093c0022f290e7
     resource: repo://src/Agent/Roles/ImplementationAgent.cs
+  - id: openwiki-source-7709fb6d7a3503104984ea26
+    resource: repo://src/Configuration/EnvironmentPlaceholders.cs
   - id: openwiki-source-c011dda0b85bc515c2bfb12c
     resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
@@ -27,20 +26,29 @@ sources:
     resource: repo://src/Jobs/JobQueue.cs
   - id: openwiki-source-08195758b0bf04f6d257000b
     resource: repo://src/Libs/Git.cs
+  - id: openwiki-source-a92f06976972996bb310dbe8
+    resource: repo://src/Libs/RepositoryIdentity.cs
   - id: openwiki-source-c50ef9f06b01c87779c3983c
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
+  - id: openwiki-source-abc13e7f25ce7fa26e27952a
+    resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
+  - id: openwiki-source-b8b7242b27602133c8fabb3f
+    resource: repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs
   - id: openwiki-source-7f9ac1665b935b4f858f87e0
     resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
   - id: openwiki-source-c13b20e41fd15a696ab1eb84
     resource: repo://tests/Sebastian.Tests/Sebastian.Tests.csproj
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Code Conventions and Build Constraints
 
-Sebastian's build is not a formality. The project compiles with `TreatWarningsAsErrors`, `AnalysisLevel` set to `latest-all`, code-style enforcement in the build, and `PublishAot`; the practical consequence is that **any new compiler or analyzer diagnostic is a build failure, not a suggestion**, and any code path that only works with a JIT and a reflection-heavy runtime is a build failure too. A change that "works locally" but introduces a `CA`/`IDE`/`IL` diagnostic does not merge, and the repository's own policy for that situation is stated in the project file: fix the underlying issue, or add a `NoWarn` for that specific rule with a reason.
+Sebastian's build is not a formality. The single project file, `Sebastian.csproj`, sets `TreatWarningsAsErrors`, `AnalysisLevel` `latest-all`, `EnforceCodeStyleInBuild`, and `PublishAot`; the practical consequence is that **any new compiler or analyzer diagnostic is a build failure, not a suggestion**, and a code path that only works with a JIT and a reflection-heavy runtime is a build failure too. A change that "works locally" but introduces a `CA`/`IDE`/`IL` diagnostic does not merge, and the repository's own policy for that situation is stated in the project file next to `AnalysisLevel`: fix the underlying issue, or add a `NoWarn` for that specific rule with a reason.
 
-This page covers the constraints and the conventions the existing code establishes for satisfying them. For what the app *does*, start with [System Overview and Runtime Topology](../architecture/overview.md); for how services are wired and bound, see [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md).
+This page describes each gate and the conventions the existing code establishes for passing it, framed as evidence from the repository rather than preference. For how the resulting service graph is wired and bound, see [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md); for what the app *does*, start with [System Overview and Runtime Topology](../architecture/overview.md).
 
 ## The build gate
 
@@ -52,12 +60,12 @@ flowchart TD
     CA --> IDE["Code-style rules enforced in build"]
     IDE --> AOT["AOT and trim analyzers because PublishAot is set"]
     AOT --> EXP["Experimental API diagnostics MAAI001 MEAI001 OPENAI001"]
-    EXP --> OUT["Build result"]
-    OUT --> FIX["Fix the code"]
-    OUT --> SUPPRESS["Suppress one rule with a written justification"]
+    EXP --> RESULT["Build result"]
+    RESULT --> FIX["Fix the code"]
+    RESULT --> SUPPRESS["Suppress one rule with a written justification"]
 ```
 
-Every gate between a source change and a successful build, in the order a diagnostic usually surfaces.
+Every gate between a source change and a successful build, in the order a diagnostic usually surfaces. Everything in the "Setting" column below is declared in `Sebastian.csproj` and nowhere else.
 
 | Gate | Setting | What it costs you if violated |
 | --- | --- | --- |
@@ -70,9 +78,9 @@ Every gate between a source change and a successful build, in the order a diagno
 
 Two of these deserve emphasis because they surprise people arriving from JIT-era .NET:
 
-**`latest-all` is a moving target.** The project file says so explicitly: *"latest-all: SDK upgrade can surface new analyzer errors; fix or add a justified NoWarn per rule."* A routine SDK bump can therefore break the build with rules that had nothing to do with your change. The sanctioned responses are: fix the code, or add a narrowly scoped `NoWarn` naming the rule and why it does not apply here. Silencing a rule globally without a reason defeats the configuration, because `TreatWarningsAsErrors` is what makes the analyzer set load-bearing.
+**`latest-all` is a moving target.** The project file says so explicitly: *"latest-all: SDK upgrade can surface new analyzer errors; fix or justify a NoWarn per rule."* A routine SDK bump can therefore break the build with rules that had nothing to do with your change. The sanctioned responses are: fix the code, or add a narrowly scoped `NoWarn` naming the rule and why it does not apply here. Silencing a rule globally without a reason defeats the configuration, because `TreatWarningsAsErrors` is what makes the analyzer set load-bearing.
 
-**AOT is treated as a property of the code, not a publish-time afterthought.** `PublishAot` turns on the trim and AOT analyzers, so reflective patterns are reported as diagnostics inside the same warnings-as-errors gate as everything else. The codebase contains **no** trim/AOT suppressions (`UnconditionalSuppressMessage`, `DynamicallyAccessedMembers`, `RequiresUnreferencedCode`) — AOT safety is achieved structurally instead, which is the pattern to preserve:
+**AOT is treated as a property of the code, not a publish-time afterthought.** `PublishAot` turns on the trim and AOT analyzers, so reflective patterns are reported as diagnostics inside the same warnings-as-errors gate as everything else. The codebase survives `latest-all` by being structurally AOT-safe rather than by silencing the analyzers: it contains no trim/AOT suppressions at all — no `UnconditionalSuppressMessage`, no `DynamicallyAccessedMembers`, no `RequiresUnreferencedCode`, no `Activator`, and no direct `System.Text.Json` usage. The patterns that make that true are the ones to preserve:
 
 - Configuration binds through a source-generated path (`EnableConfigurationBindingGenerator`), so no runtime reflection over `SebastianConfig`.
 - Logging is source-generated through `[LoggerMessage]` partial methods, so no reflection over format strings.
@@ -80,20 +88,20 @@ Two of these deserve emphasis because they surprise people arriving from JIT-era
 - GitHub and webhook traffic go through the generated Kiota/Octokit clients rather than hand-rolled serialization; repository code contains no direct `System.Text.Json` or `Activator` usage.
 - Dependency injection constructs the one awkward service with an explicit factory, so the container never has to reflect over an internal implementation type.
 
-The binding constraint has a visible consequence for the config tree: `Sebastian.csproj` carries the comment *"Reflection binding is not AOT-safe; generated binder needs non-required properties (CS9035)"*, and every config property is therefore declared as `public string Foo { get; set; } = null!;` rather than as a `required` property. Converting those to `required` to clean up the null-forgiving operators breaks the build. The key tree and validation rules are documented in [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md).
+The binding constraint has a visible consequence for the config tree. `Sebastian.csproj` carries the comment *"Reflection binding is not AOT-safe; generated binder needs non-required properties (CS9035)"*, and every config property is therefore declared as `public string Foo { get; set; } = null!;` rather than as a `required` property. Converting those to `required` to clean up the null-forgiving operators breaks the build. The key tree and validation rules are documented in [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md).
 
 ## Suppression: two shapes, both justified
 
-The repository suppresses diagnostics in exactly two spellings, chosen by scope.
+The repository suppresses diagnostics in exactly two spellings, chosen by scope. There are no `NoWarn` entries, so every exception to the gate is visible in the file it applies to.
 
-**File-level pragma for a whole experimental API surface**, at the top of the files that touch it, naming the rule and the reason:
+**File-level pragma for a whole experimental API surface**, at the top of the files that touch it, naming the rule and the reason on the same line:
 
 ```csharp
 #pragma warning disable MAAI001 // HarnessAgent and file access APIs are experimental.
 #pragma warning disable MEAI001 // Microsoft.Extensions.AI experimental extensions.
 ```
 
-`MAAI001`/`MEAI001` appear in the two role files and in `ImplementSpec` — the places that construct `HarnessAgent`, `LocalShellExecutor`, and file access. `ProviderResolver` instead suppresses `OPENAI001` and `MEAI001` for the OpenAI client surface. Keeping the pragmas at file scope, with the reason on the same line, is what makes it obvious that the experimental surface is contained to the agent layer rather than spread through the domain code. When you add a call to another preview API, expect a new diagnostic id and add it the same way; do not reuse an id that does not match the diagnostic you are silencing.
+`MAAI001`/`MEAI001` appear in the three files of the agent layer — `AgentRole`, `ImplementationAgent`, and `ImplementSpec` — which is where `HarnessAgent`, the role options, `LocalShellExecutor`, and file access are constructed. `ProviderResolver` instead suppresses `OPENAI001` and `MEAI001` for the OpenAI client surface, which is the same idea at the provider boundary: the file that touches the preview surface is the file that names it. (The same two pragmas are repeated at the top of `tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs`, because a test that asserts on `HarnessAgentOptions` needs the same suppression even though the test project does not enforce warnings-as-errors.) Keeping the pragmas at file scope, with the reason on the same line, is what makes it obvious that the experimental surface is contained to the agent layer rather than spread through the domain code. When you add a call to another preview API, expect a new diagnostic id and add it the same way; do not reuse an id that does not match the diagnostic you are silencing.
 
 **Targeted attribute for a single member**, when a file-wide pragma would be too broad and the rule is about that one method or type:
 
@@ -102,7 +110,7 @@ The repository suppresses diagnostics in exactly two spellings, chosen by scope.
 protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 ```
 
-That one is load-bearing behavior, not style: catching broadly inside the per-job body is how the queue keeps consuming after a job throws. The second instance is on the options type, with a comment above it repeating the reason:
+That one is load-bearing behavior, not style: catching broadly inside the per-job body is how the queue keeps consuming after a job throws. The behavior itself is pinned by `ContinuesAfterJobFailure` in `JobQueueTests`. The second instance is on the options type, with a comment above it repeating the reason:
 
 ```csharp
 // CA1812: options types are created by the options infrastructure, not by visible `new`.
@@ -110,11 +118,11 @@ That one is load-bearing behavior, not style: catching broadly inside the per-jo
 internal sealed class SebastianConfig
 ```
 
-The convention to copy: `SuppressMessage` carries a category, a rule id, and a `Justification` sentence that explains why the analyzer is wrong *here*. An empty or vague justification is as good as no suppression at all, because the next reader cannot tell whether it is still true.
+Those are the only two `SuppressMessage` attributes in the repository. The convention to copy: `SuppressMessage` carries a category, a rule id, and a `Justification` sentence that explains why the analyzer is wrong *here*. An empty or vague justification is as good as no suppression at all, because the next reader cannot tell whether it is still true.
 
 ## Logging is always source-generated
 
-There is no `logger.LogInformation(...)` call anywhere in the repository. Every log statement is a `private partial` method decorated with `[LoggerMessage]`, and every containing class is declared `partial` to host the generated implementation:
+There is no `logger.LogInformation(...)` (or any other `ILogger.Log*` call) anywhere in the repository. Every log statement is a `partial` method decorated with `[LoggerMessage]`, and every containing class is declared `partial` to host the generated implementation:
 
 ```csharp
 [LoggerMessage(Level = LogLevel.Information, Message = "Implementation completed for {Repository}#{IssueNumber} at {Path}. Git status: {Status}. Agent response: {Response}")]
@@ -125,13 +133,15 @@ Three details of the established pattern:
 
 - **The declaring type must be `partial`.** `JobQueue`, `Git`, `GitHubWebhookProcessor`, and `ImplementSpec` are all `internal sealed partial class`. Adding a log line to a non-partial class means making it partial first.
 - **A `static` logger parameter is used when the logger is not a field.** `ImplementSpec` is a job object with no logger field, so `LogCompleted` takes `ILogger logger` explicitly and is `static`; `Git` and `JobQueue` hold their logger and declare instance partial methods instead.
-- **Levels and message templates live in the attribute**, so the level is visible at the call site in source and structured property names are checked by the generator. Exceptions are passed as a first parameter (`LogFailed(Exception exception, string key)`, `LogSyncFailed(Exception exception)`), which is how the generator wires up exception logging.
+- **Levels and message templates live in the attribute**, so the level is visible at the call site in source and structured property names are checked by the generator. Exceptions are passed as a first parameter (`LogFailed(Exception exception, string key)` in `JobQueue`, `LogSyncFailed(Exception exception)` in `Git`), which is how the generator wires up exception logging.
+
+`Git` shows the pattern at full density: seven `[LoggerMessage]` declarations cover every state change in the mirror-sync path, from `LogRepository` at startup through `LogMainFastForwarded` to `LogSyncCancelled`, so its `catch` blocks log through generated methods too rather than through `LogError`.
 
 ## Type and member conventions
 
 **Internal by default, `sealed` unless designed for inheritance.** Every service in `src/` is `internal sealed` (or `internal` for the two intentional extension seams: `AgentRole` is `internal abstract` and `IJob` is `internal interface`). `Program.cs` is the exception — top-level statements, so no type at all.
 
-**Tests reach internals through the project file, not through `public`.** `Sebastian.csproj` declares `<InternalsVisibleTo Include="Sebastian.Tests" />` and the test project holds a `ProjectReference` to the web project. That is why an `internal` method like `AgentRole.CreateOptions()` or `ImplementSpec.PrepareWorkspaceAsync` can be asserted directly, and why making something `public` "so the tests can see it" is the wrong move. The same project file excludes the test tree from compilation with `<DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>`, so the web project never compiles a second copy of the tests.
+**Tests reach internals through the project file, not through `public`.** `Sebastian.csproj` declares `<InternalsVisibleTo Include="Sebastian.Tests" />` and the test project holds a `ProjectReference` to the web project. That is why an `internal` method like `AgentRole.CreateOptions()` or `ImplementSpec.PrepareWorkspaceAsync` can be asserted directly — `AgentRoleTests` and `ImplementSpecTests` both call them — and why making something `public` "so the tests can see it" is the wrong move. The same project file excludes the test tree from compilation with `<DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>`, so the web project never compiles a second copy of the tests.
 
 **Primary constructors when the constructor only captures parameters.** Classes whose dependencies are pure state use the parameter-list form:
 
@@ -141,7 +151,7 @@ internal sealed class ImplementationAgent(
     string workspacePath) : AgentRole, IAsyncDisposable
 ```
 
-`JobQueue`, `ImplementSpec`, and `GitHubWebhookProcessor` follow the same shape. Classes that do real work before the object is usable keep an explicit constructor instead — `Git` normalizes the content root and stores a logger, `ProviderResolver` validates the provider configuration and resolves the endpoint, `GitHubService` imports the PEM and builds the Kiota adapter. The split is visible in the same codebase, and it is the signal to use: primary constructor for capture, explicit constructor for validation or field initialization.
+`JobQueue` (`IServiceProvider`, `ILogger<JobQueue>`), `ImplementSpec` (the issue identity plus title and body), and `GitHubWebhookProcessor` (its four collaborators) follow the same shape. Classes that do real work before the object is usable keep an explicit constructor instead — `Git` normalizes the content root with `Path.TrimEndingDirectorySeparator(Path.GetFullPath(...))` and stores a logger, `ProviderResolver` validates the provider list and resolves the endpoint, `GitHubService` imports the PEM and builds the Kiota adapter. The split is visible in the same codebase, and it is the signal to use: primary constructor for capture, explicit constructor for validation or field initialization.
 
 **Factory registrations instead of implementation-type registrations** where the container would otherwise reflect over an internal type. `Program.cs` carries the reason inline:
 
@@ -153,7 +163,11 @@ builder.Services.AddSingleton<WebhookEventProcessor>(
         ...
 ```
 
-**Small mechanical conventions that appear consistently:** collection expressions (`[new ShellEnvironmentProvider(_shell)]`, array returns); `Path.Combine` plus `Path.TrimEndingDirectorySeparator` rather than string concatenation of paths; an explicit `StringComparison` argument on string comparisons (`Ordinal`, or `OrdinalIgnoreCase` for labels and provider names); `CultureInfo.InvariantCulture` for number parse and format (`Git.CountCommitsAsync`, `ImplementSpec`'s issue-number directory name), which is the direct consequence of `InvariantGlobalization`; `ConfigureAwait(false)` on every `await`, `await using` included; and `_ =` discards (`_ = PrepareLock.Release();`) for results that are deliberately ignored.
+The same factory spelling is used for `ProviderResolver` and `Git`, which pins each singleton's dependency set at the registration site; `AddHostedService(services => services.GetRequiredService<Git>())` reuses the already-registered singleton rather than constructing a second one. See [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for why those two descriptors must resolve to the same object.
+
+**Value-shaped data is a record, not a class.** `RepositoryIdentity` is `internal sealed record RepositoryIdentity(string Owner, string Name)` whose only logic is a static `Parse` that normalizes an origin URL; the immutable positional form documents that nothing mutates it. The convention generalizes poorly beyond that one type, but it is the shape to reach for when a service hands back a value.
+
+**Small mechanical conventions that appear consistently:** collection expressions (`[new ShellEnvironmentProvider(_shell)]`, array returns, and the `ShellPolicy(denyList: [...])` literal); `Path.Combine` plus `Path.TrimEndingDirectorySeparator` rather than string concatenation of paths; an explicit `StringComparison` argument on string comparisons (`Ordinal`, or `OrdinalIgnoreCase` for labels, provider names, and repository names — `HasLabel`, `ProviderResolver`'s duplicate detection, `ImplementSpec`'s owner/name check); `CultureInfo.InvariantCulture` for number parse and format (`Git.CountCommitsAsync`, `ImplementSpec`'s issue-number directory name), which is the direct consequence of `InvariantGlobalization`; `ConfigureAwait(false)` on every `await` in production code, `await using` scopes included; and `_ =` discards (`_ = PrepareLock.Release();`, `_ = app.Services.GetRequiredService<GitHubService>();`) for results that are deliberately ignored.
 
 ## Comments and `// shortcut:`
 
@@ -167,19 +181,24 @@ private static readonly SemaphoreSlim PrepareLock = new(1, 1);
 if (Directory.Exists(worktreePath))
 ```
 
-`// shortcut:` is a distinct marker: it labels a **known pragmatic tradeoff that has been decided, not a defect waiting to be reported**. There are three, and each names both the shortcut and the condition that would justify upgrading it:
+Both of those guard behavior that tests pin (`ImplementSpecTests.ReusesExistingWorktreeAndKeepsUncommittedWork` is the second comment as an assertion), which is only visible because the comment says what the code is protecting.
+
+`// shortcut:` is a distinct marker: it labels a **known pragmatic tradeoff that has been decided, not a defect waiting to be reported**. There are exactly four, and each names both the shortcut and the condition that would justify upgrading it:
 
 - `Git.StartAsync` — *"shortcut: push + startup sync only; add a periodic fetch if missed push webhooks become a problem."* The startup sync is best-effort and bounded to ten seconds for the same reason.
 - `Git.SyncMainAsync` — *"shortcut: worktree prep can run during a fast-forward; worst case the prep fails on git's index.lock, the repo stays consistent."* The race is accepted because the failure mode is a failed preparation, not corruption.
 - `GitHubWebhookProcessor.ProcessPushWebhookAsync` — *"shortcut: synchronous fetch in the webhook; move to a background queue if delivery latency becomes a problem."* Push handling blocks the HTTP response on purpose.
+- `EnvironmentPlaceholders.ExpandEnvironmentPlaceholders` — *"shortcut: whole-value placeholders only; extend if inline interpolation is needed."* Only a value that is exactly `{env:NAME}` is substituted, which is why `GitHub:AppId` can be supplied as text and still bind as an `int`.
 
-Treat these as documented decisions. Removing the shortcut is a design change that should replace the comment with the new arrangement; "fixing" it silently, or deleting the comment while leaving the behavior, destroys the only record of why the code looks wrong.
+Treat these as documented decisions. Removing the shortcut is a design change that should replace the comment with the new arrangement; "fixing" it silently, or deleting the comment while leaving the behavior, destroys the only record of why the code looks wrong. If a change makes one obsolete, update the comment in the same commit — the count above is the easiest way to notice that a decision was dropped.
 
 ## Project layout constraints
 
 There is no solution file and no `Directory.Build.props`: `dotnet build Sebastian.csproj` and `dotnet test tests/Sebastian.Tests/Sebastian.Tests.csproj` are the entry points, and all shared build settings live in the one web project file.
 
-The test project is deliberately configured *less* strictly than the product: it inherits none of `TreatWarningsAsErrors`, `AnalysisLevel`, `PublishAot`, or `InvariantGlobalization`, and it adds only the xunit stack, a global `<Using Include="Xunit" />` (which is why test files have no `using Xunit;`), and `IsPackable` `false`. Two consequences for a change: a diagnostic that fails the build in `src/` may pass in `tests/` and still be worth fixing, and code that must be AOT-clean cannot be validated by the test project — the analyzer evidence comes from the web project, which does not compile `tests/**`. Test classes are `public sealed`, unlike production types, because xunit discovers them by reflection.
+The test project is deliberately configured *less* strictly than the product. It declares only `TargetFramework` `net10.0`, `ImplicitUsings`, `Nullable`, and `IsPackable` `false`, and it inherits none of `TreatWarningsAsErrors`, `AnalysisLevel`, `PublishAot`, or `InvariantGlobalization`; beyond that it adds only the xunit stack, `Microsoft.NET.Test.Sdk`, `coverlet.collector`, a global `<Using Include="Xunit" />` (which is why test files have no `using Xunit;`), and the `ProjectReference`. Two consequences for a change: a diagnostic that fails the build in `src/` may pass in `tests/` and still be worth fixing, and code that must be AOT-clean cannot be validated by the test project — the analyzer evidence comes from the web project, which does not compile `tests/**`. A green `dotnet test` therefore proves behavior, not analyzer or AOT cleanliness.
+
+Test classes are `public sealed`, unlike production types, because xunit discovers them by reflection — the internal-by-default rule relaxed only where a framework requires it.
 
 Test conventions and coverage gaps are covered in [Testing Strategy and Harness](../testing/test-strategy.md); the agent-layer use of the experimental pragmas is covered in [Agent Roles, Tools, and Sandbox Boundaries](agent-execution.md).
 
@@ -187,7 +206,7 @@ Test conventions and coverage gaps are covered in [Testing Strategy and Harness]
 
 - **New analyzer diagnostic?** Fix it. If it genuinely does not apply, add a `NoWarn` for that rule *per rule* with a reason, or a member-scoped `SuppressMessage` with `Justification` — never a blanket disable.
 - **New configurable setting?** A bindable, non-`required` property with a `= null!;` initializer, plus a validation attribute if mandatory, plus a consumer reading `IOptions<SebastianConfig>`. Do not reach for a reflection-based binder or a custom `TypeConverter`.
-- **New preview API call?** Expect a new experimental diagnostic id; scope the pragma to the file that touches the harness surface.
+- **New preview API call?** Expect a new experimental diagnostic id; scope the pragma to the file that touches the preview surface, even when that file is a test.
 - **New log line?** A `[LoggerMessage]` partial method on a `partial` class. No `ILogger.Log*` calls.
 - **New service?** `internal sealed`, registered with a factory if it takes dependencies you want pinned; internal visibility is enough for the tests.
 - **Adding a test?** It may use internals freely; it must not assume the production warnings-as-errors or AOT analysis apply to it.

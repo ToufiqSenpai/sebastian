@@ -1,11 +1,8 @@
 ---
 type: quickstart-router
 title: Sebastian Wiki Quickstart
-description: Task-routing entry point for the Sebastian wiki — what the service is, the single request path from GitHub webhook to job queue to issue worktree to agent run, and which page to open for intake, queueing, git workspace, agent, configuration, operations, and testing work.
+description: Task-routing entry point for the Sebastian wiki — what the service is, the single path from GitHub webhook delivery to job queue to issue worktree to agent run, and a task table that routes each kind of change to the one page that owns it.
 tags: [quickstart, navigation, task-routing, architecture, github-webhooks, job-queue, git-worktrees, agent]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-8037e2358a2c4f9b2c722a11
     resource: repo://AGENTS.md
@@ -21,6 +18,8 @@ sources:
     resource: repo://src/Agent/Roles/AgentRole.cs
   - id: openwiki-source-12def67a8b093c0022f290e7
     resource: repo://src/Agent/Roles/ImplementationAgent.cs
+  - id: openwiki-source-c011dda0b85bc515c2bfb12c
+    resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-b3d60c1a960ba3aa23ae9a7a
     resource: repo://src/Jobs/IJob.cs
   - id: openwiki-source-167226a05ed7e6303a82d168
@@ -31,21 +30,25 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-c13b20e41fd15a696ab1eb84
     resource: repo://tests/Sebastian.Tests/Sebastian.Tests.csproj
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Sebastian Wiki Quickstart
 
 Sebastian is a self-hosted ASP.NET Core service (`net10.0`, AOT-published) that turns GitHub issue events into agent work on one local clone of one repository. There is no dashboard, no database, and no scheduler: everything it remembers between deliveries lives in git, in GitHub (labels, issue body, comments), and in the untracked `.sebastian/` folder.
 
-**Source and tests are authoritative; these OpenWiki pages are generated context.** `AGENTS.md` says the same thing to coding agents: the wiki is optional just-in-time context, and a brief's "unknowns" are verification gaps, not requirements. When a page and the code disagree, the code wins — and the page is what needs fixing.
+**Source and tests are authoritative; these OpenWiki pages are generated context.** `AGENTS.md` says the same thing to coding agents: the wiki is optional just-in-time context, a brief's "unknowns" are verification gaps rather than requirements, and a brief should prefer the narrowest quiet validation that proves the changed behavior. When a page and the code disagree, the code wins — and the page is what needs fixing.
 
 ```mermaid
 flowchart LR
     GH["GitHub App delivery"] --> WH["GitHubWebhookProcessor intake and spec gate"]
-    WH -->|"spec invalid"| CLOSE["close issue as not planned"]
+    WH -->|"spec invalid"| CLOSE["post comment and close issue as not planned"]
+    WH -->|"push to main"| SYNC["SyncMainAsync inline in the webhook request"]
     WH -->|"feature plus ready-for-agent"| JQ["JobQueue admission on owner/repo issue key"]
-    JQ --> PREP["PrepareWorkspace: fetch, mirror check, ff-only merge, worktree"]
+    JQ --> PREP["PrepareWorkspace: fetch, mirror guards, ff-only merge, worktree"]
     PREP --> AG["ImplementationAgent run in the worktree"]
     AG --> LOG["log line with git status and agent response"]
 ```
@@ -83,12 +86,14 @@ Read the row that matches what you are changing. Each page is the single place t
 | Adding or extending tests | [Testing Strategy and Harness](testing/test-strategy.md) | What the xunit suite pins, the `TestRepository` real-git fixture, the internal-visibility seam, and the large areas with no coverage. |
 | Making a change that must pass review | [Code Conventions and Build Constraints](concepts/codebase-conventions.md) | Warnings-as-errors with `latest-all` analyzers, AOT safety, the experimental-API pragmas, internal-by-default types, and source-generated logging. |
 
+That is every page in this wiki; the domain index pages ([architecture](architecture/index.md), [concepts](concepts/index.md), [integrations](integrations/index.md), [operations](operations/index.md), [testing](testing/index.md), [workflows](workflows/index.md)) exist only to group them.
+
 ## Before you touch anything
 
 Two invariants explain most of the surprises in this codebase:
 
-- **It is one process for one repository.** Sebastian must start from the root of the clone it serves, `origin` must parse to the `owner/repo` its GitHub App is installed on, and an issue event for any other repository fails instead of being redirected. Local `main` is a read-only mirror — never a workspace.
-- **Nothing in the process commits or pushes.** The git layer has no such primitive, the agent is instructed not to run git commands, and the HTTP surface is `/health` plus the webhook endpoint. Adding a third capability is an architectural change, not a configuration one.
+- **It is one process for one repository.** `Program.cs` resolves exactly one `Git` instance from the host's content root, `Git.StartAsync` refuses to start unless that directory *is* the git toplevel and `origin` parses to an `owner/repo`, and an `ImplementSpec` job for any other repository throws instead of being redirected. Local `main` is a read-only mirror — never a workspace.
+- **Nothing in the process commits or pushes.** `Git` exposes fetch, ff-only merge, worktree create/prune, and status — no commit, no push — the agent prompt forbids git commands, and the HTTP surface is exactly `GET /health` returning `ok` plus the webhook endpoint. Adding a third capability is an architectural change, not a configuration one.
 
 ## Verifying a change
 

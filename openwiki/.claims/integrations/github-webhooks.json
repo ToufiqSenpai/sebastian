@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:dbadb21431ff64ac5af1ea8026846f1a26c808bef54d2678767b7c93bef4faeb",
+  "pageVersion": "sha256:01d79ce69ebba105cd1b25eb84f05675fdf474a336249dc9d940ec4c715d8f86",
   "claims": [
     {
       "id": "claim_ce64284223ee468bb8f2f9708116bf42",
       "statement": "Sebastian's only inbound integration is `app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` next to a `/health` endpoint; the host registers no authentication middleware, so the HMAC webhook secret (required, non-blank, read once from the `IOptions<SebastianConfig>` snapshot at composition time) is the sole trust boundary and rotating it requires a process restart.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L40-L49",
+          "resource": "repo://Program.cs#L43-L52",
           "version": "repo-lines-v1:sha256:f6acfc010c246b13e3f11efaa5c69474232b31deee26704acf7fab9c50859211:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyNmJlNDNhMGVhMjFhMjgwN2FmYTMyNjAzODA0NDBjNWMzNDE1OTU2OWVjMzBkZWJmZGM5ZDNkMDhiMmRhNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
@@ -21,7 +21,7 @@
       "statement": "`WebhookEventProcessor` is registered through an explicit constructor-call factory rather than `AddSingleton<WebhookEventProcessor, GitHubWebhookProcessor>()` because `GitHubWebhookProcessor` is `internal sealed`; the factory also fixes the processor's four dependencies (`ILogger<GitHubWebhookProcessor>`, `GitHubService`, `JobQueue`, `Git`) at the registration site, so the processor is constructed on the first delivery rather than at boot.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L30-L36",
+          "resource": "repo://Program.cs#L33-L39",
           "version": "repo-lines-v1:sha256:ed7e5dd05c485dbdb7297e1f0147bc989d244ace5f55d048fb5d939c8af2ebe3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTkyM2VmZGE3NTk5YzBlZTQ5ZmI2OTJhZTE1NDJhN2FiODNmZmVkZDNkYTM2ZDllMzkzMDM1MWM5NWVlNTZjZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTU3YzFlZWJlMWM2NzNjNWQ5YWU0YmU2MThkMGY1MzM1ZjZjZWQ5ZmYxNzRjOTA3NzVmZDA4MTJhZWEyYmM2NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTFjYmUyMzZiNjNiZjBjZjUxYjk2MzlmNGI5MTgzNWE3YjZjMTU3ODU4ZjkyYjYwZjk1MWE2ZWI1NjQxNDQxOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiJ9"
         },
         {
@@ -196,15 +196,11 @@
     },
     {
       "id": "claim_61e165812e7741d5bb079d3b6533298a",
-      "statement": "Sebastian's only inbound integration is app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret) alongside a /health route; the secret is read once at composition time from GitHub:WebhookSecret (a [Required] string), so the HMAC trust boundary cannot be rotated without a process restart, and no authentication middleware exists anywhere in the host.",
+      "statement": "Sebastian's only inbound integration is app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret) mounted at Program.cs lines 49-50 alongside app.MapGet(\"/health\", () => \"ok\"); `config` is the IOptions<SebastianConfig> value read once at line 43 right after Build(), and GitHub:WebhookSecret is a [Required] string, so a missing secret stops startup in options validation while the HMAC trust boundary cannot be rotated without a process restart, and no authentication middleware exists anywhere in the host.",
       "evidence": [
         {
-          "resource": "repo://Program.cs",
-          "version": "repo-file-v1:sha256:bf440af4f366c77125b07d636c97b26453ed2d4102b659596e29100907e1f96d"
-        },
-        {
-          "resource": "repo://Program.cs#L40-L49",
-          "version": "repo-lines-v1:sha256:f6acfc010c246b13e3f11efaa5c69474232b31deee26704acf7fab9c50859211:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyNmJlNDNhMGVhMjFhMjgwN2FmYTMyNjAzODA0NDBjNWMzNDE1OTU2OWVjMzBkZWJmZGM5ZDNkMDhiMmRhNTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://Program.cs#L41-L50",
+          "version": "repo-lines-v1:sha256:56272cba58f93a88ec92241eb1cc31fe478253b9c832a512e18d02280704bad8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxOTI5YTE3OTZjMWJhYWM4MWU3NGRlMmRiNjgyNTNjNWFiNjJhYjQyZjFhZTUwOGRkZGNlMmE4Y2U5MjFmODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwMGZhYTcxMDQxZWZjZjdlMzMwNmNjMzYzY2ZjMjQ1NTdmYjM5ODQyOGNhYjczMmNhOTZhMTk5MWJiNWQwMDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlNmRkN2M1ZTBlZmVkNjQ2OGM0ZDM4MjZjNDlkYTNiYTJlMTRiMDU2NjY4MzBjMDMzNDNkMTY0ZDI4ZmJiMDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0YWYwZmJkMTUwMjlkYTJlMDA5YzA1OTEzY2VkMzQ1MjMxNWVlNzNhY2E3YTQ1MjFmNzUwMzllMmI1MGM0NTkifQ"
         },
         {
           "resource": "repo://src/Configuration/SebastianConfig.cs#L20-L24",
@@ -217,11 +213,11 @@
       "statement": "GitHubWebhookProcessor is registered under the abstract WebhookEventProcessor via a factory lambda (not AddSingleton<TService, TImpl>) because the concrete type is internal and must stay out of reflection-based construction; its four dependencies — ILogger<GitHubWebhookProcessor>, GitHubService, JobQueue, and Git — are all root singletons, and this registration is a lazy singleton constructed on the first delivery, so a construction failure is a failed webhook request rather than a failed deployment (unlike GitHubService and ProviderResolver, which Program.cs resolves eagerly).",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L19-L28",
+          "resource": "repo://Program.cs#L22-L31",
           "version": "repo-lines-v1:sha256:18f8a3f5f75a746282936aa86706d377e9e6f5ecbc9ec222267e48f4ea9be623:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4ZDdlNzFlZjk0MjQ5OWZhYTRmYjFhYjZlNDVmMTUyNGZiNmJiZjVlNjA1NmUyZjM3NGE0YjNlZDEyMzQ2OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0ZDM4MzcwYzI2NDc4NGRmNjZjNjIwOGIwOWVjZDI1OTUwN2ZmOGY0MjBlZTE2N2NhMzIyZTA5N2JhNDU0NTIifQ"
         },
         {
-          "resource": "repo://Program.cs#L30-L44",
+          "resource": "repo://Program.cs#L33-L47",
           "version": "repo-lines-v1:sha256:948609f3b30854e1cd5161dd60d27761450ee3061332937c9a6dee58de37570b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5MjNlZmRhNzU5OWMwZWU0OWZiNjkyYWUxNTQyYTdhYjgzZmZlZGQzZGEzNmQ5ZTM5MzAzNTFjOTVlZTU2Y2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiNDUwYmViOTRlZjgyMmJhZmY2MmI1MzViZWE5MTY0NzY3NGQyM2M0MGFiZDc4MDA2YWE4OGQ3MzYxMjk2ZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxY2JlMjM2YjYzYmYwY2Y1MWI5NjM5ZjRiOTE4MzVhN2I2YzE1Nzg1OGY5MmI2MGY5NTFhNmViNTY0MTQ0MTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhM2Q2ZTMzNjYzYjMxMTk0YjIyMDU1NzMwMmJjNTQ3NzYxOTdjNjNkNGY4ZWQxNWJhNWVmOTk4ZjVkMzg0MDQifQ"
         }
       ]
@@ -372,7 +368,7 @@
     },
     {
       "id": "claim_8c7e3ea543d4416a96b9b8cb062432ff",
-      "statement": "A push-triggered sync cannot fail the webhook request because SyncMainAsync catches InvalidOperationException (logged Warning, 'Local main sync failed') and OperationCanceledException (logged Debug, 'Local main sync cancelled'); the processor itself has no try/catch, so any other exception type thrown from the sync or from a GitHub write propagates out of the handler as a failed request, and JobQueue is the only error-isolating boundary in the process (downstream of intake).",
+      "statement": "A push-triggered sync cannot fail the webhook request because the catch clauses live in Git.SyncMainAsync, not in ProcessPushWebhookAsync: InvalidOperationException is logged at Warning ('Local main sync failed') and OperationCanceledException at Debug ('Local main sync cancelled'). The processor itself has no try/catch, so any other exception type thrown from the sync or from a GitHub write propagates out of the handler as a failed request, and JobQueue is the only error-isolating boundary in the process (downstream of intake).",
       "evidence": [
         {
           "resource": "repo://src/Libs/Git.cs#L143-L151",
@@ -429,10 +425,50 @@
           "version": "repo-lines-v1:sha256:eb63edd09b4ac41a41900e8037c8289557a833ddbc5926b4da6bf7e739064e04:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwZWE3NGJmNDU0OTJiNTUwMTZhOGQxOTI2MTBhMDI2NjkyMWE0MjY3M2RhMzQ5ZGQ5NDM5YmMwYTM5YzI3N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ZmJmYzA4ZWQwZjFkNjkyNDE3ODViY2E4YzI2ZjNkNTZiMDlmYzhhNzY0ZTM5MGI0MGEzZTM4NDlmMmM2OTIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_0be9bd5612694225bd0083399981610d",
+      "statement": "The inline push sync is a deliberate latency trade-off, not an oversight: because the only periodic mirror refresh is the once-at-startup sync in Git.StartAsync, the push webhook is the sole mechanism keeping the local main mirror current between restarts, and ImplementSpec fast-forwards from origin/main under a per-repository semaphore; the '// shortcut: synchronous fetch in the webhook; move to a background queue if delivery latency becomes a problem' comment records the exit condition (move the fetch to a background queue, not delete the sync), and it is one of four shortcut markers in the repository alongside Git.StartAsync, Git.SyncMainAsync, and EnvironmentPlaceholders.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L23-L35",
+          "version": "repo-lines-v1:sha256:7894a55837197bc433d89cdfb2d420e93981134b0128b8ccf2af2b52769d9198:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkMDBiMjBiZTM3NzhhYjEwZmRlYjg5YjFjMmNhZjYwYmJlOGY1OWViY2FiMzQ3MDhkYmU3N2Y5ZDc0ODNhM2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3ZGVmOWJiNmU0M2NlYjc1Y2M4MzM0NmI3ZTE3ZmQzNWIwNGI1ZTFjMzIxODQ2OTI2MjRkMTYyY2Q5NzhiZTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5NTE5NjUxODhlOGY3MDM1ZGJmNGEwMTgwYzVjNzg1ZTM4YjA5MzFlMWQ3MjE3NTQwN2MzZjRkYmRlZDhlMzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1Mzk4MDdjZWQ1OGM1MTc0NDk4MTJjZDRhY2ZlYTMwYmZkMTVjNjM3MDA5Zjg5OTAzMTAzZGYwOGY5MzUxNmIifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L9-L9",
+          "version": "repo-lines-v1:sha256:3ca82d88af0d595279e6e7dcbae9efc14bd798596c1bab2931b628bdaaa9cc63:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2NhODJkODhhZjBkNTk1Mjc5ZTZlN2RjYmFlOWVmYzE0YmQ3OTg1OTZjMWJhYjI5MzFiNjI4YmRhYWE5Y2M2MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2NhODJkODhhZjBkNTk1Mjc5ZTZlN2RjYmFlOWVmYzE0YmQ3OTg1OTZjMWJhYjI5MzFiNjI4YmRhYWE5Y2M2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWZlZGE3YzhkYTVlZjIyMzhjYzJkNDMwNjZhMmQyZmY4ZDNlMTUwMmRmYTYzMzQ2MDY0NTc1ZWE5MWFkYzY1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjRiMDMzYjhlMTgxNmIzOWUxODAwZWY2NjU4OGM2NzY4OWZkMGZhNzg0OTJlM2EyZWZhMjI5ZTYwZjI0NDY1ZCJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L118-L119",
+          "version": "repo-lines-v1:sha256:c480724a19eaf2f3a590a2b8f817a3eebbed4a40faaa5c70e73dfee35d3b93dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjAwZjVmZmFjOWUyZmQwZDM1YTdkYzRiMzhhYzczYjMxNjVkMmQyYzIzYmQwNjM1MmQzZTM1YTBjZjE3YjlmZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzQwODUzNmI3ZWE4ZDUzN2JiNGQzZTBhOTQyNThkZWJiZmM1ODMxN2QxOWZmNGYxZDM5ZjI2MGRlN2Y3NWEyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjMzOGZkMjgxZjEwNjQ3MjE4NDNkMzRmMDc4Y2NjMmM0Y2M2OTgzZTVjODJiZDgyYmVmOTkyNjFlZDA2Y2YyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWMxODhiNzRlMDY4NzFhODE5YmFiNWRiNzIyM2JhN2U0YzI3ZDdjYTZiZjk2YTk0MzVjMzExNjU0M2MzZDcwYiJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L27-L36",
+          "version": "repo-lines-v1:sha256:8e54e79299ad569dfe53557e093a405a6d5eeba2d1ed1679dd9caf9dfc8bbbea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTQ3Mzg0OTliNjNmOGE2MmVmMTNmMjY3YTkyZThkMTZjZjQxMDc0YzhjYjFlYmFhZGZmY2QwNzQxNjEyNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2MmY5MDM0YmQ0MzAzMjI5MmVjNDMxZGEzMGYyNmJiZTQ1MGVlNjI2NWE4YjZlYWE0YjJlMmJmMzZhNGU4NmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L107-L117",
+          "version": "repo-lines-v1:sha256:157fae54eb39a767fcaa9562bc592d1cfa5a6be5dadf7c984f9a08e5a9cc7400:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZTAzNjk3YjVjMGRiZmZjMjVlZmE1ZDVjYjQ1NWM4Mjg4NjVhYmZmMzM5OTJkMTU1NDUzYzM4Y2NkZjQ1NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1OWE3MzFlZDZkYWJhNGExMDZjZjc1MWRlMDU5MmI2M2YwZWE3NzFkZTk1OTQ4ZjMxYzY0MDg1MzJjYTkzMzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4f80349929f94beab0d2200b8c36acda",
+      "statement": "The two gate labels are read-only const filters ('feature' and 'ready-for-agent') matched by HasLabel, which scans Issue.Labels with StringComparison.OrdinalIgnoreCase and treats a null label list as no label; nothing writes a label, so approval into agent work is enforced entirely by humans.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L104-L105",
+          "version": "repo-lines-v1:sha256:a738bcc56ff2a6df6e42876fc9a2505ef09b6ec099f134d3c09da19ddd9c20bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmNiY2IxYTljMDEzYzIzODIwOGRmZjZhODk1MTZhNjZmNmE1NDc4NWE4N2MzYmJlMTM3OGZlYjk5MzcxM2JiNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWJlMDBhZjdlYjhkOGU5ZDFlMTViYWQwYjQzODljOTNjOWNhODIwNmIyNzI1MTliMDUzMDNjMjc1MTNmMGIxOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTk5YmRlZmVlYWNhNjM0MGUwMjkwZGM4NmU4ODljODlkNWUxODlhYTViYTQ0YjU4NWIzYjcwNzM0ZjRhNjJkOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmEyY2E1NmFiMjk3NGQwZjZlZTA0OGZlZTRhM2I2YTc1ODI3OTNkYTFkMWI3YTM4MjdhZTQ0ZjRmZDk5Zjc0MCJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L20-L21",
+          "version": "repo-lines-v1:sha256:99506d63015f026c54dee072c553d3d081ce8367c4705315ca1daa8d18b5fdea:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGVmNDVjYTA1ODBmMWY0YWVhMjQ1NzYxMTE1ZDZlOWExZTQ3NmZhZjBlZDhjY2FiOWQ0NDQyYjUzZmM5YTllZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmRlMzhjZmQ3NDM2Y2FlYzg1NWJjYzc1MzNjY2FmNjM2YjJkOTQxMzRmN2VhYWNjNmNkNTQ1MzViYTFhZTdjNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTRhYmI1Zjc1MDE0ODdmY2YwNmFiZWUwYTA2ZWNhODUxNjY0YmU0MDJlNTQ2MmYzZjRhYmMxZDFjYzEyNWY1NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjYzZTkyZWVjNTQ4YWRjOWY2MzQyNzAyYTIwNDZiMzIxM2JlNWQ1MWRhNTNhOTIzNjQyYzBhMzQ1MGQ3NDM2YyJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

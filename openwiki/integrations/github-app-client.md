@@ -3,9 +3,6 @@ type: integration-github-app-client
 title: GitHub App Authentication and Issue Writes
 description: How Sebastian authenticates outbound GitHub REST calls — the PEM path to RSA key to installation-token to Kiota request adapter chain wired in GitHubService — and the only two writes it performs, posting an issue comment and closing an issue as not_planned, with their exact payloads, failure semantics, and extension boundary.
 tags: [github-app, authentication, installation-token, kiota, octokit, issue-writes, idempotency, extension-points]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
@@ -17,11 +14,16 @@ sources:
     resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
     resource: repo://src/GitHub/GitHubService.cs
+  - id: openwiki-source-167226a05ed7e6303a82d168
+    resource: repo://src/Jobs/JobQueue.cs
   - id: openwiki-source-c50ef9f06b01c87779c3983c
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-5b02b033021548a1c1fc0ba0
     resource: repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # GitHub App Authentication and Issue Writes
@@ -154,7 +156,7 @@ The intake close path through the client: two sequential authenticated calls, no
 - **No error handling, no retry, no logging.** `GitHubService` takes no `ILogger`, wraps nothing in `try`/`catch`, and has no idempotency key. A non-success response surfaces as an SDK exception that propagates through `GitHubWebhookProcessor` (which also has no `try`/`catch`) and fails the webhook request. Retrying a comment POST inside this class would be unsafe without a dedupe check, because comment creation is not idempotent: a redelivered webhook runs the same two calls again.
 - **Partial outcomes are possible in both directions.** A failure on the comment leaves the issue open and untouched; a failure on the close leaves a posted comment on an open issue. Nothing reconciles the two.
 - **The caller's `CancellationToken` is forwarded**, so a client-aborted webhook delivery can cancel a write in flight — a third way to end up with one of the two effects applied.
-- **The class is a root singleton**, constructed once and shared by every webhook request (and, through the per-job DI scope, by any job that resolves it, landing on the same instance). There is one `HttpClientRequestAdapter` for the whole process.
+- **The class is a root singleton**, constructed once (`AddSingleton<GitHubService>()`) and shared by every webhook request. Background jobs get a per-job `IServiceScope`, but scopes resolve from the same root provider, so any job that needed the client would land on that same instance. There is one `HttpClientRequestAdapter` for the whole process — and today `GitHubWebhookProcessor` is its only consumer; `ImplementSpec` and `JobQueue` never resolve it.
 - **Disposal releases the adapter, then the key:**
 
   ```csharp
@@ -175,12 +177,14 @@ There is no interface, no repository abstraction, and no owner/name defaulting: 
 What does not exist anywhere in the codebase, and cannot be reached by configuration:
 
 - **Label writes.** Both labels (`feature`, `ready-for-agent`) are read-only filters in `GitHubWebhookProcessor`; nothing moves an issue between states.
-- **Pull request operations of any kind.** No PR creation, no PR comments, no PR review, no merge. `ProcessPullRequestWebhookAsync` is not overridden, and no pull-request REST path is used. The PRD's "PR is the terminal state" stage is absent from the code, not misconfigured — see [Product Intent vs. Implemented Behavior](../concepts/product-intent-and-gaps.md).
+- **Pull request operations of any kind.** No PR creation, no PR comments, no PR review, no merge. Sebastian never overrides a pull-request handler, and no pull-request REST path is used. The PRD's "PR is the terminal state" stage is absent from the code, not misconfigured — see [Product Intent vs. Implemented Behavior](../concepts/product-intent-and-gaps.md).
 - **Comment editing or deletion.** Only creation exists, which is what makes the PRD's "never edit or delete others' comments" vacuously true.
 
-Adding any of these means changing two things together: new methods (and new payload types) in `GitHubService`, and the caller in `GitHubWebhookProcessor`. Note that there is no test seam either — the class is `internal sealed` with no `IGitHubService`, and no test in the suite references it, so exercising new write behavior in a unit test requires extracting an interface or injecting the transport *before* the first write operation is added, not after.
+Adding any of these means changing at least two things together: new methods (and new payload types) in `GitHubService`, and the caller in `GitHubWebhookProcessor` — plus the intake gate that decides when the new operation should fire, since today that decision is a handful of early `return`s in `ProcessIssuesWebhookAsync`. There is also no test seam: the class is `internal sealed` with no `IGitHubService`, and no test in the suite references it. Extracting an interface or injecting the transport is a prerequisite for unit-testing new write behavior, not a follow-up step — and it touches `Program.cs` (factory registration) and the `WebhookEventProcessor` factory at the same time.
 
 `Program.cs` needs no change for new methods: `GitHubService` is resolved by the container and passed into the `WebhookEventProcessor` factory, so the dependency graph only changes if the new write needs a collaborator this class does not have today.
+
+One reason not to widen this surface casually: the only thing standing between a bad payload and an unhandled exception is the ordering of the method body. Both writes are `await`-ed directly with no surrounding `try`, which is what makes the exception travel all the way out of the webhook endpoint — always a failing delivery, never a swallowed error.
 
 ### Why the file is full of `global::` aliases
 
@@ -188,10 +192,15 @@ The type names at the top of the file are not style:
 
 ```csharp
 using GitHubAppAuthProvider = global::GitHub.Octokit.Client.Authentication.AppInstallationAuthProvider;
+using GitHubAppTokenProvider = global::GitHub.Octokit.Client.Authentication.GitHubAppTokenProvider;
 using GitHubClient = global::GitHub.GitHubClient;
 using GitHubHttpAdapter = global::Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter;
+using GitHubInstallationTokenProvider = global::GitHub.Octokit.Client.Authentication.AppInstallationTokenProvider;
 using GitHubRequestAdapter = global::GitHub.Octokit.Client.RequestAdapter;
 using IssueCommentBody = global::GitHub.Repos.Item.Item.Issues.Item.Comments.CommentsPostRequestBody;
+using IssueUpdateBody = global::GitHub.Repos.Item.Item.Issues.Item.WithIssue_numberPatchRequestBody;
+using IssueUpdateState = global::GitHub.Repos.Item.Item.Issues.Item.WithIssue_numberPatchRequestBody_state;
+using IssueUpdateStateReason = global::GitHub.Repos.Item.Item.Issues.Item.WithIssue_numberPatchRequestBody_state_reason;
 ```
 
 The file's own namespace is `Sebastian.GitHub`, so inside it the bare identifier `GitHub` binds to `Sebastian.GitHub` and a plain `using GitHub.Octokit...` would not resolve to the SDK at all. Every SDK type is therefore reached through `global::`, and the aliases give the generated, deeply nested body types (`CommentsPostRequestBody`, `WithIssue_numberPatchRequestBody`) readable local names. Reuse the aliases when extending the file; adding an inline fully qualified `global::GitHub.Repos...` reference works but makes the two payloads hard to compare. The aliases also disambiguate the two similarly named SDK types (`GitHubAppTokenProvider` vs `AppInstallationTokenProvider`), which differ by exactly one word and have different roles.
@@ -200,9 +209,13 @@ The file's own namespace is `Sebastian.GitHub`, so inside it the bare identifier
 
 `Sebastian.csproj` sets `PublishAot`, `InvariantGlobalization`, and `EnableConfigurationBindingGenerator`, whose inline comment scopes the AOT work to configuration binding: *"Reflection binding is not AOT-safe; generated binder needs non-required properties (CS9035)."* `GitHubService` itself contains **no** AOT accommodation: no `DynamicDependency`, no `JsonSerializerContext`, no `RequiresUnreferencedCode` suppression, no trimming roots anywhere in the repository. The SDK is consumed as-is — `GitHub.Octokit.SDK` 0.0.31 and `Microsoft.Kiota.Bundle` 1.22.2 — and serialization of the two request bodies is the generated client's responsibility. Keep it that way: hand-written `JsonSerializer`-based request building or reflection over the generated types would be the first thing on this path to break under AOT, and nothing here currently establishes a pattern for it.
 
+A second project convention applies to any new code here: `AnalysisLevel` is `latest-all` with `TreatWarningsAsErrors`, so a new method or field in this class must be analyzer-clean — `CA1812` and `CA1031` are suppressed only where they were deliberately chosen (the options types, and the job loop that must not tear down the queue), not globally.
+
+Note also that `Sebastian.csproj` declares `<InternalsVisibleTo Include="Sebastian.Tests" />`, so `internal sealed GitHubService` *is* visible to the test assembly. The absence of tests for it is a gap in coverage, not a language or visibility barrier — a test could construct it today with `Options.Create(config)` and a real PEM path.
+
 ## Tests
 
-Nothing pins this class. `tests/Sebastian.Tests` contains no reference to `GitHubService`, `PostCommentAsync`, or `CloseIssueAsync`; the closest coverage is the generated validator test that constructs a `GitHubConfig` to prove a blank API key is rejected (`BlankApiKeyIsRejectedByGeneratedValidator`), plus the spec-template tests that pin the *input* to the close path. The consequence is specific: the `not_planned` reason, the comment ordering, and the absence of retry all rest on review alone, and any change to them — or to how the two calls fail — needs manual verification against a real installation.
+Nothing pins this class. `tests/Sebastian.Tests` contains no reference to `GitHubService`, `PostCommentAsync`, or `CloseIssueAsync` — its only `GitHubConfig` reference is blank-API-key validation inside `ProviderResolverTests` (a test whose real subject is the agent provider, using a valid GitHub config as filler) — while the spec-template tests pin the *input* to the close path. That the class is reachable from the test assembly (`InternalsVisibleTo`) only sharpens the point: the gap is coverage, not accessibility. The consequence is specific: the `not_planned` reason, the comment ordering, and the absence of retry all rest on review alone, and any change to them — or to how the two calls fail — needs manual verification against a real installation.
 
 ## Where to go next
 

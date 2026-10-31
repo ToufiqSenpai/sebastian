@@ -1,11 +1,8 @@
 ---
 type: integration-webhook-intake
 title: Webhook Intake and Event Routing
-description: How Sebastian receives GitHub App deliveries — MapGitHubWebhooks with the configured secret, the only two WebhookEventProcessor overrides (IssuesEvent and PushEvent), the issue action/state/label gates and their silent-ignore branches, push handling that runs SyncMainAsync inside the request, and the per-branch logging that makes the routing observable.
+description: How Sebastian receives GitHub App deliveries — MapGitHubWebhooks wired with the composition-time secret, the only two WebhookEventProcessor overrides (IssuesEvent and PushEvent), the ordered issue gates (action, open state, feature label, repository/owner presence, spec validation, ready-for-agent) and their silent-ignore branches, push handling that awaits SyncMainAsync inside the request, and the log lines that make routing observable.
 tags: [github-webhooks, event-routing, intake, hmac-signature, labels, synchronization, latency, logging, extension-points]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
@@ -13,6 +10,8 @@ sources:
     resource: repo://Sebastian.csproj
   - id: openwiki-source-b5cf04fcd9c2585d8cde1706
     resource: repo://src/Agent/ImplementSpec.cs
+  - id: openwiki-source-7709fb6d7a3503104984ea26
+    resource: repo://src/Configuration/EnvironmentPlaceholders.cs
   - id: openwiki-source-c011dda0b85bc515c2bfb12c
     resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
@@ -29,12 +28,15 @@ sources:
     resource: repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs
   - id: openwiki-source-7f9ac1665b935b4f858f87e0
     resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Webhook Intake and Event Routing
 
-Sebastian has exactly one inbound integration: a GitHub App posts deliveries to an endpoint, and one class decides what each delivery means. [`src/Webhooks/GitHubWebhookProcessor.cs`](../../src/Webhooks/GitHubWebhookProcessor.cs) is about 130 lines, derives from `Octokit.Webhooks.WebhookEventProcessor`, and overrides only two handlers — `ProcessIssuesWebhookAsync` and `ProcessPushWebhookAsync`. Every other GitHub event type reaches the library's base dispatch and does nothing.
+Sebastian has exactly one inbound integration: a GitHub App posts deliveries to an endpoint, and one class decides what each delivery means. [`src/Webhooks/GitHubWebhookProcessor.cs`](../../src/Webhooks/GitHubWebhookProcessor.cs) is a single `internal sealed partial` class of about 130 lines, derives from `Octokit.Webhooks.WebhookEventProcessor`, and overrides only two handlers — `ProcessIssuesWebhookAsync` and `ProcessPushWebhookAsync`. Every other GitHub event type reaches the library's base dispatch and does nothing.
 
 The page is worth reading as three separate contracts that happen to live in one file:
 
@@ -46,7 +48,7 @@ The *content* of the issue path — the seven required sections, the exact close
 
 ## The endpoint and how the processor is constructed
 
-`Program.cs` mounts two things and nothing else:
+`Program.cs` mounts two things and nothing else. The endpoint is the very next statement after the eager credential resolution, at `Program.cs` lines 49–50:
 
 ```csharp
 app.MapGet("/health", () => "ok");
@@ -55,10 +57,10 @@ app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret);
 
 `MapGitHubWebhooks` comes from `Octokit.Webhooks.AspNetCore`. Only the secret argument is supplied, so the route itself is the library default and does not appear anywhere in this repository — read the library, not the code, if you need the path. Two properties follow from the call shape:
 
-- **No authentication middleware exists anywhere in the host.** The webhook route is anonymous; the HMAC secret from `GitHub:WebhookSecret` is the entire trust boundary. Signature verification happens inside the endpoint before dispatch, so `GitHubWebhookProcessor` only ever sees deliveries that matched the secret. A wrong or missing signature is rejected by the library and the processor is never invoked — that rejection is invisible in Sebastian's own logs.
-- **The secret is read once, at composition time**, and configuration is frozen for the process lifetime. Changing `GitHub:WebhookSecret` requires a restart; a running process keeps verifying against the value it started with. See [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for why `IOptionsMonitor` is deliberately absent.
+- **No authentication middleware exists anywhere in the host.** The webhook route is anonymous; the HMAC secret from `GitHub:WebhookSecret` is the entire trust boundary. Signature verification happens inside the endpoint before dispatch, so `GitHubWebhookProcessor` only ever sees deliveries that matched the secret. A wrong or missing signature is rejected by the library and the processor is never invoked — that rejection is invisible in Sebastian's own logs, because the only intake log line is emitted from inside the processor.
+- **The secret is read once, at composition time.** `config` is `app.Services.GetRequiredService<IOptions<SebastianConfig>>().Value`, captured at `Program.cs` line 43 and handed to the mapping call; `GitHubConfig.WebhookSecret` is a `[Required]` string, so a blank or missing secret stops startup during options validation rather than mapping an unusable endpoint. Configuration is frozen for the process lifetime, so changing `GitHub:WebhookSecret` requires a restart — a running process keeps verifying against the value it started with. See [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for why `IOptionsMonitor` is deliberately absent.
 
-Registration is a factory over the public base type:
+Registration is a factory over the public base type (lines 34–39):
 
 ```csharp
 // Factory, not AddSingleton<TService, TImpl>: internal processor is unknown to DI's reflection path.
@@ -67,11 +69,10 @@ builder.Services.AddSingleton<WebhookEventProcessor>(
         services.GetRequiredService<ILogger<GitHubWebhookProcessor>>(),
         services.GetRequiredService<GitHubService>(),
         services.GetRequiredService<JobQueue>(),
-        services.GetRequiredService<Git>(),
-        ));
+        services.GetRequiredService<Git>()));
 ```
 
-The four dependencies are `ILogger<GitHubWebhookProcessor>`, `GitHubService`, `JobQueue`, and `Git` — all root singletons, so the git mirror and the queue the webhook path touches are the same instances jobs use. Note the lifetime asymmetry with the credentials: `GitHubService` and `ProviderResolver` are resolved eagerly right after `Build()`, but `WebhookEventProcessor` is a lazy singleton constructed on the **first delivery**. An exception thrown in the processor's construction (or in the lazy construction of a new collaborator added to this factory) is therefore a failed webhook request, not a failed deployment. If you add a fifth dependency, extend this factory call rather than switching to `AddSingleton<WebhookEventProcessor, GitHubWebhookProcessor>()`, which would hand the internal type to the container's reflection-based activator.
+The four dependencies are `ILogger<GitHubWebhookProcessor>`, `GitHubService`, `JobQueue`, and `Git` — all root singletons, so the git mirror and the queue the webhook path touches are the same instances jobs use. Note the lifetime asymmetry with the credentials: `GitHubService` and `ProviderResolver` are resolved eagerly at lines 46–47, right after `Build()`, with the comment *"Construct the services now so missing credentials fail at startup"*; `WebhookEventProcessor` is a lazy singleton constructed on the **first delivery**. An exception thrown in the processor's construction (or in the lazy construction of a new collaborator added to this factory) is therefore a failed webhook request, not a failed deployment. If you add a fifth dependency, extend this factory call rather than switching to `AddSingleton<WebhookEventProcessor, GitHubWebhookProcessor>()`, which would hand the internal type to the container's reflection-based activator.
 
 ## The one line every delivery emits
 
@@ -99,21 +100,21 @@ So from logs alone you can tell *that* a delivery arrived and *what kind*, but n
 
 `ProcessIssuesWebhookAsync` is a sequence of early returns. In order:
 
-| # | Guard | Accepted | Otherwise |
+| # | Gate | Accepted | Otherwise |
 | --- | --- | --- | --- |
 | 1 | Action | `Opened`, `Labeled`, `Edited`, `Reopened` | silent `return` |
 | 2 | Payload issue state **and** labels | `IssueState.Open` **and** a label named `feature` (`OrdinalIgnoreCase`) | silent `return` |
 | 3 | Repository identity in the payload | `Repository`, `Owner.Login`, and `Name` all non-null | silent `return` |
 | 4 | Spec completeness | `SpecTemplateValidator.FindMissingSections` returns nothing | comment + close, `Debug` log, `return` |
-| 5 | Approval label | `ready-for-agent` present | return with no side effect |
+| 5 | Approval label | `ready-for-agent` present | enqueue; nothing if absent |
 
-The labels are two `const` strings in the class — `FeatureLabel = "feature"` and `ReadyForAgentLabel = "ready-for-agent"` — and they are **read-only filters**. Nothing in this codebase writes a label, so who may move an issue into `ready-for-agent` is enforced entirely by humans. The gate also never verifies *who* applied the label: any actor able to label the issue can start an agent run.
+The labels are two `const` strings in the class — `FeatureLabel = "feature"` and `ReadyForAgentLabel = "ready-for-agent"` — matched by `HasLabel`, which scans `Issue.Labels` with `StringComparison.OrdinalIgnoreCase` and treats a null label list as "no label". They are **read-only filters**: nothing in this codebase writes a label, so who may move an issue into `ready-for-agent` is enforced entirely by humans. The gate also never verifies *who* applied the label: any actor able to label the issue can start an agent run.
 
-Guard 3 is defensive rather than semantic. It cannot fire for a well-formed GitHub payload; it exists so the two calls that follow can be given non-null `owner`/`name` without null-forgiving operators. Note the asymmetry it creates in logging: `repository.FullName ?? "unknown"` is used for the log lines, so an exotic payload would log `unknown` rather than throwing.
+Gate 3 is defensive rather than semantic. It cannot fire for a well-formed GitHub payload; it exists so the two calls that follow can be given non-null `owner`/`name` without null-forgiving operators. Note the asymmetry it creates in logging: `repository.FullName ?? "unknown"` is used for the log lines, so an exotic payload would log `unknown` rather than throwing.
 
 Ordering matters and is easy to break: **the spec check and its `return` come before the `ready-for-agent` check.** An issue a maintainer already approved is still closed as `not_planned` if a later `edited` delivery leaves a required section empty. Nothing tests this.
 
-### Why the first three guards log nothing
+### Why the first three gates log nothing
 
 The silence is a deliberate filter decision, not an oversight, and the reasoning is worth keeping if you extend the method:
 
@@ -121,7 +122,7 @@ The silence is a deliberate filter decision, not an oversight, and the reasoning
 - **Skip traffic dominates.** Issue events fire on every label change, title edit, milestone, assignment, and comment-free edit across the installation. Logging each rejection would make the interesting lines — a closure, an enqueue — unfindable.
 - **A skip is not an error.** No exception, no retry, no state change; nothing an operator must act on.
 
-The price is auditing: when an issue that "should have been picked up" was not, the log shows only that an `IssuesEvent` arrived. Answering "why didn't the agent start" means re-reading the payload conditions against the code, not searching logs. If that becomes a real operational need, add a `Debug` line per guard rather than promoting any of them to `Information`.
+The price is auditing: when an issue that "should have been picked up" was not, the log shows only that an `IssuesEvent` arrived. Answering "why didn't the agent start" means re-reading the payload conditions against the code, not searching logs. If that becomes a real operational need, add a `Debug` line per gate rather than promoting any of them to `Information`.
 
 The *outcome* lines are split by level, which is the other thing to internalize: at the default `Information` level, the only visible outcomes in the whole intake path are "a delivery arrived" and "implementation started". Every failure-to-progress outcome — a duplicate-suppressed enqueue, and the closure of an issue with an invalid spec — is `Debug`.
 
@@ -167,7 +168,7 @@ flowchart TD
     EV -- "any other event" --> BASE["Base ProcessWebhookAsync dispatch, no override, no effect"]
 ```
 
-Every path a verified delivery can take. The only three branches that touch anything external are the two GitHub writes, the queue admission, and the inline git sync.
+Every path a verified delivery can take. The only branches that touch anything external are the two GitHub writes, the queue admission, and the inline git sync.
 
 ### Decision table
 
@@ -187,7 +188,7 @@ Every path a verified delivery can take. The only three branches that touch anyt
 
 Two entries in that table are consequences of reading the payload rather than re-fetching GitHub state, and both surprise people:
 
-- **A redelivery of an invalid-spec delivery repeats both writes.** The guard evaluates the `state` carried in the *payload*, so a redelivered "open, missing sections" event passes the state guard again and posts a second comment on the (now closed) issue. Comment creation is not idempotent and nothing dedupes on delivery id.
+- **A redelivery of an invalid-spec delivery repeats both writes.** The gate evaluates the `state` carried in the *payload*, so a redelivered "open, missing sections" event passes the state gate again and posts a second comment on the (now closed) issue. Comment creation is not idempotent and nothing dedupes on delivery id.
 - **A redelivery after a job finishes starts a second run.** `TryAdd` only rejects while that key is in flight; once the run completes the key is released, so the same delivery arriving later enqueues a fresh `ImplementSpec`.
 
 ## Push routing: the documented synchronous exception
@@ -202,11 +203,17 @@ await git.SyncMainAsync(pushEvent.Ref, pushEvent.Deleted, cancellationToken).Con
 
 This is the only place in the codebase where git work happens on a request thread. `LogPushReceived` is `Information` with the template `Push {RefName} on {Repository}: {Before} -> {After}`, which is genuinely useful: it records the ref and both SHAs, so the log identifies exactly which push caused (or did not cause) a mirror update.
 
+### Why the push handler blocks the request
+
+The inline await is a deliberate latency trade-off, not an oversight. `/health` is the application's only liveness signal, and nothing in the host schedules periodic work except the once-at-startup sync in `Git.StartAsync`; the push webhook is therefore the *only* mechanism that keeps the local mirror of `main` current between restarts. Because `ImplementSpec.PrepareWorkspaceAsync` fast-forwards from `origin/main` under a per-repository semaphore, a stale local `main` would silently change the base an agent branches from unless the sync had already happened before the job ran. Doing the sync inside the request means the mirror is advanced by the time GitHub considers the push delivered, with no extra moving part — no second hosted service, no timer.
+
+The comment is the recorded exit clause: the trade-off is accepted *while delivery latency is acceptable*, and the named remedy is moving the fetch to a background queue, not deleting the sync. Tearing the sync out without replacing it removes the only trigger that refreshes the mirror after boot. Note that this is one of four `// shortcut:` markers in the repository (the others are `Git.StartAsync`, `Git.SyncMainAsync`'s index-lock note, and `EnvironmentPlaceholders`); each names the condition that would justify upgrading it. See [Codebase Conventions and Change Checklist](../concepts/codebase-conventions.md).
+
 The three-argument `SyncMainAsync` is a ref filter first and a sync second: a deletion, or any ref that is not exactly `refs/heads/main` (`Ordinal`), returns before touching git. That means the log line and the side effect are decoupled — a push to a feature branch produces an `Information` line and no work whatsoever. The state machine, the three mirror guards, the `--ff-only` merge, and the `index.lock` race with workspace preparation are covered in [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
 
 Two failure properties of this call are specific to the webhook path:
 
-- **The sync swallows its own failures.** `SyncMainAsync` catches `InvalidOperationException` (a non-zero git exit → `Warning`) and `OperationCanceledException` (`Debug`), so a failed fetch or a rejected fast-forward does not fail the webhook request and produces a warning at most. Exceptions outside those two types — for example a parse failure on `rev-list --count` output — would propagate out of the handler, because the processor itself has no `try`/`catch` anywhere.
+- **The sync swallows its own failures.** `SyncMainAsync` catches `InvalidOperationException` (a non-zero git exit → `Warning`) and `OperationCanceledException` (`Debug`), so a failed fetch or a rejected fast-forward does not fail the webhook request and produces a warning at most. The `catch` clauses live in `Git.SyncMainAsync`, not in `ProcessPushWebhookAsync`. Exceptions outside those two types — for example a parse failure on `rev-list --count` output — would still propagate out of the handler, because the processor itself has no `try`/`catch` anywhere.
 - **The bound is the request, not a timer.** The startup call site wraps the same sync in a linked `CancellationTokenSource` with `CancelAfter(TimeSpan.FromSeconds(10))`; the push call site does not. Its only limits are the request's `cancellationToken` and whatever timeout the HTTP server and the git process themselves impose, so a slow `git fetch --prune origin` is time added directly to the delivery's response. A client disconnect cancels the fetch mid-flight and is logged at `Debug` only, i.e. invisibly at default levels.
 
 ## Latency and redelivery are the design constraint for anything added here
@@ -241,7 +248,7 @@ sequenceDiagram
     end
 ```
 
-Where a delivery spends its time. Only the `IssueEvent` enqueue branch returns without waiting on a network call.
+Where a delivery spends its time. Only the `IssuesEvent` enqueue branch returns without waiting on a network call.
 
 Why this matters when you add work:
 
@@ -260,8 +267,6 @@ The escape hatch is already the right one: `JobQueue` is *the* place work may ha
 - **New GitHub write.** It belongs in `GitHubService`, which is a deliberately narrow two-method surface; the caller here composes the text and the ordering.
 - **New label semantics.** The two label constants are read-only filters and the codebase writes no labels. Adding a state transition is new feature work, described in [Product Intent vs. Implemented Behavior](../concepts/product-intent-and-gaps.md).
 
-The `// shortcut:` comment on the push handler is a recorded decision, not a defect: there are exactly three such markers in the repository (`Git.StartAsync`, `Git.SyncMainAsync`, and this one), and each names the condition that would justify upgrading it. Removing the behavior without replacing the comment destroys the only record of why the code deliberately blocks a request. See [Codebase Conventions and Change Checklist](../concepts/codebase-conventions.md).
-
 ## Log line reference
 
 | Level | Template | Emitted when |
@@ -272,11 +277,11 @@ The `// shortcut:` comment on the push handler is a recorded decision, not a def
 | `Debug` | `Implementation already running for {Repository}#{Number}` | `TryAdd` rejected the key |
 | `Debug` | `Issue {Repository}#{Number} closed; missing spec sections: {Sections}` | after both writes of the invalid-spec close path |
 
-Every template is a `[LoggerMessage]` partial method on the `partial` class, per the project's logging convention. `Information` is the effective default, so the three outcome lines that matter most for diagnosis are the two `Debug` ones; enabling `Debug` for `Sebastian.Webhooks` is what makes intake auditable. The git sync contributes its own lines through `Git`, documented in [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
+Every template is a `[LoggerMessage]` partial method on the `partial` class, per the project's logging convention. `Information` is the effective default, so the three outcome lines that matter most for diagnosis are the two `Debug` ones; enabling `Debug` for `Sebastian.Webhooks` is what makes intake auditable. The git sync contributes its own lines through `Git` (`Syncing local main from origin`, `Local main already matches origin/main`, `Fast-forwarded local main from … to …`, `Skipped local main sync: …`), documented in [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
 
 ## What is not tested
 
-Nothing in the suite exercises this file. `tests/Sebastian.Tests` contains no reference to `GitHubWebhookProcessor`, no `WebApplicationFactory`, and no integration test of `Program.cs`, so every guard, the action list, the label comparisons, the ordering of validation before approval, the silent returns, and the inline push sync rest on review alone. The nearest coverage is indirect: `SpecTemplateValidatorTests` pins the validator's input contract, and `JobQueueTests` pins that a duplicate key is rejected while a job runs — both are dependencies of branches here, not tests of them.
+Nothing in the suite exercises this file. `tests/Sebastian.Tests` contains no reference to `GitHubWebhookProcessor`, no `WebApplicationFactory`, and no integration test of `Program.cs`, so every gate, the action list, the label comparisons, the ordering of validation before approval, the silent returns, and the inline push sync rest on review alone. The nearest coverage is indirect: `SpecTemplateValidatorTests` pins the validator's input contract, and `JobQueueTests` pins that a duplicate key is rejected while a job runs — both are dependencies of branches here, not tests of them.
 
 Practical consequence for a change to this page's behavior: verify manually against a real installation, sending each delivery kind (`opened`, `labeled`, `edited`, `reopened`, an unrelated action, a non-`main` push, a `main` push) and watching for the expected log line and side effect. Adding a test means first introducing a seam — the processor takes concrete singletons (`GitHubService`, `Git`, `JobQueue`) and constructs `ImplementSpec` directly, so there is no interface to substitute. See [Testing Strategy and Harness](../testing/test-strategy.md).
 

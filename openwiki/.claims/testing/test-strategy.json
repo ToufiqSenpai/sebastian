@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:663c23c5749052989a7e98937b6c1887609eddbc832cc9f822b801b185b6853f",
+  "pageVersion": "sha256:decabf583012392c42484c18d87298627749af1c05ba9a204725a64264acf12c",
   "claims": [
     {
       "id": "claim_eb3eb0b48f3c481fb7ca4a228057b09a",
@@ -243,7 +243,7 @@
       "statement": "Nothing in the suite exercises intake or GitHub writes: no test references `GitHubWebhookProcessor`, `GitHubService`, `PostCommentAsync`, or `CloseIssueAsync`, and there is no `WebApplicationFactory`, so the action list, label checks, spec-before-approval ordering, comment text, `not_planned` close, enqueue path, PEM import, and token adapter all rest on review alone. Making the processor testable requires first introducing a seam, because it takes concrete `GitHubService`, `Git` and `JobQueue` instances and constructs `ImplementSpec` inline.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L19-L36",
+          "resource": "repo://Program.cs#L22-L39",
           "version": "repo-lines-v1:sha256:e38a35e1f2c411aee52d2c741b8a04cbcb2fe042a6c2626d21c9b48cb81222db:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1N2MxZWViZTFjNjczYzVkOWFlNGJlNjE4ZDBmNTMzNWY2Y2VkOWZmMTc0YzkwNzc1ZmQwODEyYWVhMmJjNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIifQ"
         },
         {
@@ -323,10 +323,94 @@
           "version": "repo-lines-v1:sha256:8a16c25992e382f80a5b31b3d85e8d23224696724c52368fb8e668084ee2430c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3OWM4ODBmNjJkNDIyNTM4YmNhODRjYjU1ZWNlOGZlMTBlOTY1OGIwNjExMTVjM2ZhYmNkYzdiM2JlY2Y0NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NzE4ZjA2N2I1ZTVjMWYwOTkxYTZlNzQ3MjZmZTJhMjNkMjY0MzQ1ZTA4ZTRlYWQwNGZhZjczYzI3ZWQ0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxOTEzNzMyNTgyYzNlNjAzNTkwNzg2Yzg2ODM2OTUxZmYzNWU5YjJkMGY4ZDMxMDY3ZDRmNGM4NzQzZGIyYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_9eaf052d89f44142af5adb011eacd804",
+      "statement": "`EnvironmentPlaceholdersTests` is the only test that drives the product's configuration-placeholder layer: it calls the public `ExpandEnvironmentPlaceholders` extension on a `ConfigurationManager` fed by `AddInMemoryCollection` and pins that a whole-value `{env:NAME}` is replaced from the process environment while a literal value is untouched, and that an unset variable makes expansion throw an `InvalidOperationException` whose message names both the environment variable and the configuration key.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L10-L35",
+          "version": "repo-lines-v1:sha256:c641598b20c8cccfd3e7444a079315fe9248d528b5cc54f41dcaf4c3f35b6b06:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MDNlMzg0MGVjYTY5MDRlNDJhMDdhMWY2ODc4Mjg4ZmQ0YmYwODU2MTU3N2Y0YjEyMjhhNGYzZjc0OWY3YzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmM2QwNzlmYjUxNWMwZWIxMmQ0MjY0NjEwOWYyYjY3MDJmZGI2NWZmYWE4MjFkOGE0MWY4Y2RiODIyY2QxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L8-L51",
+          "version": "repo-lines-v1:sha256:0ec63c6407098885aef287f10794788a4abf4b18d60d7129b9cda133687d4f30:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzMjZhZDEyNDhmNjA3NDY0NTAzMTJhMDQxYTFjNjBjNTNiODY2M2UxMDBhZGUzNGM4OTk0NTZmZGE3ZTI3NWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4196f708d4d2475d8b5fb0f4a5189192",
+      "statement": "Because `EnvironmentPlaceholdersTests` mutates process-global environment variables, it isolates itself with a freshly generated `SEBASTIAN_TEST_<guid>` variable name per case and clears it in a `finally`, which keeps the otherwise-parallel suite free of cross-test interference; the suite has no other shared mutable state.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L11-L31",
+          "version": "repo-lines-v1:sha256:7f9ea284f8a76e2890795fd867dc0c343e2a32f2f0edcd5ddc2d901ddc306b98:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwZTAxZjg1ZGVkMWViY2M0Yjg3ZTM0NzE2YmZkMGU5NmYzZmQ2YzRmMTRhZGQwNDdiZWY4MDVkNjMyNGQyNjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3MzRlMTBlMmMwNzVhOTk0NTQxMjU3ZGMxZjY3NjIyNDg1MDc5MGEyZWJiMjE3NWE2MjU3MWYzOTRjMGRmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYyYzFiMjZlYWRjMzA5ZGYxODQ3OTAwODlhMTNjMmNiZTI1MmIzOTdmNGRhYmI2NjU2NzZiMGE0MjJmNjVjOTIifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L37-L39",
+          "version": "repo-lines-v1:sha256:944d9ec15bc49227085313a66f87fc3020501d75b139525ec8e05fa532c90efb:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzBlMDFmODVkZWQxZWJjYzRiODdlMzQ3MTZiZmQwZTk2ZjNmZDZjNGYxNGFkZDA0N2JlZjgwNWQ2MzI0ZDI2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDkwOGI3YTY5ZmY4NWM5OTg5MmFmODZmNTYzZGI0ODVjMjJmYTVhOTNjNmQ3ODllYWY5ZDdjYzc4MWUwOTYxNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTgxYjYwMTg2ZDY4OWEwOWVjNjc3YWUyODNmYWFjNjYwMmQ2ZTE3YjFmZWM1YjQyMDBiY2I5ZTE3NmIxMzgyNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f71158ee45df416a91739bf903e9e391",
+      "statement": "`FindMissingSections` treats a null body as empty and varies only the ordering of the seven production section names, so `NullBody_ReportsAllRequiredSections` asserts the result equals the test's own `RequiredSections` array and additionally pins that the reported order matches `SpecTemplateValidator.RequiredSections`.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L17-L41",
+          "version": "repo-lines-v1:sha256:1883b0558010252ee8588c775560236511c28e56bcf5901cf898755e140a4c8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4MDU5NWI1N2EzM2VhNDY4MzJkN2Q0MWM0Yzg1NTcxYTAwZmMxNmQ4ZGJiMzg2ZThiZmFmNmNmNWE3ZmI5NzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0OTdlNTk3OTUwNjBjYzUzNmRhODNjOGE3OTMzYzQ5NjhkMTEyMjJhNTQ5Y2QzNDAyZTMwYzc5YzYwMDUwNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4NGZiYjIwOGUwOTcyMDY0NDhlZDczNmUwYmQ3NWQ2ZDE0MTAxMjEzYTk3NzFmNDk2NjJlNDI3YTJhOWNlZDMifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L114-L118",
+          "version": "repo-lines-v1:sha256:30ae2abbcc4ae64c742fd8c8d84f27df9678742556c86851ae1aa42cc7a83e2c:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjdjMGEwYjJjZjU2YzZmYWVjMjQ2ODEzNGMzOTYwYjg0NDVhOTAyOTU0MTFhMmM2ZjBlZGIwZTc0YTljOWVhOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGI5OTlkNzA4NzA0NDY3NDk4MTRhZThmNDQ3YzQ2MjY1MmJlNmIwYjI4OTYxMmVjZTc3NjYzNjNmYWVmNzM5ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzY3ODI3NDAzMWRjNjg5NTA4MDcwMjA4MjUzM2Q0OTVmZTNiYTBiMTlkNGZmYmUzMmM4NGI3OWJhNzkwMDQ4MiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8db67137c84344529d4f8922bac1c2c7",
+      "statement": "`EnvironmentPlaceholders` has partially covered edges: inline interpolation is unsupported by design (the `shortcut` comment scopes it to whole-value placeholders) and an empty `{env:}` name is treated as missing, but neither an empty name nor whitespace-only variable values has a test — only the unset-variable path is pinned.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L8-L29",
+          "version": "repo-lines-v1:sha256:fd1aee203c849368829bdbcfd44f48ea8998e1703c5867e514e0cd6d81f09291:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5NDBhNTM4NTQ4ODEwNjg0ZDIyMTk2ZWRlNTY0YmIxOTc1NGFjNTk3OThjODIyOTMxZThmMmY5YWY1NGQ0NzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjJjNDJjZDE5YzZkMDNkODA4YzQ1MjcyMDU1MjgyNWI3ZWExYzViNDkxYjIxODUxMWNhYzc0MTVjZjlkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0MzIzMzYxMGMzNTU2YmFmNzg1MWM3ODI2YTI0MTNmODNhN2Q5ZWRmN2IwNzdiYWIyYmEyYzhmZGMxN2ZmYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZkMTkxOWMwMTI3NDJiODA0OWRmZWE4MjJkZTZkYTkyNzY3ZjQxOGZhN2ExYjZiZGIxMGFkOTZmNmE1ZWY1MzUifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L34-L51",
+          "version": "repo-lines-v1:sha256:101b8935f165a5c5233a252ce2cf8d17db7aaf60ec4e94ca12072aa6eae60d8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bdf2b1f3427f4ca1a487e6781be3f496",
+      "statement": "`Program.cs` composition has no integration coverage and is therefore unverified by the suite: the `ExpandEnvironmentPlaceholders()` call at startup, the binding-plus-generated-validator registration, and the factory-style registrations that make `Git` and `JobQueue` the same instance as their hosted-service descriptors would all be removable without a failing test.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L11-L40",
+          "version": "repo-lines-v1:sha256:f9c39f52940a997cf934ecd7b7f593f0db99a088b4f64dc071a26dd1f8bacd08:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmMzY4ODRhYTE0ZjUwMDA0N2I4NzNiYjIxMmY1MDRjNzk3OTUwMWQxNDM2MTA3NzAzMWNkNmFhNDVkZTc2MWUifQ"
+        },
+        {
+          "resource": "repo://Sebastian.csproj#L15-L16",
+          "version": "repo-lines-v1:sha256:328bca0d6dbf6b12feaae48c51ece1bd662a99010001fa264056f8ed08f4f1d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDU2ZDUxNDgxZGEyN2JhYTNkM2FkZTA5NDA2NTg0YjZiNzg4OTY4NmZiNjg1YTMyZjFmODZlMzhiYzAwZWE3NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ0YjYwMGZmNjFhMDRjNzg3ZmFmMjg3M2JkZWRiZDUzMTQwZjE4MmU3ZTMzODUyYzU3ZTE0NzE1ODBjNjUxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGRjMWRmYTBlNDJhMTQ4ZTE3MTVmYzM5NzdmODIxOTVjZTMwNmYzMWUwYmIwZGJkOGEwNTRkOGZhMmIxNjQ3ZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_48faa1090ff5452d9f3ca2a4360440a8",
+      "statement": "`TestRepository` fixes a deterministic commit identity by setting `user.name`/`user.email` locally in the clone (and in every `CloneAgain()` result) rather than relying on global git configuration, which is what makes the fixture reproducible on a clean machine or CI runner.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L102-L106",
+          "version": "repo-lines-v1:sha256:fa26fa2e0b4de36a43d4a5ac2c71861057c35488fa122539fb96beb1af242d03:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzdmMDRhODI1YWU4OGRlYzZlNTBjYWJhYjYzOWU3ODdjNTg0ZDA4ZGRlZTE3NGFiY2JjMGIwMmRmYTNkNzFlZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDc1YzEyMmNmZjZmYzQ2ZDU1NDAyZDEzZDAxNWZlYzVjYTVlOTU1MjZhYzNhYzg3OGFiODM4YTc0ODM3NzVjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWIzNTRiYWVmMjY1MTI1ZmYzOGE3Y2I3ZjI0ZWMzMGMyZmQ2OTA0ZWE3NmJiNWM5ZTFmYzQyYzMyZTU2OWQ4ZCJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L28-L38",
+          "version": "repo-lines-v1:sha256:db9989144f2b16bc8b16c80789f50315d85638199b7e19ee4a06a78190efb006:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmMDZkMGE2NjA0NjliODYwN2JkMTQzODdiODdlZmFkZDYzYTZhMTA1NjY0MDZjMzM4NjQ4Y2RmZTE4NzcwMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkYTI1OTNmNDA1Njk2ZGRiZDgyNjQwZTM1M2NkMWI5YzRmNTU5MWIyNWQwMWQ0MWU2ZWI4YjBmZDE5YzFlNmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhMzVhYjAwMzY0MjFhMjk3YTY0OWMzY2M2M2E0MzMxMzM5YzZlM2NkMWJjNDlkYjJhNjA4ZmFlYTgwYTAxNzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwZGEyZTgxNGFjMDk1Y2RkNmJkNWIxNzcwNzJjMzUyZjMzYzlmYWE0ZjBjYjFlODhjYzZiMmFlM2ZiYTFkNTMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

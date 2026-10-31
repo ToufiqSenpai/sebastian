@@ -1,11 +1,8 @@
 ---
 type: failure-handling-runbook
 title: Failure Handling, Restart Behavior, and Known Races
-description: Every failure path in Sebastian and its blast radius — the hard startup checks that abort the host, the ten-second bounded non-fatal mirror sync, the deliberate swallow points in the git runner, the mirror guards that fail a job, per-job exception isolation with no retry and no GitHub-visible signal, unguarded GitHub writes in intake, duplicate-key suppression, what a restart destroys, and the documented index.lock race.
+description: Every failure path in Sebastian and its blast radius — the hard startup checks that abort the host before it serves a webhook, the ten-second bounded non-fatal mirror sync, the deliberate swallow points in the git runner, the mirror guards that fail a single job, per-job exception isolation with no retry and no GitHub-visible signal, unguarded GitHub writes in intake, duplicate-key suppression, what a restart destroys, and the documented index.lock race.
 tags: [failure-handling, blast-radius, restarts, cancellation, error-isolation, observability, git, known-races]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
@@ -13,6 +10,10 @@ sources:
     resource: repo://src/Agent/ImplementSpec.cs
   - id: openwiki-source-815a573c061c6efd30bc89a6
     resource: repo://src/Agent/ProviderResolver.cs
+  - id: openwiki-source-7709fb6d7a3503104984ea26
+    resource: repo://src/Configuration/EnvironmentPlaceholders.cs
+  - id: openwiki-source-c011dda0b85bc515c2bfb12c
+    resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
     resource: repo://src/GitHub/GitHubService.cs
   - id: openwiki-source-167226a05ed7e6303a82d168
@@ -23,9 +24,14 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-abc13e7f25ce7fa26e27952a
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
+  - id: openwiki-source-7468e4bacf37515653b4d440
+    resource: repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs
   - id: openwiki-source-7f9ac1665b935b4f858f87e0
     resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Failure Handling, Restart Behavior, and Known Races
@@ -34,7 +40,7 @@ Sebastian has no supervisor, no retry loop, no dead-letter queue, and no databas
 
 | Policy | Where it applies | What the user sees |
 | --- | --- | --- |
-| **Fail the host** | repository identity, configuration, credentials, provider selection — before or during `IHostedService.StartAsync` | process exits, no `/health`, no webhook endpoint |
+| **Fail the host** | environment placeholders, configuration validation, credentials, provider selection, repository identity — all before or during `IHostedService.StartAsync` | process exits, no `/health`, no webhook endpoint |
 | **Log and continue** | the mirror sync (`Git.SyncMainAsync`) on startup and on push deliveries, and every `git` process kill on cancellation | a `Warning` or `Debug` line; the webhook response is still a success |
 | **Throw to the queue** | workspace preparation and the agent run inside a job | one `Error` line `Job {key} failed`, in-flight key released, **no retry and no comment on the issue** |
 | **Nothing** (by omission) | the two GitHub REST calls in intake | exception escapes the webhook handler; the delivery fails |
@@ -42,7 +48,7 @@ Sebastian has no supervisor, no retry loop, no dead-letter queue, and no databas
 ```mermaid
 flowchart TD
     F["Something fails"] --> L{"Which layer"}
-    L -->|"host startup: config, credentials, repository identity"| S["throw from StartAsync or eager resolution"]
+    L -->|"host startup: placeholders, config, credentials, repository identity"| S["throw from Program.cs, options validation, a constructor, or StartAsync"]
     S --> S1["host does not start: process exits, no endpoint"]
     L -->|"mirror sync: startup with 10s bound, or push webhook"| Y["Git.SyncMainAsync catches"]
     Y --> Y1["Warning or Debug log, caller continues normally"]
@@ -63,19 +69,31 @@ These are preconditions, and each one throws rather than degrading. The reasonin
 
 | Trigger | Handler | User-visible effect | How to verify |
 | --- | --- | --- | --- |
+| A `{env:NAME}` placeholder whose variable is unset or blank | `ExpandEnvironmentPlaceholders`, the third statement in `Program.cs`, before anything is bound | process exits with `InvalidOperationException`: `Environment variable '<NAME>' for configuration key '<key>' is not set.` | unset `GITHUB_WEBHOOK_SECRET` and start |
+| Missing/blank required configuration | `AddOptions<SebastianConfig>().Bind(...).ValidateOnStart()` plus the source-generated `ValidateSebastianConfig` — fails when `Program.cs` reads `IOptions.Value` right after `Build()`, and again at host start | process exits with `OptionsValidationException` naming the member | start with an empty `Agent__Providers` |
 | Content root ≠ `git rev-parse --show-toplevel` | `Git.EnsureRepositoryAsync` throws `InvalidOperationException`: `"Sebastian must run from the repository root. Content root is '<path>', git root is '<path>'."` | host start fails; exception text names both paths | start the binary from a subdirectory |
 | `origin` remote missing or unparsable | `RepositoryIdentity.Parse` returns `null` → `"Could not parse the origin remote URL."` (a missing remote fails earlier as `git remote get-url origin failed: <stderr>`) | host start fails | `git remote -v` in the content root |
-| Missing/blank required configuration | `AddOptions<SebastianConfig>().ValidateOnStart()` plus the source-generated `ValidateSebastianConfig` | host start fails before any hosted service runs | start with an empty `Agent__Providers` |
 | Unreadable or malformed PEM at `GitHub.PrivateKeyPath` | `GitHubService` constructor: `File.ReadAllText` then `ImportFromPem` | host start fails | point `PrivateKeyPath` at a non-PEM file |
 | No providers, duplicate provider names, unknown `Agent.General.Provider`, unparsable endpoint | `ProviderResolver` constructor throws `InvalidOperationException` with a message naming the offender | host start fails | configure `Agent:General:Provider` to a name absent from `Agent:Providers` |
 
-The last two rows are enforced at startup *by construction time*, not by first use: `Program.cs` resolves both services eagerly after `builder.Build()` specifically so a missing credential fails the start rather than the first job.
+The last two rows are enforced at startup *by construction time*, not by first use: `Program.cs` resolves both services eagerly after `builder.Build()` specifically so a missing credential fails the start rather than the first job. Because their constructors validate, resolution *is* the validation — nothing else in the graph would force either type to be built before traffic arrives.
 
 ```csharp
+var app = builder.Build();
+
+var config = app.Services.GetRequiredService<IOptions<SebastianConfig>>().Value;
+
 // Construct the services now so missing credentials fail at startup.
 _ = app.Services.GetRequiredService<GitHubService>();
 _ = app.Services.GetRequiredService<ProviderResolver>();
+
+app.MapGet("/health", () => "ok");
+app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret);
+
+await app.RunAsync().ConfigureAwait(false);
 ```
+
+Read that block as the startup-failure ladder, because the order is the order in which each gate fires. Line 43's `IOptions.Value` read materializes the options factory once and runs the generated validator with it, so a broken configuration dies *before* the eager resolutions above it — and the webhook secret that `MapGitHubWebhooks` captures on line 50 is the already-validated value. Hosted services start later still, in registration order: `Git` (line 29) before `JobQueue` (line 31), so the repository invariant is checked before the queue begins consuming, and neither can be dodged by an early delivery. `GitHubWebhookProcessor` is constructed on the first request, because its registration is a factory that the Octokit endpoint resolves per delivery — worth knowing, since a throw there is a failed delivery rather than a failed deployment.
 
 One asymmetry inside `Git.StartAsync` is worth knowing before you debug a host that will not come up:
 
@@ -137,6 +155,8 @@ catch (OperationCanceledException)
 | The ten-second startup bound fires, or host shutdown during the sync | `catch (OperationCanceledException)` → `LogSyncCancelled` at **Debug** | at default log level: **completely invisible** | start the host with a slow remote and no `Debug` sink attached |
 
 Two consequences to hold on to. First, because the cancellation catch is `Debug`, a startup whose sync was cut off by the ten-second bound looks identical to a clean startup at the default `Information` level — the mirror may be stale and nothing says so. Second, because the push path is inline and unfailing, **a webhook can be acknowledged while the mirror it was supposed to update did not move**; the next `PrepareWorkspaceAsync` re-fetches, so the practical effect is a slower job, not a wrong one — see [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
+
+The same `FindMirrorProblemAsync` result is consumed with the opposite policy one layer down: `PrepareWorkspaceAsync` rethrows it so no agent starts on a questionable base. One predicate, two policies, chosen by caller.
 
 ### The deliberate and accidental swallow points in the git runner
 
@@ -202,7 +222,7 @@ The consequence is small but worth stating: **`LogCompleted` is a success-only r
 
 ### Soft: job isolation in `JobQueue`
 
-The queue is the containment boundary, and it is three lines of policy:
+The queue is the containment boundary, and it is three clauses of policy wrapped in a method-level `[SuppressMessage("Design", "CA1031", Justification = "A failed job must not tear down the queue.")]` — the suppression is the design statement, recorded rather than inferred:
 
 ```csharp
 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
@@ -225,10 +245,12 @@ finally
 | `OperationCanceledException` from any other cause (a timeout in the agent harness, an `HttpClient` timeout surfacing as OCE) | filter does not match → falls into the general catch | logged as `Job {Key} failed` — the only way to tell a genuine cancellation bug from a shutdown | — |
 | `finally` | `_inFlight.TryRemove` | the key is released immediately, even on failure | `RejectsDuplicateKeyWhileJobRuns` |
 
+The `finally` is also the only writer-release site. `IJob.RunAsync` receives an `IServiceProvider` and a token and nothing else — there is no acknowledgement callback, so a job cannot report partial success and cannot hand work back — and the queue re-enqueues nothing, which is why "no retry" is structural rather than a missing feature flag.
+
 Three operational facts follow, and they are the sharpest edges in the whole design:
 
 1. **There is no retry.** A failed job does not go back on the channel, gets no attempt count, and leaves no dead-letter record. Recovery requires GitHub to send another qualifying `issues` delivery — a re-label, an edit, a reopen. If nothing touches the issue, nothing runs. See [Job Queue and Execution Semantics](../concepts/job-queue.md).
-2. **A failed job is invisible to the issue author.** `ImplementSpec` resolves `Git` and `ProviderResolver` but never `GitHubService`; nothing in the job path posts a comment or changes a label. The only two GitHub writes in the codebase both live in the intake path, for invalid specs. So a job that fails on a dirty mirror, a broken `origin`, or an exhausted model quota leaves the issue sitting in `ready-for-agent` forever with a single Error line in the log as evidence. This is the most important blast-radius fact on this page.
+2. **A failed job is invisible to the issue author.** `ImplementSpec` resolves `Git`, `IOptions<SebastianConfig>`, `ProviderResolver` and `ILogger<ImplementSpec>` but never `GitHubService`; nothing in the job path posts a comment or changes a label. The only two GitHub writes in the codebase both live in the intake path, for invalid specs. So a job that fails on a dirty mirror, a broken `origin`, or an exhausted model quota leaves the issue sitting in `ready-for-agent` forever with a single Error line in the log as evidence. This is the most important blast-radius fact on this page.
 3. **The Error line carries nothing but the key.** `LogFailed` passes the exception but adds no context; the reason lives in whatever the job logged before throwing, which for a mirror guard is *nothing* — the guard message is only in the exception. Reading `Job owner/repo#1 failed` therefore always requires the exception detail from the log sink.
 
 ### Intake: the unguarded path
@@ -275,7 +297,7 @@ private readonly Channel<IJob> _channel = Channel.CreateUnbounded<IJob>();
 private readonly ConcurrentDictionary<string, byte> _inFlight = new(StringComparer.OrdinalIgnoreCase);
 ```
 
-Both live in process memory only. There is no persistence, no journal, no startup reconciliation, and no code that inspects `ready-for-agent` issues at boot.
+Both live in process memory only. There is no persistence, no journal, no startup reconciliation, and no code that inspects `ready-for-agent` issues at boot — `Program.cs` has no hook between `Build()` and `RunAsync` that could do it, and none of the hosted services scan GitHub.
 
 | Survives a restart | Does not survive |
 | --- | --- |
@@ -323,7 +345,7 @@ On a retry or a post-restart re-run, preparation still fetches and fast-forwards
 | New `TryAdd` after `StopAsync` | key added, write fails, key rolled back, returns `false` | the processor's **Debug** "already running" line |
 | Buffered, never started | **abandoned** — the reader's token is cancelled, so the loop ends instead of draining | nothing |
 | Running, cooperative | per-iteration token fires; `ImplementSpec` propagates it into git calls, which kill their child process trees, and into the agent | nothing — both catches are filtered on `stoppingToken.IsCancellationRequested` |
-| Running, ignoring the token | keeps running until the framework's `HostOptions.ShutdownTimeout` expires; `Program.cs` does not configure it, so the framework default applies | nothing |
+| Running, ignoring the token | keeps running until the framework's `HostOptions.ShutdownTimeout` expires; `Program.cs` does not configure it (no `Configure<HostOptions>` anywhere in the composition root), so the framework default applies | nothing |
 
 Buffered jobs are abandoned *while still holding their in-flight keys* — harmless in production (the writer is complete, so nothing can be admitted) and only observable in a test that reuses the same `JobQueue` instance after `StopAsync`. There is no test for any row of this table; see [Job Queue and Execution Semantics](../concepts/job-queue.md) for why those are the two additions worth making first.
 
@@ -367,7 +389,8 @@ Read this table before changing any `catch` block. Everything in the first colum
 Any change to a `catch` block, a `when` filter, or a cancellation path is **behavior-changing**, not a refactor, and needs a test. The current suite pins the two policies that matter most and nothing else:
 
 - `tests/Sebastian.Tests/Jobs/JobQueueTests.cs` — `ContinuesAfterJobFailure` proves a throwing job neither escapes the handler nor stops the loop; `RejectsDuplicateKeyWhileJobRuns` proves the key is held for the run and released in the `finally`; `RunsAtMostTenJobsConcurrently` proves the concurrency cap.
-- `tests/Sebastian.Tests/Agent/ImplementSpecTests.cs` — `RejectsDirtyMain` and `RejectsForeignRepository` prove two of the three preparation throws; the two reuse tests pin the restart-safe worktree behavior.
+- `tests/Sebastian.Tests/Agent/ImplementSpecTests.cs` — `RejectsDirtyMain` and `RejectsForeignRepository` prove two of the three preparation throws; the two reuse tests pin the restart-safe worktree behavior. Both preparation tests depend on `git.StartAsync` having populated `Git.Repository`, so the null-repository throw is the untested one.
+- The startup gates have unit cover but not composition cover: `EnvironmentPlaceholdersTests.MissingEnvironmentVariableFails` pins the placeholder failure message, `ProviderResolverTests` pins the four constructor throws, and `RepositoryIdentityTests` pins URL parsing. Nothing exercises `Program.cs` end to end, so the eager-resolution block and the options-validation ordering are review-only.
 
 Not covered by anything, and therefore manual-verification-only: every path in `SyncMainAsync` (the ref filter, the three guard branches, the warning swallows, the ten-second bound), both `JobQueue` cancellation filters, admission-refused-after-`StopAsync`, the abandonment of buffered jobs, the intake GitHub calls, and the whole webhook processor. See [Testing Strategy and Harness](../testing/test-strategy.md).
 
@@ -378,6 +401,10 @@ At the default `Information` level the complete set of visible lines is small, w
 | Line | Level | Means |
 | --- | --- | --- |
 | `Webhook {EventType} ({Event})` | Information | a delivery arrived and passed signature verification |
+| `Using repository {Owner}/{Repository} on {BaseBranch}` | Information | the repository identity check passed — the last startup proof before traffic |
+| `Syncing local main from origin` | Information | the mirror sync began (startup or a push delivery) |
+| `Local {BaseBranch} already matches {BaseRef}` | Information | the sync ran and there was nothing to fast-forward |
+| `Fast-forwarded local {BaseBranch} from {Before} to {After}` | Information | the mirror genuinely moved |
 | `Push {RefName} on {Repository}: {Before} -> {After}` | Information | a push delivery arrived |
 | `Started implementation for {Repository}#{Number}` | Information | the job was admitted — the last proof the job existed |
 | `Implementation completed for {Repository}#{IssueNumber} at {Path}. Git status: {Status}. Agent response: {Response}` | Information | the run finished **and** the status call succeeded |
@@ -387,6 +414,8 @@ At the default `Information` level the complete set of visible lines is small, w
 | `Implementation already running for {Repository}#{Number}` | Debug | an event was dropped as a duplicate |
 | `Issue {Repository}#{Number} closed; missing spec sections: <sections>` | Debug | the issue was closed as `not_planned` |
 | `Local main sync cancelled` | Debug | the ten-second bound or shutdown cut the sync short |
+
+The three sync lines are the important addition to the usual "started / completed / failed" triad: at `Information` a healthy mirror announces itself (`already matches` or `Fast-forwarded`), so **a sync that produced none of the three sync lines either returned early on a non-`main` ref or was absorbed by one of the two warning catches**. Startup with no sync line at all and no Warning means the push was not to `refs/heads/main`.
 
 So "started" without "completed" and without "failed" means the process died mid-run. "Started", then "failed" means look at the exception. Neither line at all, on an issue that visibly carries `ready-for-agent`, means the event was filtered before enqueue (wrong action, closed issue, missing `feature`) or suppressed as a duplicate — and at `Information` level none of those branches says anything.
 

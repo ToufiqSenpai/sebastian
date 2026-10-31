@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:997d7753305ed1ec0f23e96386e4f4e7515621056d2a40df99f1e3dbaa667dad",
+  "pageVersion": "sha256:6ed79fc723f05ed047847cb200095eace5475d2c736738ce98b70091fae00027",
   "claims": [
     {
       "id": "claim_fac6312db7714ffa95066b47502cb645",
@@ -223,10 +223,42 @@
           "version": "repo-lines-v1:sha256:0aa5a9d0b74d2c48b2c1ae3d9e0ecb4a431aa2e99eb62a93e4d1c4fdc3a1ac04:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4OTNkZTIxNGY2OGE0ODZjOGIyMmUxM2Y0NWZhMTFlZDU3MDAzNzFlNGZiMzczZGQ4MGY5MWJkOGRmMzI1MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2ODc3NTIyYWViMWE5NGUxMmUxODZiM2JmNzIyYjhmNDg3OGQwNTkzZmI0YTA4YmI3ZmZkNjZhNjM5MWMzYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliYTJiYTRkMWRhNDdkMjcwYjE4YzhkMWEyMGRjMWM3MjIwOWNmZmMzM2FkYTdkNzFjNDlmZDE4YzIyYTU5ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyYmRkZjRmYjFiMGUzZjRhOGE0MjM5ZTM4ODNkYTg0MDExZWU4YTkwZjA5NWY0MGYxZmQwZDFiYWM4NTU1ZTMifQ"
         }
       ]
+    },
+    {
+      "id": "claim_4f492359dee6446c99f6bbe8e41f5172",
+      "statement": "A single issues delivery resolves to exactly one of seven dispositions — silently dropped (action filter, closed state, missing `feature` label, or null repository/owner/name), closed as invalid, dormant awaiting `ready-for-agent`, deduped by an in-flight key, queued-then-failed, queued-then-cancelled on shutdown, or run — and only the last produces a workspace; only the invalid-spec branch writes to GitHub, and only the run branch ends in `Implementation completed`.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L28-L61",
+          "version": "repo-lines-v1:sha256:53f9fb148752070c9dbfbaa10f3d40be30a9d3a8cd1fe886893e5b3efe5a177c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4NzkyMzc4NDU2ZTAyODc4YWEwMjNiZjM0MjUzYzkyMzMyZDdkZTJjYmUzNmU1YmNiMDY1MThhNzcwNTVjNjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNjc0ZGU4ZGFmZTNhMDk2ZTQ5NWZkNTcwNTA3ZmFkNDg0ZTRjZWExY2NlM2I1M2I2YjE1NDc5ZjgzN2U0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4ZjZjM2I5MzFkNDIxZWRiNjE4MzBhMzBjYjc2Mzk1ZDg1OWVmNTc1NDZmYzA4OGZhZDFhMTlkZDdiZDMzNDAifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L55-L74",
+          "version": "repo-lines-v1:sha256:ed6c9811c63381075ba09fa23424fad593c738b9ffcf2b6ce880189842018a29:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiNWJjNDE4M2M5MWE2N2YwNDBjN2MxZjkwYzVhNjA1YjEzYTQ4NzdmODRlYTFjMDk1YTM5NTU2NWY1MGY4NGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2ZTA1M2Q0MDhkY2IxMDMyYWQ2NjRlMzhlNDcwZTQ0NGUzYjQ5NWM3MmFiNjI2NzY5NjY4Yzk0NTNjMzIyNWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4NDk5YjBlMTYwMTNmYzdiZTg2MzRjZThiNGY5YWEyODA5OTkyNDliOGVhODAzMzY0MzU2MGZiMGY4YzdkN2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxNDNjMzdkYzc3ZDEyMWMzNWZkMTRhYzk2MTEwMWM2ZDg4MDcxZWQ1YjlmNzY3N2ZlODRmZDJlY2RjMjFhNDgifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L105",
+          "version": "repo-lines-v1:sha256:3907686fe48b13846e8b4d70cac3c76da4f1786e1c7d533b58f982610a5f6678:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiZTAwYWY3ZWI4ZDhlOWQxZTE1YmFkMGI0Mzg5YzkzYzljYTgyMDZiMjcyNTE5YjA1MzAzYzI3NTEzZjBiMTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJhMmNhNTZhYjI5NzRkMGY2ZWUwNDhmZWU0YTNiNmE3NTgyNzkzZGExZDFiN2EzODI3YWU0NGY0ZmQ5OWY3NDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bbf1f2ca5ab34545a0b2b2c49cf6c68e",
+      "statement": "At default verbosity a dropped delivery and a dormant delivery are indistinguishable from a deduped one: all three log only the generic `Webhook IssuesEvent (issues)` line, the dedupe case adds a `Debug` line (`Implementation already running for ...`), and nothing counts or records declined deliveries, so operators must inspect the issue's state and labels or enable Debug for `Sebastian.Webhooks` to attribute the outcome.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L119-L132",
+          "version": "repo-lines-v1:sha256:f3978f79a40951518d88d6170356e2655860f60c8f7779651f4fba559541538a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5NmUyNjg4MmJjYjZmMjcxYjk0ZTNiNDYwMDU3MTc3MDFjYWNjYTI1M2NkZGMyNDMxNDdlNDkyNWY4OTIzZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyM2NiYmZhMzdlOGY5NmMwN2FjNjM2MDllZWJjMThjZTRjMmUzZjgxNGRiYmUxMmNiMmEzMmE0OGI3NzY2N2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0NzRhM2RmY2VkZWJlYTlkNTc0N2Q0NDc4NmJjM2NlN2I2ZjhjOGY4MmE2NDllNWM1NDUxODQ4YzAzMmVkNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L23-L30",
+          "version": "repo-lines-v1:sha256:e0cc2820a6e6ec518ebc2689ed4b9be664abb03f6de3368a47464cadb3b345f2:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU2NTFhMzBmMTU1ZWMyYTNjMzJjZTkyNzRjMTIyNzUzOTZkMDZjMTdhMWFmN2EwNmRjMTQwOGYxNTU0ODA5YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc4Njg4MTk1YThkZjNjNDU0ZGQ1ZTgzYmRhODI0YmM1YzA5NTg3NjcwNWMxOWRmZGVjZGY1ODBjZTdiZDA3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA3ZjBkMTU1ZTc2ZjRkNmJjOTRkNGZhMWRkMzgwMzkzYzRkYzg5Njc2NGE4OWE0MGFlOGVkYTk3ZjRlNjY5NCJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

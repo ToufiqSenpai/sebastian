@@ -3,10 +3,9 @@ type: model-provider-resolution
 title: Model Provider Resolution
 description: How Sebastian picks one LLM at startup — the provider list rules enforced in ProviderResolver's constructor, case-insensitive selection via Agent:General:Provider, the optional OpenAI-compatible endpoint defaulting to https://api.openai.com/v1, and why a fresh IChatClient is created per job and disposed by the run.
 tags: [providers, configuration, llm, chat-client, startup-validation, failure-modes, lifecycle]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
+  - id: openwiki-source-ede59da55b0d48006223d1c0
+    resource: repo://appsettings.json
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
   - id: openwiki-source-3bf67c20a76eb7fa3cac2e6e
@@ -21,7 +20,10 @@ sources:
     resource: repo://src/Jobs/JobQueue.cs
   - id: openwiki-source-5b02b033021548a1c1fc0ba0
     resource: repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Model Provider Resolution
@@ -32,7 +34,7 @@ generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
 2. **Selection** — resolve *which* provider, *which* endpoint, and *which* model id, exactly once, at startup.
 3. **Client construction** — build an `IChatClient` on demand, once per job, from the already-resolved values.
 
-Responsibility 1 and 2 happen in the constructor and therefore at process startup; responsibility 3 happens inside a job. Splitting them this way is deliberate: a misconfigured provider list should stop the process from serving webhooks, while a wrong-but-well-formed API key should only fail the run that used it.
+Responsibilities 1 and 2 happen in the constructor and therefore at process startup; responsibility 3 happens inside a job. Splitting them this way is deliberate: a misconfigured provider list should stop the process from serving webhooks, while a wrong-but-well-formed API key should only fail the run that used it.
 
 ```csharp
 internal sealed class ProviderResolver
@@ -49,7 +51,7 @@ internal sealed class ProviderResolver
 }
 ```
 
-Nothing else in the repository reads provider configuration. `ImplementSpec` is the only caller of `CreateChatClient`, and no other type touches `Agent:Providers` or `Agent:General:Model`. See [Agent Roles, Tools, and Sandbox Boundaries](agent-execution.md) for what happens to the returned client, and [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for how the resolver gets its options.
+Nothing else in the repository reads provider configuration. `ImplementSpec` is the only caller of `CreateChatClient`, and no other type touches `Agent:Providers` or `Agent:General:Model`. The file is also the only one that suppresses the OpenAI experimental-API analyzer warning (`OPENAI001`) in addition to `MEAI001`, which matters under this project's `TreatWarningsAsErrors` / `AnalysisLevel=latest-all` settings: it keeps the experimental OpenAI client surface pinned to one file instead of leaking it into the agent-harness code. See [Agent Roles, Tools, and Sandbox Boundaries](agent-execution.md) for what happens to the returned client, and [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for how the resolver gets its options.
 
 ## The configuration surface
 
@@ -66,6 +68,8 @@ The keys are the property names on the config tree in `src/Configuration/Sebasti
 `Agent` carries `[ValidateObjectMembers]` and `Agent.Providers` carries `[ValidateEnumeratedItems]`, so **every** element of the list is validated, not just the selected one. Practically: a second provider entry kept "for later" still needs a non-blank `Name` and `ApiKey`, or the process refuses to start. Its `Endpoint`, however, is never URI-checked unless it is the selected entry — that check lives in `ProviderResolver`, not in the config attributes.
 
 `Endpoint` being `string?` interacts with the default in a way that is easy to get wrong: `selected.Endpoint ?? DefaultEndpoint` only falls back on `null`. An explicitly empty string is not `null`, so it reaches `Uri.TryCreate` and fails as an invalid endpoint rather than silently using the OpenAI default.
+
+The shipped `appsettings.json` is the canonical example: one provider named `deepseek` with `Endpoint` set to `https://api.deepseek.com/v1`, its `ApiKey` bound from the `DEEPSEEK_API_KEY` environment placeholder, and `Agent:General:Provider` selecting `deepseek` — the same spelling as the entry, so the shipped defaults never exercise the case-insensitive path — with `Model` `deepseek-v4.1-flash`.
 
 ## The resolution ladder
 
@@ -88,7 +92,7 @@ Constructor validation order: list non-empty, then name uniqueness, then selecti
 
 Three details in that ladder are load-bearing:
 
-- **The duplicate check runs before selection**, and it groups with `StringComparer.OrdinalIgnoreCase`. Two entries named `DeepSeek` and `deepseek` are a startup failure even if the selected entry is unambiguous — the resolver refuses to leave a shadowed entry in place. The message interpolates the *first* spelling encountered.
+- **The duplicate check runs before selection**, and it groups with `StringComparer.OrdinalIgnoreCase`. Two entries named `DeepSeek` and `deepseek` are a startup failure even if the selected entry is unambiguous — the resolver refuses to leave a shadowed entry in place. The message interpolates the group *key*, which under `GroupBy` with an ignore-case comparer is the first spelling encountered.
 - **Selection is case-insensitive** through `string.Equals(provider.Name, agent.General.Provider, StringComparison.OrdinalIgnoreCase)`, and takes the *first* match. Combined with the preceding uniqueness check, "first match" can never be ambiguous; the two checks are what make an `OrdinalIgnoreCase` lookup safe.
 - **Endpoint validation is shape-only.** `Uri.TryCreate(value, UriKind.Absolute, ...)` accepts any absolute URI — `ftp://host`, `file:///x` — because no scheme or HTTP check exists. A syntactically valid but useless endpoint passes startup and fails at request time.
 
@@ -96,7 +100,7 @@ Once constructed, the resolver holds `_apiKey`, `_endpoint`, and `_model` in fie
 
 ## Failure modes: exact messages and when they fire
 
-All four failures below are `InvalidOperationException` thrown from the constructor. Because `Program.cs` resolves `ProviderResolver` eagerly (`_ = app.Services.GetRequiredService<ProviderResolver>();`, immediately after `Build()` and before `RunAsync`), every one of them aborts startup rather than surfacing on the first webhook.
+All four failures below are `InvalidOperationException` thrown from the constructor. Because `Program.cs` resolves `ProviderResolver` eagerly (`_ = app.Services.GetRequiredService<ProviderResolver>();`, immediately after `Build()` and before `RunAsync`), every one of them aborts startup rather than surfacing on the first webhook. Startup validation is also requested explicitly via `ValidateOnStart()` plus a registered `ValidateSebastianConfig` singleton.
 
 | Failure | Message | Fires at |
 | --- | --- | --- |
@@ -106,13 +110,25 @@ All four failures below are `InvalidOperationException` thrown from the construc
 | `Endpoint` present but not an absolute URI (includes the empty-string case) | `Agent provider '<name>' has an invalid endpoint.` | Construction — startup |
 | Wrong/missing/revoked API key, unknown model id, unreachable host | no message from this class — the provider SDK's error | First agent run, caught by `JobQueue` and logged as `Job {Key} failed` |
 
-The last row is the deliberate gap. `ProviderResolver`'s constructor does not contact the network and `CreateChatClient` does not either, so **credential validity and model existence are unproven until the first run actually talks to the endpoint**. That is a startup-versus-first-job tradeoff, not an oversight; the eager resolution exists to catch *shape* errors cheaply.
+The last row is the deliberate gap. `ProviderResolver`'s constructor does not contact the network and `CreateChatClient` does not either, so **credential validity and model existence are unproven until the first run actually talks to the endpoint**. That is a startup-versus-first-job tradeoff, not an oversight; the eager resolution exists to catch *shape* errors cheaply. The per-job failure is non-fatal to the service: `JobQueue.ExecuteAsync` wraps each job in a broad catch, logs `Job {Key} failed`, and removes the key from the in-flight set so the queue keeps draining.
 
 ### The validator fires before the constructor does
 
-Blank-string rules are not the resolver's job. `[Required]` on a `string` rejects null, empty, and whitespace-only values, and the source-generated `ValidateSebastianConfig` enforces it. Because the constructor's first statement dereferences `options.Value`, the options infrastructure runs the validators at that moment — and `Program.cs` has already read `.Value` for the webhook secret before the eager resolutions, so validation always precedes `ProviderResolver`.
+Blank-string rules are not the resolver's job. `[Required]` on a `string` rejects null, empty, and whitespace-only values, and the source-generated `ValidateSebastianConfig` enforces it. Because the constructor's first statement is `options.Value.Agent`, the options infrastructure runs the validators at that moment — and `Program.cs` has already read `.Value` for the webhook secret before the eager resolutions, so validation always precedes `ProviderResolver`.
 
 `ProviderResolverTests.BlankApiKeyIsRejectedByGeneratedValidator` pins exactly this boundary: it validates a fully populated config (`valid.Failed == false`), sets `config.Agent.Providers[0].ApiKey = " "`, and asserts `invalid.Failed == true`. The evidence value is the ordering — a whitespace-only key never reaches the resolver, it is rejected on the `.Value` read. This matters when adding settings: values that are required but not structurally checked (like `Model`) need an attribute, because no code in `ProviderResolver` examines their content.
+
+Note that the *generated options validator* and the *resolver's runtime checks* fail in different ways and on different inputs:
+
+| Concern | Owner | Input that trips it | Surface |
+| --- | --- | --- | --- |
+| `Name`/`ApiKey`/`Provider`/`Model` null, empty, or whitespace | `ValidateSebastianConfig` (data annotations) | any element, selected or not | `OptionsValidationException` on `.Value`; with `ValidateOnStart()` it surfaces during host startup |
+| No entries at all | `ProviderResolver` ctor | empty `Providers` list — which passes the `[Required]` list binding | `InvalidOperationException` with a Sebastian-specific message |
+| Duplicate names | `ProviderResolver` ctor | any two entries sharing a name ignoring case | same |
+| Selected name unknown | `ProviderResolver` ctor | `General.Provider` not present in the list | same |
+| Malformed endpoint on the selected entry | `ProviderResolver` ctor | non-absolute URI or empty string | same |
+
+Data annotations cannot express any of the last four rules, which is exactly why they live in code rather than as attributes.
 
 ## CreateChatClient: one client per job
 
@@ -187,15 +203,26 @@ Reading the code as an exhaustive validation layer will mislead you. The resolve
 - **Tightening endpoint validation** (require an `http`/`https` scheme) is a small, safe change that converts a request-time failure into a startup failure and is not currently pinned by any test.
 - **Never log the resolved `_apiKey`**, and do not add code that re-reads it per job — one read at startup is what keeps the secret surface small.
 
+### Adding a provider or switching models without code changes
+
+Both operations are configuration-only, and the drift-prone part is realising that the *selection string* and the *list entry* must agree:
+
+1. **Add a second provider entry** — append an object to `Agent:Providers` with a `Name`, an `Endpoint` (or omit it to use the OpenAI default), and an `ApiKey` (typically `{env:VENDOR_API_KEY}`, expanded by `ExpandEnvironmentPlaceholders`). Because of `[ValidateEnumeratedItems]`, the entry must have a real `Name` and `ApiKey` even while unselected, and its `Name` must not collide case-insensitively with any existing entry.
+2. **Switch to it** — set `Agent:General:Provider` to that entry's `Name` (case does not matter) and `Agent:General:Model` to a model id the vendor accepts. Restart the process; there is no live reload.
+3. **Verify at startup** — a successful boot only means the list was coherent; the first issue-driven job is what proves the key and the model id.
+4. **Rolling back** is the reverse edit plus a restart, which is why keeping the previous provider entry in the list is cheap: it costs one required secret and no runtime behavior.
+
+In environment-variable or secret-manager deployments the same thing is expressed as `Agent__General__Provider`, `Agent__General__Model`, and `Agent__Providers__1__Name` / `__Endpoint` / `__ApiKey`.
+
 ## What the tests pin, and what they leave open
 
 `tests/Sebastian.Tests/Agent/ProviderResolverTests.cs` builds a resolver directly with `Options.Create(config)` and never reaches the network:
 
-- `MissingProviderFails`, `DuplicateProviderNamesFail`, and `EmptyProvidersFails` assert the exact three constructor messages, so a reordered or removed check is a visible break rather than a startup surprise.
+- `MissingProviderFails`, `DuplicateProviderNamesFail`, and `EmptyProvidersFails` assert on distinctive fragments of the three constructor messages ("missing", "more than once", "At least one agent provider"), so a reordered or removed check is a visible break rather than a startup surprise. They pin the diagnostics, not the wording: a full-message edit that keeps the fragment survives.
 - `SelectedProviderCreatesChatClient` asserts only `NotNull` on the result and disposes it defensively. Its real value is negative evidence: the whole test suite constructs the resolver and a chat client with no network available, which only works because neither validates reachability.
 - `BlankApiKeyIsRejectedByGeneratedValidator` pins the validator-versus-constructor split described above.
 
-Left unpinned: the default endpoint constant, the `has an invalid endpoint` message, the case-insensitive selection path, the model id actually passed to `GetChatClient`, and any assertion that disposal propagates. Changes to any of those are unverified by the suite — see [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for the full fail-fast inventory and [Running, Configuration, and Deployment](../operations/running-and-deployment.md) for the operator checklist that consumes these messages.
+Left unpinned: the default endpoint constant, the `has an invalid endpoint` message, the case-insensitive *selection* path, the model id actually passed to `GetChatClient`, and any assertion that disposal propagates. The duplicate fixture (`deepseek` alongside a second `deepseek`) does exercise case-insensitive grouping, but no test selects a provider whose configured spelling differs from `General.Provider`, so a regression that made selection case-sensitive would pass. Changes to any of those are unverified by the suite — see [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for the full fail-fast inventory and [Running, Configuration, and Deployment](../operations/running-and-deployment.md) for the operator checklist that consumes these messages.
 
 ## Related
 

@@ -1,14 +1,18 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:400be540d825ed67873ee17aef7c572776eb172b757d6e42a7c42aaf4a977fe1",
+  "pageVersion": "sha256:f4fd1c11b4584bfd16a8db3c0d1a1261caad640e7d322c857ba2a19d46f4b09d",
   "claims": [
     {
       "id": "claim_8c17d5da1795460bb71892075a8b7aeb",
-      "statement": "Startup runs as an ordered set of gates — options validation, eager resolution of GitHubService and ProviderResolver, Git repository identity checks, then a bounded mirror sync — and the process only reaches app.RunAsync (which opens the listener) after all of them pass, so every misconfiguration in that chain is a failed start with no /health and no webhook endpoint.",
+      "statement": "Startup is an ordered chain of gates — {env:NAME} placeholder expansion over the committed appsettings.json, options validation, eager resolution of GitHubService and ProviderResolver, then app.RunAsync starting Git (repository identity, then a bounded mirror sync) before JobQueue — and the listener only opens once the hosted services start, so every misconfiguration in that chain is a failed start with no /health and no webhook endpoint.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L11-L49",
-          "version": "repo-lines-v1:sha256:55c780b60958294912167d4df7ef03f84d978eb4acaf0f5d177a37bcbb41a099:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://Program.cs#L11-L52",
+          "version": "repo-lines-v1:sha256:94cf220a8fd8099f1bdd03c3d8f530f7faaf70776dfcf985b10632936d9fcfea:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L10-L35",
+          "version": "repo-lines-v1:sha256:c641598b20c8cccfd3e7444a079315fe9248d528b5cc54f41dcaf4c3f35b6b06:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MDNlMzg0MGVjYTY5MDRlNDJhMDdhMWY2ODc4Mjg4ZmQ0YmYwODU2MTU3N2Y0YjEyMjhhNGYzZjc0OWY3YzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmM2QwNzlmYjUxNWMwZWIxMmQ0MjY0NjEwOWYyYjY3MDJmZGI2NWZmYWE4MjFkOGE0MWY4Y2RiODIyY2QxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         },
         {
           "resource": "repo://src/Libs/Git.cs#L27-L54",
@@ -21,7 +25,7 @@
       "statement": "/health is a constant liveness probe: it returns \"ok\" without inspecting mirror freshness, queue depth, in-flight jobs, or whether either credential chain works, so it cannot be used as a readiness check for agent work.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L46-L46",
+          "resource": "repo://Program.cs#L49-L49",
           "version": "repo-lines-v1:sha256:379756f83d225db44f89f0cf42a2a343575eadfb81b955ed74e61d3c3e132d13:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTgyYTE5ZmM4Mzk2NGI3MmQ4N2RhODFhNmQyZTcwMTI5Mzg2ZDgzZGNjODkwY2YxNGM5YTgwODcyZGU5YzhkNCJ9"
         }
       ]
@@ -80,11 +84,15 @@
     },
     {
       "id": "claim_67be24a8e38945d385624e5cc08b6c78",
-      "statement": "Configuration is a single bound SebastianConfig tree whose property names are the configuration keys, supplied through the default ASP.NET Core builder stack (environment variables with '__' as the section separator, user secrets, or command line) because no appsettings.json, environment-specific settings file, or launchSettings.json is committed.",
+      "statement": "Configuration is a single bound SebastianConfig tree whose property names are the configuration keys, supplied by a committed appsettings.json (the only settings file; no appsettings.{Environment}.json or launchSettings.json) whose secret values are {env:NAME} placeholders, with the stock ASP.NET Core provider order — environment variables (__ separator, numeric list indices), user secrets, and command line — layered on top.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L13-L17",
-          "version": "repo-lines-v1:sha256:9e5f8f1d827151e65b50737011dd7e6d186f09579173640ef6dcd7514eb20030:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjJmOTRlMzNkY2NhNzA5NGY2NjMyZDljMzQ3YzE0ZTBmMjI3MjE0YjcwMzU5ZDZhNjQ3NzJiYTkxNzllNzVlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzJjOWEyNDA2OGUzY2JiMzU4NzJiYTYxZGI3ZGJhNDk1ZjVhYjk5MzMyZDdlYzhmNWQzMzk0M2U2NzQxNTFhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmYzMGQxZGVhOGE4ZjBiMzc3OTM0NTMwNDM1ZDY2NzYwYzMzOWJiY2JiMjk1ZGI5MGQzN2RkMTFlODljNmM1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJiNGUyYzM5MjE4NjQzYjE4MzNlZWVlZGU2MWY4ZjNjODZjZmJmMzVlZDIyN2NjNmM1MWZmZWZlZmE1Y2I4ZCJ9"
+          "resource": "repo://Program.cs#L11-L19",
+          "version": "repo-lines-v1:sha256:510be1d3153b5c13684d9e0b0ba3f832edd4a9b6da24ce6f350f9fbe815b1ba2:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzYyZjBkM2NlMzI1MmJhZGU4NzdkY2U1OWVlZjM1YTYyNmM2OTUxYTg4NWQ2YWE4NzdhZDRiYmIyMWJmZDczMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JmNzU2OTM3ZTMyYTgxNWY0Y2Y0MDM5NDNlNzI2Njg4YzEwMDMyYTgwODZjNmNlM2M1YTA4MWZjY2E2NTY1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTAyYmY4Yzg2Yzk1Y2I1NzNhMTdjODNjNDYxYjlkZjE1YTlmY2ExMWE5M2YyZjQ3YTA3ZmI0YmIwN2M1NjRhOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmQ2MDdhZTg1Yjg2NjM2NDE3ZjNkNDM1MDEzMGVlZjYyZWYwOGY4ZTBiYWQ5ZDNiMjhlZDA1YTkyN2M5N2NlNSJ9"
+        },
+        {
+          "resource": "repo://appsettings.json#L1-L22",
+          "version": "repo-lines-v1:sha256:8a00262e5b636ea33f13d920c5b5647bb138d40dd87ba8cde78b4b5534978493:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://src/Configuration/SebastianConfig.cs#L9-L67",
@@ -121,7 +129,7 @@
       "statement": "GitHubService validates the GitHub credentials by construction — it reads the file at GitHub:PrivateKeyPath with File.ReadAllText, imports it with RSA.ImportFromPem, and builds the installation token provider — and Program.cs resolves it eagerly after Build() so a missing or malformed PEM fails the start rather than the first job.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L42-L44",
+          "resource": "repo://Program.cs#L45-L47",
           "version": "repo-lines-v1:sha256:c929e30b2209c342f3a1782e8af22f55dd8f0bbbdd57b6997d044e750f1f5eee:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE0NjAxMTMzZmMzN2RiOTQ1MGZmZjU1YjZmODJkYzQ0MzcxZDkwZjY4MzdkYWZjYTc1ODVlZDkwNDBkNWMyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGQ0NGViZTFkYzE3Y2I5ZDgyMTgzZTU5ZWRiZTI1MGFhNWE4MmFkNDdkM2NiOTRhZmJmYTMyYmIxMDZhNjJhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
         },
         {
@@ -169,7 +177,7 @@
       "statement": "The webhook endpoint is anonymous and trusted solely via the HMAC secret passed to MapGitHubWebhooks, and because the secret is read once at composition time from IOptions<SebastianConfig>.Value, changing GitHub:WebhookSecret requires a restart.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L40-L47",
+          "resource": "repo://Program.cs#L43-L50",
           "version": "repo-lines-v1:sha256:ae703da5b213c015d96da29c802eb50f80474ecdef1652da6c79aec732759a36:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI2YmU0M2EwZWEyMWEyODA3YWZhMzI2MDM4MDQ0MGM1YzM0MTU5NTY5ZWMzMGRlYmZkYzlkM2QwOGIyZGE1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
         },
         {
@@ -183,7 +191,7 @@
       "statement": "The webhook route path is not defined in this repository — MapGitHubWebhooks is called with only the secret, so the path is the Octokit library default — and no listening address is configured anywhere (no UseUrls, Kestrel endpoint, launch profile, or ASPNETCORE_URLS reference), so the port comes from standard ASP.NET Core hosting configuration.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L46-L47",
+          "resource": "repo://Program.cs#L49-L50",
           "version": "repo-lines-v1:sha256:249f502f71258975f361ec1b9f2cf31d4bf21a5457c3cbcc4fab521eafecd282:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
         }
       ]
@@ -289,10 +297,66 @@
           "version": "repo-lines-v1:sha256:3d3f56518402dd6204e649deb34b378876c9b2bb804024c29da6d3eac36debb5:eyJzZWxlY3RlZExpbmVDb3VudCI6ODksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NzE4ZjA2N2I1ZTVjMWYwOTkxYTZlNzQ3MjZmZTJhMjNkMjY0MzQ1ZTA4ZTRlYWQwNGZhZjczYzI3ZWQ0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_067271336786404d8f76225cb2038447",
+      "statement": "Program.cs calls ExpandEnvironmentPlaceholders on the ConfigurationManager immediately after CreateBuilder and before options binding; it only matches values that both start with '{env:' and end with '}', substitutes the named variable via GetEnvironmentVariable, and overlays results with AddInMemoryCollection, so a non-secret setting like GitHub:AppId is still substituted as text and converted by the binder while an inline interpolation such as 'https://{env:HOST}/v1' is never expanded.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L13-L14",
+          "version": "repo-lines-v1:sha256:209d6c27f6c47c4f1ccfad9d3ce24c3e9963235984ac3797418da175f8a06272:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGJkMTI4ZjMyOTc3ZDVmYTA2MjEzMWYzMzJlMWMxZWNmYjBhNzAyYjYzYWZmNTg3ZjE0ZjNjZGM3M2RlMDFiZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTFlZDczNDIwOTNmMjdkNDcyYTdmNjc1YTc1ODM4ZDA1YWIwMjY0ZjUzMDMyNjJjYWY3YjhhZWRlYjI3YzE1YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmYzMGQxZGVhOGE4ZjBiMzc3OTM0NTMwNDM1ZDY2NzYwYzMzOWJiY2JiMjk1ZGI5MGQzN2RkMTFlODljNmM1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2I0YjA0NDQyZjNkZDllYmNkMDE1NGI0MjlmNmVmNTdmZjA2ODAxYTMwZWQ0MDIyZWIyMjBkNjAyYzBmYTI3OSJ9"
+        },
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L5-L35",
+          "version": "repo-lines-v1:sha256:c2370bf7e67a2c34e445ed1345b096d14d20e4a2fb4ec51f72675a134751d53e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmOTY4YmRlN2Y0NGQ5ZGUxMjgyOGIyZDRjNzZjMTFhYTExZGMyM2NlNzQwNmM2M2Q3MDM5YTYxYjMwZmU1ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjMmU4YmQwZGE5MmY1Y2QwYTYzOTIzYTZmNjg2NjU4NzVjY2FiZjU4YTc3YzY5YzI5ODA3MzJiY2M1NzRiZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ab7fecc0daf74373bc81e2dc0b48aa67",
+      "statement": "A {env:NAME} placeholder whose variable is unset, empty, or whitespace throws InvalidOperationException \"Environment variable '<name>' for configuration key '<key>' is not set.\" from Program.cs before the host is built, so the process exits with no listener and the message names both the variable and the configuration key; there is no optional-placeholder syntax.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L5-L16",
+          "version": "repo-lines-v1:sha256:d4858f1ed2475f2be900c1ed2cac9c81b6eda897a79c3cb828c78c8917858585:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyOTYzYTk1NTY5Mzc4NjExNTA1MDhlNzNmNzQ4YTQ4ODQxYzZjZmNlYTI0MDA5OTVkMmJkZjUyY2QzMDIxOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyZjk0ZTMzZGNjYTcwOTRmNjYzMmQ5YzM0N2MxNGUwZjIyNzIxNGI3MDM1OWQ2YTY0NzcyYmE5MTc5ZTc1ZTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyMGYzY2UxZDZmOTBkZWFhZjMyZTNiYjc1YWQ3MjJiYWZiYmIyOWNkOGQxN2RmYjQ2MGQ4MzU2ZDM0NDJhYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjNmZhM2JmYTE3NWFkMDY3YTgwYWZkOTYwM2EzYTVmMDZiYzk1YTJkN2UzMjkwZjM3MTRkMTZiNjJlODRhNGIifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L24-L29",
+          "version": "repo-lines-v1:sha256:f5c142c4b68720f08fd836d119c0dfb13f2939f7c27d16e608687ba14c6e7c8a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2I0ZGZiMzM2NWFlMTMyYjczZThmZDA4ZTY4MjA4NTRlYWQ4MWJmYjE3NTcwODgyMzhhZWI3NjA5ZWQ0YzBmNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjhmZWM2ZjY4NzE5ZDFmMzZlYmFlMzNkZmNiODQ5ODY3OGQwYTVkYzFhMGI0YmI5Yzc0ZTE3MGExNDRmYTNkZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmQxOTE5YzAxMjc0MmI4MDQ5ZGZlYTgyMmRlNmRhOTI3NjdmNDE4ZmE3YTFiNmJkYjEwYWQ5NmY2YTVlZjUzNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_33f861785e014031bba32c9e9e929da6",
+      "statement": "The required environment variables are fixed by the committed appsettings.json placeholders — GITHUB_WEBHOOK_SECRET, GITHUB_APP_ID, GITHUB_PRIVATE_KEY_PATH, GITHUB_INSTALLATION_ID, and DEEPSEEK_API_KEY (the default deepseek provider entry's ApiKey) — while Agent:Name, Agent:General:Provider, Agent:General:Model, and the provider Name/Endpoint are literal values in the file, overridable through Agent__* environment variables.",
+      "evidence": [
+        {
+          "resource": "repo://appsettings.json#L3-L19",
+          "version": "repo-lines-v1:sha256:dc501bc66b6b0b568b972522ab0218818546207caa0aee58a18d38190702bc08:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYWQ4ODZkNTBkNmMxMTM4MjY2ODY0M2NjZjA3YTVmYjE3OTlhYjIwNWVmNjM2YTU3MWVkYjU1MTMwMDYzYWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5MGMyMGM1Y2QxNGI5YmFmNWEwYjE0YTM3YjNkZWY2OGJmNjZiNWM5MGQxOWM0MDZjM2NkMDBlNjAzNGFiZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1NDY5YzM2ZmNjMjQwMTFlYWE0YmI0ODlmN2YwZmM4ODVjNzdkZTE3NWI4NmVhMjNlYjM2MjcxZjhmZDVjMjgifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L10-L35",
+          "version": "repo-lines-v1:sha256:c641598b20c8cccfd3e7444a079315fe9248d528b5cc54f41dcaf4c3f35b6b06:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MDNlMzg0MGVjYTY5MDRlNDJhMDdhMWY2ODc4Mjg4ZmQ0YmYwODU2MTU3N2Y0YjEyMjhhNGYzZjc0OWY3YzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmM2QwNzlmYjUxNWMwZWIxMmQ0MjY0NjEwOWYyYjY3MDJmZGI2NWZmYWE4MjFkOGE0MWY4Y2RiODIyY2QxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5610795081ff4dd39484578cdfb378a7",
+      "statement": "The committed appsettings.json ships with the published application as a content file and contains only placeholder names and non-secret defaults (Agent:Name Sebastian, provider deepseek at https://api.deepseek.com/v1, model deepseek-v4.1-flash), so a published binary still requires the referenced environment variables at start.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L1-L27",
+          "version": "repo-lines-v1:sha256:62c02dab80965f2d80751b7065c2fc56ab342e2e082d5f4a280fc01aa1a21eaa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1YjdjMDUwNWE4MWJkOTYwNWU5NjhmYTQ4Yjk5ODNmNWY5MDAwOGRiMTQ0MGVhY2ZiNDA4ZjhmMDg4NDM4MWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkZGMxNTliYjU5NzQ5OGY1MjJlNzkzNWM4MTIxN2JlZTI3OTcyODZlMDNkNmRlYWQ2YWUxZDUyNjI1ZTdlNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljYWVkMTZhZDM5ZjAxMDM2YTFmOTUyNjU2YjhiZjJlMjQ3YTIyNjZmNTVjNjhlZjUwMjkwNTk0YmU1NzgxMzkifQ"
+        },
+        {
+          "resource": "repo://appsettings.json#L1-L22",
+          "version": "repo-lines-v1:sha256:8a00262e5b636ea33f13d920c5b5647bb138d40dd87ba8cde78b4b5534978493:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

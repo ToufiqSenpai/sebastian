@@ -3,9 +3,6 @@ type: issue-intake-contract
 title: Issue Spec Contract and Validation Gate
 description: The feature-issue intake contract — the seven required markdown sections SpecTemplateValidator enforces, the exact heading and empty-content algorithm, the close-as-not_planned terminal outcome for invalid specs, and the maintenance link to the to-spec skill template.
 tags: [issue-intake, spec-validation, markdown-parsing, github-webhooks, feature-gate, labels, maintenance]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-6f35f7ccf1495063b8fc71d0
     resource: repo://docs/PRD.md
@@ -21,7 +18,10 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-8a717290a8315456a0f1fc7e
     resource: repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Issue Spec Contract and Validation Gate
@@ -49,7 +49,7 @@ Both constants are read-only filters: `FeatureLabel = "feature"` and `ReadyForAg
 Three consequences follow from the guards, and they are the ones that surprise people:
 
 - **This gate is `feature`-only.** The PRD (§3.1.2) describes validation "with per-label requirements" covering reproduction, template completeness, and evidence, with `bug` routed to implementation or closure and anything ambiguous to `needs-triage`. None of that exists. An issue labeled `bug` without `feature` hits the label guard and returns, so it is never validated, never implemented, and never closed. Do not treat that as a regression to repair on sight; adding it is new feature work.
-- **A closed issue can never be re-validated.** After the close path below runs, later `edited` deliveries carry `state = closed` and return at the state guard. Recovery therefore requires a `reopened` (or a re-label) event, not an edit.
+- **A closed issue cannot be re-validated by editing it.** After the close path below runs, later `edited` deliveries carry `state = closed` and return at the state guard. Recovery therefore requires a `reopened` (or a re-label) event, not an edit — re-open plus edit is what re-triggers validation.
 - **Validation runs again on every matching delivery.** Labeling, editing, and reopening all re-enter the gate, so a spec that loses a section after approval is closed on the next event, even though it was implementable a minute earlier.
 
 ## The contract: seven sections
@@ -107,7 +107,7 @@ Step by step, the semantics a reader must internalize:
 
 1. **Split on `\n` and `Trim` every line.** The trim is what makes CRLF bodies work (the trailing `\r` disappears), and it also means leading indentation does not hide a heading.
 2. **A heading is a line whose trimmed form starts with `"## "` — exactly two hashes and a space.** The section name is the remainder, trimmed. This is ordinal: `## ` matches, `### ` does not, `# ` does not.
-3. **`filled` is a set of section *names*, not positions.** Membership is `OrdinalIgnoreCase`, so `## tech stack` satisfies `Tech Stack`, and a required section appearing twice counts as filled if *either* occurrence has content.
+3. **`filled` is a set of section *names*, not positions.** Membership is `OrdinalIgnoreCase`, so `## tech stack` satisfies `Tech Stack`, and a required section appearing twice counts as filled if *either* occurrence has content. The last `## ` heading seen wins as the owner of following lines, so a repeated heading starts a fresh opportunity to fill the same name.
 4. **A section is filled by any single non-empty line under it.** There is no minimum length, no structure check, and no inspection of what the line says. One character of text is enough.
 5. **Content before the first `## ` heading is discarded** (`currentSection is null`), so a preamble or a template header line cannot fill anything.
 6. **The result is `RequiredSections` minus `filled`, in declaration order.** A null body splits into one empty line, so all seven are reported missing.
@@ -174,9 +174,10 @@ The side effects are user-visible behavior, so treat each as part of the contrac
 | --- | --- |
 | Comment body | Exactly `Closed: the spec is missing required sections: <a, b, c>.` — names joined with `", "` in `RequiredSections` order, **not** document order, ending in a period |
 | Comment authorship | The GitHub App itself, via the installation token in [GitHub App Authentication and Issue Writes](../integrations/github-app-client.md) |
-| Close state | `state = closed` with `state_reason = not_planned` — not `completed` |
+| `state_reason` | `not_planned` — `GitHubService.CloseIssueAsync` patches `State = Closed, StateReason = Not_planned`, never `Completed` |
 | Ordered, not atomic | The comment is posted *first*, so the reason is on the issue and remains visible after closure. There is no `try`/`catch` around either call, so a GitHub API failure on the comment propagates out of the webhook handler and leaves the issue untouched; a failure on the close propagates too and leaves the comment posted on a still-open issue |
-| No further work | The `return` follows the close, so an invalid spec is never enqueued — even when `ready-for-agent` is present |
+| Terminal | The `return` follows the close, so an invalid spec is never enqueued — even when `ready-for-agent` is present — and the issue is not reopened by Sebastian afterwards. Only a human re-open (plus an edit) or re-label produces another delivery that reaches the gate |
+| No delivery dedup | Nothing records the delivery or comment id, so a redelivered or repeated invalid event posts the comment again and re-closes an already-closed issue |
 | Logging | A single `Debug` line, `Issue {Repository}#{Number} closed; missing spec sections: {Sections}`. Nothing at `Information` |
 
 **Validation outranks approval.** The section check and its `return` come *before* the `ready-for-agent` check in the same method. An issue a maintainer already approved with `ready-for-agent` is still closed as `not_planned` if a required section is empty. That ordering is the single easiest thing to break in this file, and it has no test protecting it.
@@ -202,7 +203,7 @@ Note the shape of the contract as a whole: **validation decides whether the issu
 
 ## Maintenance: the section list is duplicated in three places
 
-The one-line comment above the array is a real constraint, not decoration:
+The comment above the array is the source-of-truth link between the two artifacts — it is a real constraint, not decoration:
 
 ```csharp
 // Keep in sync with skills/to-spec/SKILL.md.
@@ -210,6 +211,8 @@ private static readonly string[] RequiredSections = [ ... ];
 ```
 
 [`skills/to-spec/SKILL.md`](../../skills/to-spec/SKILL.md) is the spec-authoring skill. Its `<spec-template>` block lists the seven headings — `Problem Statement`, `Solution`, `User Stories`, `Tech Stack`, `Implementation Decisions`, `Testing Decisions`, `Out of Scope` — plus `Further Notes`, and its process step applies the `feature` label when it publishes the issue with `gh`. The hash characters in front of each heading are part of that template, which is exactly what the `"## "` heading test matches.
+
+The skill lives in this repository's `skills/` tree but is not compiled, linted, or executed by the build, and nothing in `Sebastian.csproj` or the test project references it — so treat it as documentation that happens to ship alongside the code, with no build-time coupling to the validator.
 
 So the contract is authored in markdown and enforced in C#, and nothing couples them:
 
@@ -236,7 +239,7 @@ If the volume of intake ever justifies it, the cheapest real fix is a test that 
 | `HtmlCommentOnly_IsReported` | `<!-- none -->` is not an answer |
 | `LowercaseHeadings_AreAccepted` | Matching is case-insensitive on both sides |
 | `CrlfLineEndings_AreAccepted` | Windows line endings survive the split-and-trim |
-| `SubheadingsAndExtraSections_AreIgnored` | `### ` does not open a section; unknown `## ` sections are harmless |
+| `SubheadingsAndExtraSections_AreIgnored` | `### ` does not open a section (its lines stay with the enclosing `## ` section) and unknown `## ` sections are harmless |
 | `FurtherNotes_IsOptional` | The template's trailing section is not required |
 | `NullBody_ReportsAllRequiredSections` | A bodyless issue reports all seven |
 

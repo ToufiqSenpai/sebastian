@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:d56ce013411b365bb12bf9ce16233ba6e034979608619c83af5b211a5b476a86",
+  "pageVersion": "sha256:e6704081d95e447d0e07c2afa50071a798398cd25fcbd653ca6d66ab2ca17a38",
   "claims": [
     {
       "id": "claim_d654d83e34c54288a0317bc22bad58d1",
@@ -14,11 +14,15 @@
     },
     {
       "id": "claim_eb83669cc15d459ab4b6a3ab962e8283",
-      "statement": "Program.cs is the entire composition root: it binds and validates SebastianConfig on start, registers GitHubService, ProviderResolver, Git and JobQueue as singletons, exposes Git and JobQueue as hosted services through those same instances, registers GitHubWebhookProcessor via a factory as the WebhookEventProcessor, and maps exactly two endpoints — GET /health returning \"ok\" and MapGitHubWebhooks with the configured secret (the only inbound integration and the trust boundary).",
+      "statement": "Program.cs is the entire composition root: it expands {env:NAME} placeholders in configuration before binding, binds SebastianConfig with ValidateOnStart plus a singleton ValidateSebastianConfig options validator, registers GitHubService and JobQueue as plain singletons while constructing ProviderResolver and Git through factories, exposes the same Git and JobQueue instances as hosted services, registers the internal GitHubWebhookProcessor through a factory as the WebhookEventProcessor, resolves GitHubService and ProviderResolver eagerly so missing credentials fail at startup, and maps exactly two endpoints — GET /health returning \"ok\" and MapGitHubWebhooks with the configured secret (the only inbound integration and the trust boundary).",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L11-L49",
-          "version": "repo-lines-v1:sha256:55c780b60958294912167d4df7ef03f84d978eb4acaf0f5d177a37bcbb41a099:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://Program.cs#L11-L50",
+          "version": "repo-lines-v1:sha256:7f16f700a2a4ecb103c34bb43bdf95ac71100bc73c264352a988643be8303275:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwMGZhYTcxMDQxZWZjZjdlMzMwNmNjMzYzY2ZjMjQ1NTdmYjM5ODQyOGNhYjczMmNhOTZhMTk5MWJiNWQwMDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0YWYwZmJkMTUwMjlkYTJlMDA5YzA1OTEzY2VkMzQ1MjMxNWVlNzNhY2E3YTQ1MjFmNzUwMzllMmI1MGM0NTkifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L9-L70",
+          "version": "repo-lines-v1:sha256:b7701b83211fd80acd84c38e668c5fe9c523e31baaa01e0e633a7e9ae7b5f6ab:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4M2RiZmRlZDgxMzhmZWMwZmIwMjQzMDUyMjE3YzQwMzViZDJjZDk3ZTM0YTVjODZmYzhkMTkxMmNjODc4OGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MjIyMDFiZWVlODZlNTRlNGQwNzExMjUxY2U5ZjkwM2Y5ZTNiNWMyY2JkMGQ2YzA2OTYzZWY4YzhhMTUxYjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmMTk2NzZiMDViNGI5MGM5MjAzZmViMmUzM2FlM2NlZjdmYjIzY2U4MTI0NDhlNTU5NGNjM2Y3YjUzM2RiZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -157,10 +161,82 @@
           "version": "repo-lines-v1:sha256:4e16b9aa2ad845f6dc3fa1c43708d1383dc683f69b3171595fdf51a1ce1bd916:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3MDY5MmJkNGVkNzRjMjlkZTA1YzY5NWEwNTE3MGE0YzI0YThmMjY2N2Q1NWJjNWZmNzQ0MjU4ZTM3ZWY3ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlOTk2NGRlNjdjMGIzYjM4ZjcwNGEyYmNlYjQwZjQ4MTQ4YTFiZjhlZjI5ZjRhYWMzYjEwZmU0NzJkNTgwM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzNzMxZDU4NDMxMDZhMDZlMmYyMGY4N2FiY2Q5ZjM3OGUzODZhNTE5ZTM1ZTc0MjIyZWExMTI4YjFmOWZkMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NDQ2ZGI5YmNmZWFhYzA3MzA2NTAyY2MxMTQ2NTEzMTBhZDZmMDJhZmUzMTk0Zjk4MWI2MGY4OTI5MDIxMmUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_3c2d950fb85f4339b13c000d1faabe86",
+      "statement": "Single-repository operation is enforced at three layers, not one: Program.cs registers one Git instance built from the host content root, Git.StartAsync throws unless that directory is the git toplevel and origin parses to an owner/repo, and PrepareWorkspaceAsync additionally throws when a job's issue repository does not match the local origin identity.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L25-L29",
+          "version": "repo-lines-v1:sha256:3bb0fb50831233265fbf75d21a4cff6408a42a41a57ccd10199177a288226574:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWYxYzBhMWYyMTViMWM3NDU1NDQyYjRiN2I1Yzk2YzM2MmZlM2RhYWExZjg0YzdkOThlNmM2OGNmYTVkNGE1ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzJkMTdkZWVkZjExOWExNTkwZTYzNzFhMzI5YjhlMjg5Njk5YTc1MzA0MDYzZWUwYjgwZjZjMmVlNzRkYzE3YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzU5OGNkYTZkMjBkOWQ2NjAxZDY1NjViNDI1M2I4ZjFlMmFkMDg2NDI3NDZhYmYyZDNhMTc0ZmJiMjA5MzFmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTFjYmUyMzZiNjNiZjBjZjUxYjk2MzlmNGI5MTgzNWE3YjZjMTU3ODU4ZjkyYjYwZjk1MWE2ZWI1NjQxNDQxOCJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L68-L76",
+          "version": "repo-lines-v1:sha256:712da247a86982f2c86bbdbd1202f86af79b9c18b336672ba4953a640a490545:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FlYTJiZmZkYTMyYTBkMWMxY2FjMDYxZDJiODY5MGJhY2IzOGEzMmQ1NzM1ZTVkNGJiMGNmYWMxOWU3MDkwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTQxYWE1ZDlmNzdmNTY5NTY5OTkxMjg0YmFlZTY0MTU2MjU5YTNkZmZhOWQ5YjBhYzg2NmI2ZmY4MzIwYmE3MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM5MGRkZTRiZjE2NzFhMDdhNDNlNGVjN2QwMTJkNjVhY2M3YWI3YTYwMDA1ODY0OGYyOGFiNWVhZTVjODY0MCJ9"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L40-L54",
+          "version": "repo-lines-v1:sha256:d49009078aab2cac66c9694db993ff8886a75772e91084583bc594cbe995a535:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNDI0M2U1ZDc2YTZkYmFhMjY3NTgzNTQzZTc4NjRkYWEwODkwMGQ1YWY0MzkxOGRhNWM2MTRhMWFlZjBiNGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxZDA2ZDgyMGU2YjljZTY1MGUwODJkYTk2NjlhMWUxNWVkNzliOWU2OGY3MzJmZGRiZjk2Y2EwZWU1ZjQ2YWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9e7c2faa93a14224831bae500f1c0855",
+      "statement": "The process has no ability to commit or push: Git's public surface is limited to inspection (rev-parse, branch, status, rev-list), fetch with prune, ff-only merge, worktree add/prune and status — with no commit or push command — the generated agent prompt forbids running git commands, committing, pushing, or creating pull requests, and the HTTP surface is only GET /health plus the webhook endpoint, so each agent run's product is uncommitted files in its worktree plus a log line.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L49-L50",
+          "version": "repo-lines-v1:sha256:249f502f71258975f361ec1b9f2cf31d4bf21a5457c3cbcc4fab521eafecd282:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L112-L132",
+          "version": "repo-lines-v1:sha256:9b6800bf753ee018f2eebd3dcee9ccd4efcf2bf77182bbcb3f22dc77baa8ffb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmZmNkZTFhY2Y4Mzg5M2RiMDA0NTA2N2QxOTI2MDhhYTE2YmFjMTVmNDQ4MDdkMTJmNThmM2I4YzViOWYyMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMjdjNGIxM2QzMDQzMzE2MWU4NWVmNmIxN2UzYzdmMWYxNmZhNGY1NDc0ODQ4NzBlZWRkYjFhY2NmZTFlNDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxYWRlYWY0M2Y3OGRjNGQyMDQwMDM0NzA4MDk1NDU4ZDA4NzkyNWJlODk4OWU3N2M5ZmY0OWI1YTk1ZTU5MzEifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L56-L116",
+          "version": "repo-lines-v1:sha256:e6bdd02442a39d65ed01a0af08739647cc8b70933750ff559471ec73ea90f748:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxMGQxYjI5MmI0NDM3MGQwNjJjY2U1ZjUwYTBkYTM3M2E1NmM3NzdhNTY0ODVlMDZmOTliZjM2OWNlOTI0NzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjNWE2ZmRmYjk0N2VlMTgyNWE1NWQ3NmM4ZTA5Mjg4YmEwZjUyMDJhOGY5OTRhMzgzYzA2MzZkMzc5MzI1NmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkMTFhNjc1OWUwZWMzMGIwMmNmY2JmNmFmOThmZGU0MDNiZDBiNGFiOGZkYTRiZWI2NjcxYzJmNDVlYTc3YWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b7375296be3546eba06ab26158674c8a",
+      "statement": "Intake both terminalizes and admits work: an issue failing spec validation is commented on and closed, an issue passing validation but lacking ready-for-agent produces no job and no Information-level log line, an accepted issue becomes an ImplementSpec whose TryAdd returning false is only a Debug-level 'already running' note, and a push event instead calls SyncMainAsync inline — so a delivery that 'did nothing' is the normal, silent outcome of several distinct gates.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L19-L33",
+          "version": "repo-lines-v1:sha256:ba0f76edd864f71ce38a2db8b2159144715200e8ede38475b8bafb3c23ea67f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4MDQzYWNkOTY2ZTFkM2ZjMDhhOWY0NDVkMTE2ZDM0Mjc3ZTU1Y2Q3MzQ0N2Y2ZmE3ZDQ5MDVmNTM4MGY3ZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhYzgzNWM5MzQ5ZDI5ZWM3ZjVlMjI5ODE3MTkxZmYzMzA4NjI2Nzg1OWI0NmNkZTc3NDcwNjNkNDNhZTcyNDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZDM4MWRiMWQ0NmJmMzJiMzJiNTliMzQ5NTU1ZmUxNTNhODZkNGUwNzBlYmRmNTkxYmZlZmM0ZjIxY2M1NjcifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L115-L116",
+          "version": "repo-lines-v1:sha256:2afd8447f58141b2a4f89fe04ccf130eda84b3312d3636553d0c90193b4b1425:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTk0MzRkYjc0YmFjMGRiNTU3MzhhODdhYzZkYmRlNDlkMTgwNTYzNWZlMmRiMGY2YzZiMjU4MmFmZTkwOTYxNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzgxMzFiYzQ4OWJiYWRiNWUxZmEwM2RmODczNmQ5MjkzOTEzM2U1Nzg3Njg2ZTg3ZTBlYzkxYmVlYTc0MGMwYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTM4MGRkMWViYTZiMjY3MjFkMDFhNWNkZmQ2Nzc3NjZmZGJjMTUyYWIzMDkwOTg2OWFmNGVjMmE4ZmZlN2ViZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTRhNzU1MTIwNmQ5Nzg3Mjc5NDZmZDI2OTdkNWM5ZWE4YTQ3MTRlZDk5MGI0ODliZDc3N2Q3YTc1NTlmNjE5OSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L63-L101",
+          "version": "repo-lines-v1:sha256:d9618ab57a8bd878cdff159523af6b21813764492c77731075b38fe2e6847dcc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDBjMjY1OWJjYTY3NmE3MmJiODFlNzU0MTAwZTMxYjhhYmY3MjExN2U5YWUxMmRiMDU2OTQ4ZGQ0YmQ5OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OTU2OTA4YmQzOTA5MjMzNDA5ZjdiZWU3ZDhhNWIzODQ0OGY5YjA0M2E1ZDA4ZWIxZTg5MWQ0ZDQyNDFlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a9e75d38022947d1a4f8d4b26d1333a9",
+      "statement": "Sebastian has no dashboard, no database, and no scheduler: the only durable state between deliveries is the git clone (including the untracked .sebastian/workspaces folder used for issue worktrees) plus what lives in GitHub (issues, labels, comments), while in-flight work exists only in the in-memory unbounded JobQueue channel.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L11-L52",
+          "version": "repo-lines-v1:sha256:94cf220a8fd8099f1bdd03c3d8f530f7faaf70776dfcf985b10632936d9fcfea:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L88-L93",
+          "version": "repo-lines-v1:sha256:49b04e4535d36d107b0e615813d4da282071c4d74d3669599fc3c8742245b37d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmQxZjVhYTE3NjYzYjQ2ZmI0OGRhMjBkNWQ5MmI3MjU2ZjFjNjc2OWYyOWMzOTViODJmMjQyNGIyYjk3ZmRkMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGIxYzZiOWYwYTA0ZWJmMzIwNDBlMzIwYmFlMGZjNDFjMzE2NzZhZGFhN2I3ZDI2YTdkMGZhNmY4N2NiOGRmNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGNiNDYyY2U2NDU1MjQ3ODI5OTM2M2FkYWIzNThhNTRmODlhZGRhMWU0ZmQ0YWIyYTRhOTZjM2M5NGYwNmMzZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmJiOTgzMGQ5Yjc5NmE1MzI3NmYxZWFjNzIwNTFjNmE3MzBlMzg0ZjgyYTJjYWVhNjg1MTMzMTYzZGI1NDA2NSJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L14-L16",
+          "version": "repo-lines-v1:sha256:c77cc03b11ad47323a07db99282d8037274f6b2eea8b34fa3af1267bde60bb3c:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzU1Njk5YTJmOTJkZmU4NzlmN2U4NzU0NThhM2UzNWZmOTk5NjY5OThlNGZhNTU4YTU5OTUzMWU3N2QzZDQzNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ0Yjc1OGUyZWRhNjVmZDE1YzU5MDc3ZDk1MmNhMTZmOGU4OWRjMjE3YjgxOGNjOWJkMThjZTUwNmU2NTQ0MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODhlZDdiYTY2NzUwMjlmZjA4MWM1M2FiNWJjNGFlODQ0N2YzOTg2NjM4ZGE5NWY5ZGM0M2RhNDIyNDc0ZTY1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTA2ZDdiM2NlY2U5YjhhZmJjNjNlY2I1MzZlZmI5N2IyNWRlODZjYmEzMTRhMWJiNzcwY2RmNmRkZTg1ZjM2NiJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

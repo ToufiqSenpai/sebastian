@@ -3,9 +3,6 @@ type: git-workspace-model
 title: Git Mirror and Worktree Model
 description: How Sebastian pins itself to one repository — the content-root-equals-toplevel invariant, RepositoryIdentity parsing of origin, local main as a read-only mirror fast-forwarded to origin/main at startup (10s bound) and on push webhooks, the FindMirrorProblemAsync guards and their exact messages, the static PrepareLock, and per-issue worktrees under .sebastian/workspaces that are reused rather than recreated.
 tags: [git, worktree, mirror, invariants, concurrency, repository-identity, workspace-lifecycle]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-ea70eb6c045047448e446296
     resource: repo://.gitignore
@@ -27,7 +24,10 @@ sources:
     resource: repo://tests/Sebastian.Tests/Libs/RepositoryIdentityTests.cs
   - id: openwiki-source-cebf243b519f1af286c1277d
     resource: repo://tests/Sebastian.Tests/TestRepository.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Git Mirror and Worktree Model
@@ -55,7 +55,7 @@ Everything below follows from one fact: there is a single repository, a single l
 
 Comparison is done by `PathEquals`, which full-paths and trims trailing separators both sides and compares `OrdinalIgnoreCase` only on Windows. The invariant is checked with `CancellationToken.None`, deliberately: this is not cancellable startup work.
 
-The result is stored in `Git.Repository` (`RepositoryIdentity?`) and logged as `Using repository {Owner}/{Repository} on main`. That property is the *only* thing that later proves the clone's identity, which is why `PrepareWorkspaceAsync` treats a null `Repository` as "not started yet" rather than as an empty value.
+The result is stored in `Git.Repository` (`RepositoryIdentity?`) and logged as `Using repository {Owner}/{Repository} on main`. That property is the *only* thing that later proves the clone's identity, and it is assigned once, at the end of `EnsureRepositoryAsync` — so `PrepareWorkspaceAsync` treats a null `Repository` as "the hosted service has not completed its start" rather than as an empty value.
 
 ### RepositoryIdentity: the smallest possible remote parser
 
@@ -67,7 +67,7 @@ The result is stored in `Git.Repository` (`RepositoryIdentity?`) and logged as `
 4. Otherwise treat it as scp-like: everything after the first `:`; no `:` at all → `null`.
 5. Split on `/`, drop empty entries, and take the last two segments as owner and name; fewer than two segments → `null`.
 
-So `https://github.com/owner/repo.git`, `https://github.com/owner/repo`, `git@github.com:owner/repo.git`, and `ssh://git@github.com/owner/repo.git` all yield `owner`/`repo`, while `""`, `not-a-remote`, and `https://github.com/only-owner` yield `null`. `RepositoryIdentityTests` pins exactly those seven cases as a `[Theory]`. Deeper paths collapse to the last two segments, which is what makes `ssh://host/group/sub/repo.git` behave like `sub/repo` — good enough for the one repo this process serves, and the reason `Program.cs` can validate `owner/repository` on an issue event at all.
+So `https://github.com/owner/repo.git`, `https://github.com/owner/repo`, `git@github.com:owner/repo.git`, and `ssh://git@github.com/owner/repo.git` all yield `owner`/`repo`, while `""`, `not-a-remote`, and `https://github.com/only-owner` yield `null`. `RepositoryIdentityTests` pins exactly those seven cases as two `[Theory]`s (four accepted shapes, three rejected). Deeper paths collapse to the last two segments, which is what makes `ssh://host/group/sub/repo.git` behave like `sub/repo` — good enough for the one repo this process serves, and the reason `Program.cs` can validate `owner/repository` on an issue event at all.
 
 ## Mirror sync: fetch, check, count, fast-forward
 
@@ -135,7 +135,7 @@ The same function — `FindMirrorProblemAsync` — is consumed by two callers th
 Why the sync path swallows and the prepare path throws:
 
 - **The sync path runs on the critical path of things that must not fail.** Startup must complete even when the machine is offline, the remote is unreachable, or a developer left `main` dirty — otherwise a pushed commit that arrives while the host was down would leave the service unable to boot. The push webhook is the same: the delivery must be acknowledged even if the fetch times out or the fast-forward is rejected, and the `// shortcut:` comment on the ten-second bound states the accepted consequence plainly (*"a missed push webhook must not prevent the app from starting"*). `OperationCanceledException` is caught separately and logged at Debug because the 10-second timeout firing is an expected outcome, not an incident — and the runner already killed the child process tree before rethrowing.
-- **The prepare path runs immediately before an agent starts writing code.** Starting an agent on a base that is not the reviewed `main` silently corrupts the only artifact the system produces. There is no safe degraded mode, so the job fails, `JobQueue` logs `Job {Key} failed`, and the in-flight key is released — another qualifying issue event is required to retry. This is also why the mirror check is repeated per job instead of trusting the startup sync or the last push webhook: the mirror may have been left dirty at any point in between.
+- **The prepare path runs immediately before an agent starts writing code.** Starting an agent on a base that is not the reviewed `main` silently corrupts the only artifact the system produces. There is no safe degraded mode, so the job fails, `JobQueue` logs `Job {Key} failed` at Error, and the in-flight key is released — another qualifying issue event is required to retry. This is also why the mirror check is repeated per job instead of trusting the startup sync or the last push webhook: the mirror may have been left dirty at any point in between.
 
 The practical rule: **a mirror problem is a warning for the intake path and a hard error for the agent path.** See [Failure Handling](../operations/failure-handling.md) for how both land in logs and [Job Queue and Execution Semantics](job-queue.md) for what happens to the job after the throw.
 
@@ -150,7 +150,7 @@ The practical rule: **a mirror problem is a warning for the intake path and a ha
 private static readonly SemaphoreSlim PrepareLock = new(1, 1);
 ```
 
-`PrepareLock` is `static`, so it is shared by every `ImplementSpec` instance across every DI scope, not per job. With `JobQueue` running up to ten jobs concurrently, this is what guarantees that no two jobs fetch, fast-forward, or create a worktree at the same time. It is acquired first and released in a `finally`, and it deliberately covers the *entire* preparation — including the fetch — not just the worktree creation: fetching rewrites `origin/main`, and a fast-forward rewrites `main`, so those two must never interleave across jobs.
+`PrepareLock` is `static`, so it is shared by every `ImplementSpec` instance across every DI scope, not per job. `JobQueue` runs up to `MaxConcurrentJobs = 10` jobs concurrently through `Parallel.ForEachAsync`, so this is what guarantees that no two jobs fetch, fast-forward, or create a worktree at the same time. It is acquired first and released in a `finally`, and it deliberately covers the *entire* preparation — including the fetch — not just the worktree creation: fetching rewrites `origin/main`, and a fast-forward rewrites `main`, so those two must never interleave across jobs.
 
 The semaphore is **not** a repository-wide git lock. Once `PrepareWorkspaceAsync` returns, the lock is free, and the agent works entirely inside its own worktree, which git keeps on a separate branch with a separate index. Two agents can therefore edit and build simultaneously; only the mirror operations are serialized.
 
@@ -160,9 +160,9 @@ The semaphore is **not** a repository-wide git lock. Once `PrepareWorkspaceAsync
 flowchart TD
     A["ImplementSpec.RunAsync calls PrepareWorkspaceAsync"] --> B["await PrepareLock"]
     B --> C{"git.Repository is set"}
-    C -->|no| X1["throw because the Git hosted service has not started"]
+    C -->|no| X1["throw: Git hosted service has not started"]
     C -->|yes| D{"owner and repository match origin"}
-    D -->|no| X2["throw because the issue repository does not match origin"]
+    D -->|no| X2["throw: issue repository does not match origin"]
     D -->|yes| E["FetchAsync origin"]
     E --> F{"FindMirrorProblemAsync returns a reason"}
     F -->|reason| X3["throw with the mirror problem message"]
@@ -236,7 +236,7 @@ The last row is the operational consequence of "the pipeline never commits". The
 
 This is a short list because the boundary is deliberate, and each omission is repeated in another layer:
 
-- **No commit, no push, no pull request, no merge to a remote.** `Git` exposes `fetch`, `merge --ff-only`, `worktree add/prune`, `status`, `rev-parse`, `rev-list`, `remote get-url`, and `branch --show-current` — that is the entire vocabulary. There is no `commit`, `push`, or `checkout` verb anywhere in the class, and `ImplementSpec` never adds one; the successful run ends at a log line plus `GetStatusAsync`. The gap against the PRD is tracked in [Product Intent vs. Implemented Behavior](product-intent-and-gaps.md), not as missing wiring.
+- **No commit, no push, no pull request, no merge to a remote.** `Git` exposes `fetch`, `merge --ff-only`, `worktree add/prune`, `status`, `rev-parse`, `rev-list`, `remote get-url`, and `branch --show-current` — that is the entire vocabulary. There is no `commit`, `push`, or `checkout` verb anywhere in the class, and `ImplementSpec` never adds one; the successful run ends at a log line plus `GetStatusAsync`. That absence is the architectural guarantee, not a configuration flag: no caller can reach a publishing operation because no such operation exists to call. The gap against the PRD is tracked in [Product Intent vs. Implemented Behavior](product-intent-and-gaps.md), not as missing wiring.
 - **No conflict resolution.** `--ff-only` is the only merge form used. Divergence is handled by refusing to proceed (guard message) or by failing the merge (warning), never by picking sides.
 - **No branch management beyond the issue branch.** Nothing deletes `sebastian/issue-<n>` when an issue closes, and nothing rebases an existing worktree onto newer `main` — a reused worktree stays on the tree it had.
 - **No interaction.** The runner sets `GIT_TERMINAL_PROMPT=0`, so an SSH or credential prompt fails fast instead of hanging a request; and `RunAsync` kills the whole process tree on cancellation before rethrowing the `OperationCanceledException`.

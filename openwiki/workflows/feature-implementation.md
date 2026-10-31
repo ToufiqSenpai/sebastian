@@ -3,9 +3,6 @@ type: workflow-trace
 title: "Workflow: Feature Issue to Agent Workspace"
 description: The end-to-end trace from a GitHub issues delivery to a logged git status — the action/state/label guards, the seven-section spec gate and its close-as-not_planned branch, the enqueue-or-suppress decision on the owner/repo#issue key, PrepareWorkspace under the static PrepareLock, and the agent session that leaves only uncommitted work in .sebastian/workspaces.
 tags: [workflow, end-to-end, webhooks, job-queue, git-worktree, agent, concurrency, state]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-b5cf04fcd9c2585d8cde1706
     resource: repo://src/Agent/ImplementSpec.cs
@@ -21,7 +18,10 @@ sources:
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
   - id: openwiki-source-cebf243b519f1af286c1277d
     resource: repo://tests/Sebastian.Tests/TestRepository.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-10-31T14:27:15.898Z
 ---
 
 # Workflow: Feature Issue to Agent Workspace
@@ -81,7 +81,7 @@ sequenceDiagram
     end
 ```
 
-The whole workflow in one sequence: the four intake outcomes, and — for the one outcome that creates work — the queue admission, the serialized workspace preparation, the agent session, and the terminal log line.
+The whole workflow in one sequence: the four intake outcomes, and — for the one outcome that creates work — the queue admission, the serialized workspace preparation, the agent session, and the terminal log line. The full set of terminal dispositions, with what an operator sees for each, is tabulated in [Every disposition of one delivery](#every-disposition-of-one-delivery).
 
 ## State that carries forward, hop by hop
 
@@ -218,6 +218,52 @@ What the workflow does *not* do at the end is the defining property:
 - **No retry and no record of what was tried.** The key is released and the slot frees; the next delivery for the issue starts a new run against the same directory.
 
 That gap — a fully implemented workspace with no path to review — is tracked as product intent, not as missing wiring: see [Product Intent vs. Implemented Behavior](../concepts/product-intent-and-gaps.md).
+
+## Every disposition of one delivery
+
+A single issues delivery ends in exactly one of seven dispositions. They are mutually exclusive and only the last two create anything; the differences between them are entirely a question of *which* guard, gate, or key returned first, and that is what determines what an operator sees.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Intake: issues delivery arrives
+    Intake --> Dropped: action not opened labeled edited reopened
+    Intake --> Dropped: issue closed or no feature label
+    Intake --> Dropped: repository or owner or name null
+    Intake --> SpecGate: guards pass
+    SpecGate --> ClosedInvalid: one or more sections missing
+    SpecGate --> Dormant: spec complete and no ready-for-agent label
+    SpecGate --> Admission: spec complete with ready-for-agent
+    Admission --> Deduped: key already in flight
+    Admission --> Queued: key admitted
+    Queued --> Prepared: fetch mirror check fast-forward under PrepareLock
+    Prepared --> Succeeded: agent run then git status then LogCompleted
+    Prepared --> Failed: preparation throws
+    Succeeded --> Failed: agent run or git status throws
+    Dropped --> [*]
+    ClosedInvalid --> [*]
+    Dormant --> [*]
+    Deduped --> [*]
+    Failed --> [*]
+    Succeeded --> [*]
+    Dormant --> Intake: human applies ready-for-agent
+    ClosedInvalid --> Intake: reopened or relabeled then edited
+```
+
+The branch structure that decides one delivery's fate: three silent drops, one GitHub write, one dormant wait, one dedupe, and the admitted path that can still fail before or after the agent runs.
+
+| Disposition | Trigger, in guard order | GitHub-visible effect | Log evidence (default verbosity) |
+| --- | --- | --- | --- |
+| **Dropped silently** | action not in the four; or `State != Open`; or no `feature` label; or `Repository`/`Owner.Login`/`Name` null | none — issue untouched | only `Webhook IssuesEvent (issues)` from `ProcessWebhookAsync` (Information) |
+| **Closed as invalid** | a required section is empty — the write branch itself, not a guard | comment `Closed: the spec is missing required sections: …`, then `state = closed`, `state_reason = not_planned` | `Webhook IssuesEvent (issues)` plus Debug `Issue {Repository}#{Number} closed; missing spec sections: {sections}` |
+| **Dormant** | spec complete but no `ready-for-agent` label | none — issue stays open and labeled `feature` | `Webhook IssuesEvent (issues)` only |
+| **Deduped** | `JobQueue.TryAdd` returned `false` (same key in flight, or writer completed during shutdown) | none — the suppressed delivery is invisible on the issue | `Webhook IssuesEvent (issues)` plus Debug `Implementation already running for {Repository}#{Number}` |
+| **Queued, then failed** | key admitted but preparation, the agent run, or the final `git status` threw | none — no retry, no comment, no relabel | Information `Started implementation for …` then Error `Job {Key} failed`; **no** `Implementation completed` |
+| **Queued, then cancelled** | shutdown while the job ran | none | `Started implementation for …` and then neither of the other two lines |
+| **Run** | job completed | none — issue stays open and still labeled `ready-for-agent` | `Started implementation for …` then Information `Implementation completed for … Git status: … Agent response: …` |
+
+Two rows dominate debugging. **Dropped silently** and **Dormant** produce no line beyond the generic delivery log, and they are indistinguishable there — to tell them apart you have to look at the issue (closed? labeled `feature`? labeled `ready-for-agent`?) because the guards are not instrumented per-condition. **Deduped** is the only disposition with a line of its own, and that line is `Debug`, so at default verbosity it too looks like a silent drop. The practical rule: an issue that visibly carries both labels and never produced `Started implementation` was either dropped by a guard or deduped, and enabling `Debug` for `Sebastian.Webhooks` separates the two.
+
+Nothing in the process records a count of deliveries the workflow considered and declined, so none of these dispositions is alertable — only log lines and the state of the issue are evidence that a delivery happened at all.
 
 ## Failure branches, briefly
 

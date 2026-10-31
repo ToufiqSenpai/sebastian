@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:736547d9b8e3cd3856249c20324f1706f7d8f175df2b9ed626ef9c59f2b0a30c",
+  "pageVersion": "sha256:424819f1537f34c39ed4e0603050a4d22e5a8897517a1b6f316378a5e5275cbf",
   "claims": [
     {
       "id": "claim_b1071aaa4f6e45db92b21a886af00487",
@@ -145,10 +145,42 @@
           "version": "repo-lines-v1:sha256:a522e16ab9af19bcbb9a97b57ea73b0c743c224180fbb244109aa01955c700cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjN2UyNDVkMTlkZjkzYTJlZTJlMTMyZGUyYjQ1NTE5MmM5NzcyYjc5ZDRhYmRiMmEwZjFlNGVmY2ZjYmQxNjRiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3M2ZiYWZkNDY0ODUwNjg0MTNkYzNhMDllNDJmYjdkNmI4MzAzMTc0OTJhZjM0ZDczMmFiYmVhZDc2ZWM1MmUwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjNjc4Mjc0MDMxZGM2ODk1MDgwNzAyMDgyNTMzZDQ5NWZlM2JhMGIxOWQ0ZmZiZTMyYzg0Yjc5YmE3OTAwNDgyIn0"
         }
       ]
+    },
+    {
+      "id": "claim_d13e194f6737497f8d1f92f8c5589fc1",
+      "statement": "Because the spec gate records no delivery or comment identifiers, a repeated or redelivered invalid-spec event posts the `Closed: the spec is missing required sections: …` comment again and re-closes an already-closed issue instead of being deduplicated.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L38-L49",
+          "version": "repo-lines-v1:sha256:d61dcb3426034f20371d95425349bd4d0da39401ae794d4cab86010d734a08eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMmY1ZDU3MjE3Zjg0MDAxNDYxOTI0ZTY0YmQxOGM3YWQwNTdmMzNjZDMyZmMzNTNhMzdkZGUyODQyZGYwYTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1YmVhNDk1NmY1ZTAxODlkOGNhZDA0NWM1OTY2NmM3MmI0MjNhZTI4OTZhMDQ4YjU2NDgxMjQwOTE0ZWExMDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiOTAwMzZmY2M3ZGQ5MWYyYWM1Y2ViYmY4NDQ3ZjY0MjQ1ZGU1NWEyYTFlMDlhY2I2OWRkYmZmZTgzNmVhMjUifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L61-L82",
+          "version": "repo-lines-v1:sha256:78635271a4a7118164476e63f1b054e79fb58ede914f997d88cd16bcc9b6b853:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3YTMwNjdkNzlkOGE4Yjg3NGJiNDdhMmUyZGY2YWE5MmQ4OWQ1ZmM4NWNiMDIxMmRlNjQxOGFhZGRiNTk4MDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0ZDA4ZDNkZjhiNTkyNmI1ZmQ2ZTllZjJkODIwOGQzNWFmYmZmN2Q3NDJhNGM3MzIzN2Q0NzNiMmJmYWQ4ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMjQ5YTMxYmRjN2UyMWU0OGFjZTA2YjI3OTczY2YyM2Y1OGIwNzVkODU2MmQ0YzhhNGQ1ODRmYmQwNmE2YmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4db15ebe5d0e4942af5d780a2dd2b96c",
+      "statement": "The close path is terminal from Sebastian's side: once the issue is closed as not_planned nothing in the process reopens it, and a later `edited` delivery on the closed issue returns at the `IssueState.Open` guard, so only a human re-open plus an edit (or a re-label) produces a delivery that re-enters validation.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L54-L69",
+          "version": "repo-lines-v1:sha256:aaa1a90091654b124874d660e3879e50f4ceb9302da726deeff522dd808f6ba8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5NzViNWU5NjdiYTI2MWNkYzMwYTg1MTNmOTIzNGVkMjA5ZDUzYmI3MjA4ZmNhNjdmMzU3MGM2ODkyMWEyODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxMjBjMTA3YjIwN2VhOTJkYzVjYjYzMzYzMTgzOWU0MzNjMWI4NWM5MWQ5YTE4MTNiZjIzMWU0NzAyZTM1ZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L46-L49",
+          "version": "repo-lines-v1:sha256:c703b0e358b50583e2b646fe21cd480b9ce882d931d2a8865a9476c0e1e9e653:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODc5YjM5M2IwNmRmZTgwZTE4Y2RlZmYyNzI3NDFjNjM5MDg4MmI1NDM3NGRhMjg4MGQ3YTBiNGZjMjU5OWZhNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTZiMDQ0OTE0Njk3MjJlODM2M2E5NGU0MDQ0NTM4ZTAxM2EyYTIxN2UzNmIxZTU2OGJhNjBhY2I3YjRjOGYyZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjMzOGZkMjgxZjEwNjQ3MjE4NDNkMzRmMDc4Y2NjMmM0Y2M2OTgzZTVjODJiZDgyYmVmOTkyNjFlZDA2Y2YyMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGI5MDAzNmZjYzdkZDkxZjJhYzVjZWJiZjg0NDdmNjQyNDVkZTU1YTJhMWUwOWFjYjY5ZGRiZmZlODM2ZWEyNSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L63-L82",
+          "version": "repo-lines-v1:sha256:61fd2ffce9308b6d2d577af4347ee4a46367ea92c77f5642f2a54f7bdf11d157:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZDBjMjY1OWJjYTY3NmE3MmJiODFlNzU0MTAwZTMxYjhhYmY3MjExN2U5YWUxMmRiMDU2OTQ4ZGQ0YmQ5OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OTU2OTA4YmQzOTA5MjMzNDA5ZjdiZWU3ZDhhNWIzODQ0OGY5YjA0M2E1ZDA4ZWIxZTg5MWQ0ZDQyNDFlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiMjQ5YTMxYmRjN2UyMWU0OGFjZTA2YjI3OTczY2YyM2Y1OGIwNzVkODU2MmQ0YzhhNGQ1ODRmYmQwNmE2YmMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

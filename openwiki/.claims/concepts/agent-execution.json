@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a0e91053e7c9f3e6854e11b6d4a7f97cce57b79996d4a39998c4da4baf3adbbe",
+  "pageVersion": "sha256:4d986002ae10b8349fbc8e38f5e02e7b6614aa6ea521cfb793a2139c4d1c7a06",
   "claims": [
     {
       "id": "claim_ff0c0f9bef144353a5e09fe4114b59bc",
@@ -130,15 +130,15 @@
     },
     {
       "id": "claim_e9e4502bf47d401e88753eddd8f7005e",
-      "statement": "A run publishes no artifacts: after RunAsync, ImplementSpec reads the worktree's short git status and emits one LogCompleted information message interpolating repository, issue number, worktree path, status, and the agent's full response text; there is no commit, push, pull request, or written output, so the uncommitted worktree is the only result.",
+      "statement": "A run publishes no artifacts and no git objects: after the agent returns, ImplementSpec reads the worktree's short git status and emits one LogCompleted information message interpolating repository, issue number, worktree path, status, and the agent's full response text; the Git layer exposes no commit or push verb and nothing creates a pull request, so the uncommitted worktree files plus that log line are the only product of a successful run.",
       "evidence": [
         {
           "resource": "repo://src/Agent/ImplementSpec.cs#L134-L135",
           "version": "repo-lines-v1:sha256:ea6cd1b17c509cf336822a997c7b7c67972107c332c584b8e6ebd246be79eb58:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODY3ODI1MTg0ZjI1YjM4YzEwODcyMjE5YzBjYTQ5NmM3YzVkZDk1ZmExMDk2ODc5N2Q1NThhZjcyZjk2Y2FlOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjMwYTJjYjgzZjQ2Njg1MDQyOTFmNjJjY2YwNDhmZWYwOGU5Y2NkYjNiZTc3YjU3MGJhMDEyNzI1ODlkOWQ3ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGJjNzI5ZTFlZTc1ZmRlNjM4ZGUyNmU3Yjg0NTI0NDJlYTIyYTQwYWFlZmYzNjQxZDRkMzc1MTlmMjIzMWVkMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
         },
         {
-          "resource": "repo://src/Agent/ImplementSpec.cs#L50-L51",
-          "version": "repo-lines-v1:sha256:32d5e46dd9e3d1c117e051c9962cec18c472fd08dbb9c983b249cbbdd358b720:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDE0NzZkYjEzMDAzN2NjMmFjZGRlNTQ1MDFkNmQ5OTY5ZTE0NmZlMDA0Y2ZjZWQxMmJmY2ZmYTExOGY5NGIzYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzk3MjRlNGNiODE4YWI1OWFhZjYzNDk2NjI0ZDQ3YWNhNzdjNmM0NDZiYzdjYmE3ZmRiMTExN2RmM2IxN2JiNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzQ2ZWFkNjEyNDg3OGYyOTJmMTQxZjQxNGIwNzQzNjIwZjBiNzQ4NWVmZmNkYzIwMTIwNzc1NmY4N2IxY2RkNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU0NDRkNWExYzk4YWExNWM2ZDg0YmI1MWMyYTMxYTJhYmI2MDM2MzhhY2U4MGNmZTc0MjYwYjgyYjNiMzQxNSJ9"
+          "resource": "repo://src/Agent/ImplementSpec.cs#L45-L51",
+          "version": "repo-lines-v1:sha256:5ddd2ce21e6b9c0f6635020f0322b275dfb69f8f2791c402e9d1e98c37582547:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2ViYTZiOTg5NGQ1YTc5MjJlYzE3ZmI3N2RjYzc4YzMyYTY1OTBiMDdlNzg5OWJjNTk0NDEyYmFhYTBmMWNlOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzk3MjRlNGNiODE4YWI1OWFhZjYzNDk2NjI0ZDQ3YWNhNzdjNmM0NDZiYzdjYmE3ZmRiMTExN2RmM2IxN2JiNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiY2NmYTRmMDBlOWVlNjhkNjE0YzE2NzA3OTYxZDdkNDIzZmEzMDAzNTkxMDFiODhmMjVkODMwYjVlMjUwMjNmMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU0NDRkNWExYzk4YWExNWM2ZDg0YmI1MWMyYTMxYTJhYmI2MDM2MzhhY2U4MGNmZTc0MjYwYjgyYjNiMzQxNSJ9"
         },
         {
           "resource": "repo://src/Libs/Git.cs#L95-L102",
@@ -209,6 +209,6 @@
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

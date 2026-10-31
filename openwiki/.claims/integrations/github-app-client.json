@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:48b5322ba663eff4c2b58d96adb2758c55ccbf9d6576a61ef251708fe53d5e4d",
+  "pageVersion": "sha256:f2cad9a7ca16e7644b9fd0e8561c1369677200887912b443ca3648e46d9169e9",
   "claims": [
     {
       "id": "claim_da6b629d75284e799e46dffe995d0446",
@@ -51,7 +51,7 @@
       "statement": "Program.cs resolves GitHubService eagerly right after Build() specifically so constructor-time credential failures abort startup, which converts an unreadable or invalid PEM into a deployment failure; because no network call is made during construction, a well-formed but mismatched AppId/InstallationId/key set instead fails on the first write during a webhook request.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L40-L44",
+          "resource": "repo://Program.cs#L43-L47",
           "version": "repo-lines-v1:sha256:b36b1b1c86bb9d607d883845b284904cc9c67fc6b38a5dc26ebd25b756eb0b42:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI2YmU0M2EwZWEyMWEyODA3YWZhMzI2MDM4MDQ0MGM1YzM0MTU5NTY5ZWMzMGRlYmZkYzlkM2QwOGIyZGE1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
         },
         {
@@ -62,15 +62,19 @@
     },
     {
       "id": "claim_c9de5f893b934188a44532d8a2ac202a",
-      "statement": "GitHubService is registered as a root singleton implementing IDisposable, so one RSA key and one HTTP request adapter serve every request for the process lifetime (configuration and key rotation require a restart), and the host disposes it at shutdown in the order adapter first, then private key.",
+      "statement": "GitHubService is registered as a root singleton implementing IDisposable, so one RSA key and one HTTP request adapter serve every request for the process lifetime (configuration and key rotation require a restart), and the host disposes it at shutdown in the order adapter first, then private key; GitHubWebhookProcessor is the only consumer, since background jobs get per-job scopes off the same root provider but ImplementSpec and JobQueue never resolve the client.",
       "evidence": [
         {
           "resource": "repo://Program.cs#L19-L19",
-          "version": "repo-lines-v1:sha256:19cc96cae38f7f22b6eea8ad1addeed2ba13d6aa828744c6a5cd381e6ac60b0f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTljYzk2Y2FlMzhmN2YyMmI2ZWVhOGFkMWFkZGVlZDJiYTEzZDZhYTgyODc0NGM2YTVjZDM4MWU2YWM2MGIwZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTljYzk2Y2FlMzhmN2YyMmI2ZWVhOGFkMWFkZGVlZDJiYTEzZDZhYTgyODc0NGM2YTVjZDM4MWU2YWM2MGIwZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjlkMDc4YjcwOWZmOGE1NzQ4NTJjNjFiNDBhMjYxYTBhYWEyMDlhMjIwYzIzNWExMjlhNjhlYWE1MzAwMGUyZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTFkMGM4ODA2YWU1OWZiMzFmZDg1MGIzMWQwNmU5MDBmNmQwNmY4N2MzNTNjYmUyZDA2Y2YwZGE0NTM0OGI5MSJ9"
+          "version": "repo-lines-v1:sha256:cbf756937e32a815f4cf403943e726688c10032a8086c6ce3c5a081fcca65651:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JmNzU2OTM3ZTMyYTgxNWY0Y2Y0MDM5NDNlNzI2Njg4YzEwMDMyYTgwODZjNmNlM2M1YTA4MWZjY2E2NTY1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2JmNzU2OTM3ZTMyYTgxNWY0Y2Y0MDM5NDNlNzI2Njg4YzEwMDMyYTgwODZjNmNlM2M1YTA4MWZjY2E2NTY1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTc1MDU3ZGY5NjdjM2QzNGUyODA3ZjEwNzg0NWY2NTllMTZhYmQ2NWEwNGQ3MDNkMzA0ZjgyNWNhYjMzMWZhZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmQ2MDdhZTg1Yjg2NjM2NDE3ZjNkNDM1MDEzMGVlZjYyZWYwOGY4ZTBiYWQ5ZDNiMjhlZDA1YTkyN2M5N2NlNSJ9"
         },
         {
           "resource": "repo://src/GitHub/GitHubService.cs#L71-L76",
           "version": "repo-lines-v1:sha256:fbd5caed18584b11ee10fcff20b85b948339667dd83bc4fc4af6534039dd7d14:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY4MmM0NjgwYTAxNGRkN2VjNzU3YzIyNTY4ZjhjOTFkYzVhOGE2ZGZlMjk4OTU1NGE3MGY3MzUyMDg1NTVlMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDEyMGMxMDdiMjA3ZWE5MmRjNWNiNjMzNjMxODM5ZTQzM2MxYjg1YzkxZDlhMTgxM2JmMjMxZTQ3MDJlMzVkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L55-L61",
+          "version": "repo-lines-v1:sha256:fcdac0c70d9309b2cfcf8695381dbc9fb449ecc75ac5d4212e5525cc38f911a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWI1YmM0MTgzYzkxYTY3ZjA0MGM3YzFmOTBjNWE2MDViMTNhNDg3N2Y4NGVhMWMwOTVhMzk1NTY1ZjUwZjg0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTdhNWZmYTNlMDk1ZGYwNWI2YjMzMzM4NzFhYmExYzFiM2UyNWFiM2RiZjFkNDkyZjE1NGMyY2MyYjEyMmY1NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzg0OTliMGUxNjAxM2ZjN2JlODYzNGNlOGI0ZjlhYTI4MDk5OTI0OWI4ZWE4MDMzNjQzNTYwZmIwZjhjN2Q3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGVmNWI2ODMyYjFmMWQxNTEwYTdiZGEzODU5ZDg1ZjJlYzBmMzVhZWRkNWNhMzg5ZGMwOGM5OTRiOTdiOTBjMiJ9"
         }
       ]
     },
@@ -132,8 +136,12 @@
     },
     {
       "id": "claim_f90ce0f99c314ff8a2d2e9eb0c85fc60",
-      "statement": "Neither GitHubService nor its two write methods are covered by the test suite — the only test touching GitHubConfig asserts that the generated validator rejects a blank API key — so the not_planned close reason, the comment-then-close ordering, and the absence of retry rest on review alone and need manual verification against a real installation when changed.",
+      "statement": "Neither GitHubService nor its two write methods are covered by the test suite — its only GitHubConfig reference is a blank-API-key validation test in ProviderResolverTests — even though Sebastian.csproj declares InternalsVisibleTo for Sebastian.Tests, so the not_planned close reason, the comment-then-close ordering, and the absence of retry rest on review alone and need manual verification against a real installation when changed.",
       "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L25-L27",
+          "version": "repo-lines-v1:sha256:3159a2bd30178eac04b8fdc6a1064ad5ec21ce71fe5870c124ee79dcecf8af82:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2NiZWJmYjQ2ZjEyOTkxYWU0ODhlZWRiMzQxNDAyOWFiMWY5ODA3Y2RjMDllZjA2ZjNkMTBhYzk2YjI4NmJlMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2RkYzE1OWJiNTk3NDk4ZjUyMmU3OTM1YzgxMjE3YmVlMjc5NzI4NmUwM2Q2ZGVhZDZhZTFkNTI2MjVlN2U2MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2Q4NWJjOWE0NDYzNzE4ZDViMjE3MTkzMjA1YmU2ZmFkZDc0MTA2OTllNjBmMDA0MDE1MDllOWJlM2RlNjU1MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWNhZWQxNmFkMzlmMDEwMzZhMWY5NTI2NTZiOGJmMmUyNDdhMjI2NmY1NWM2OGVmNTAyOTA1OTRiZTU3ODEzOSJ9"
+        },
         {
           "resource": "repo://src/GitHub/GitHubService.cs#L40-L69",
           "version": "repo-lines-v1:sha256:0d35813228612814134624f4040cb51d61aac022ec123b62b02fe07731be9c3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MGZmZDZhYjNmMDllMzA4MDYxMDdhMjk2NzJjZjM0ODYwOTcyNmU1NzMzYjRlNzFmODJhZDJmNjYzMDA4MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwYjYxMmQ1NDg1NTgyNjZiZmI0NzY0M2ZiMDkxZDQ4Zjk1ZDA0MWIyY2U2YmY1NWQ2ZTI3MWYwMWJiZGFjYWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
@@ -143,10 +151,28 @@
           "version": "repo-lines-v1:sha256:f0d95df3cd933a9f96bb529be2f42da3b7f45491596c0dde39ca3c0426e7ac4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM4YjljODZlNjQxNmU1NGUyMTc1YjY1ZjA0MzQ4NzI2ZmYwOTgxNzAyOGU3ZDE4ZWU5NjlkNTUzYzhkYmVjOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhMDU4MDRmYmQ4Njg5NzU4YjA1ZDM1MmQ2YzI3MzkzYjE4N2UyNmJiODliNTNjMDQ5YTA0N2MyNWUwMTc5ZjUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_cbebee2db7da46498021905e61a48748",
+      "statement": "Adding a third GitHub write is an architectural change: it requires new methods and payload types in GitHubService, a new or extended gate plus call site in GitHubWebhookProcessor, and — because the class is internal sealed with no interface and no test references it — extracting a test seam (which also touches the GitHubService registration and the WebhookEventProcessor factory in Program.cs) before the new behavior can be unit-tested.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L22-L39",
+          "version": "repo-lines-v1:sha256:e38a35e1f2c411aee52d2c741b8a04cbcb2fe042a6c2626d21c9b48cb81222db:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1N2MxZWViZTFjNjczYzVkOWFlNGJlNjE4ZDBmNTMzNWY2Y2VkOWZmMTc0YzkwNzc1ZmQwODEyYWVhMmJjNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/GitHubService.cs#L17-L69",
+          "version": "repo-lines-v1:sha256:2dc9cb69a3e0ec0c4a00e5b9efb25a74c44c4b22ebe6e24dba9e79c7da1433ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2NjU3YTQyNjk5YWE1MzBjY2Q1NWZhYzE1MzI1NTJmZWYwODAwZWNiY2QyYzA1YmExMTBiMzQ1OGZhMWU5ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5M2RhN2Q5NzU4ZWQ1ZmMyOTdkNTIwNmEyMjZhMGUxNzk4MWEwNzQ5ZGM1YWIyNjE4Y2U2MDZjZjA1Y2ZlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjliMzU0YmFlZjI2NTEyNWZmMzhhN2NiN2YyNGVjMzBjMmZkNjkwNGVhNzZiYjVjOWUxZmM0MmMzMmU1NjlkOGQifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L102",
+          "version": "repo-lines-v1:sha256:0960ba62d40379940aa380a36542389dd6610658c2f1b38d5e95109ede33cfb1:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwNzdlMDhhMDQ2YjA5OGI2MTY3Mjg5ZDc1MGY0ODgzYmM1OTY1ZmYyOGI5ZDBkNTRkODhjNGU4YjkxYmFiOTMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-10-31T14:27:15.898Z"
   }
 }

@@ -5,7 +5,7 @@ description: How Sebastian runs as one long-lived, single-repository ASP.NET Cor
 tags: [architecture, runtime-topology, aspnet-core, job-queue, github-webhooks, self-hosted]
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
+    at: 2026-10-31T14:27:15.898Z
 sources:
   - id: openwiki-source-ea70eb6c045047448e446296
     resource: repo://.gitignore
@@ -35,7 +35,7 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-abc13e7f25ce7fa26e27952a
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-10-31T14:27:15.898Z" }
 ---
 
 # System Overview and Runtime Topology
@@ -70,9 +70,18 @@ Component view of the process: one HTTP surface, intake and git hosted inside th
 
 The public surface is intentionally tiny. `app.MapGet("/health", () => "ok")` provides liveness, and `app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` is the only inbound integration. No authentication middleware is registered anywhere in the host: the webhook endpoint is anonymous but every delivery is verified against the HMAC secret supplied from configuration, so the secret — not an auth scheme — is the trust boundary. Keep that in mind when changing how configuration is bound.
 
-Two hosted services carry background responsibility. `Git` is registered as a singleton and exposed as `IHostedService` through the same instance, so it initializes (parse `origin`, one bounded startup sync) before endpoint traffic is meaningful and remains the shared entry point for every git command. `JobQueue` is likewise one singleton that is both a `BackgroundService` and the admission API used by the webhook path. Because both are resolved through factory lambdas from the singleton registration, the hosted service and the injected collaborator are the same object — a detail that matters if you are tempted to make either transient.
+| Registration | Lifetime actually used | Role |
+| --- | --- | --- |
+| `GitHubService` | singleton | GitHub App credentials and the only issue writes |
+| `ProviderResolver` | singleton | Provider selection, `IChatClient` factory |
+| `Git` | singleton **and** `IHostedService` (same instance via factory) | Git command execution, repository identity, mirror sync |
+| `JobQueue` | singleton **and** `IHostedService` (same instance via factory) | Admission API plus the background consumer |
+| `WebhookEventProcessor` | singleton factory over the internal `GitHubWebhookProcessor` | Intake policy |
+| `SebastianConfig` options | singleton, validated on start | Configuration snapshot |
 
-Startup is deliberately eager about credentials: `GitHubService` and `ProviderResolver` are resolved immediately after build so that a missing PEM file or an unconfigured provider fails the start instead of the first job. The startup git sync is the opposite — best-effort and bounded to ten seconds, because a missed push delivery must not prevent the app from starting. See [Startup, Composition, and Configuration Binding](startup-and-composition.md) for the composition mechanics and [Running, Configuration, and Deployment](../operations/running-and-deployment.md) for the operator view.
+Two hosted services carry background responsibility. `Git` is registered as a singleton and exposed as `IHostedService` through a factory lambda that resolves the same singleton, so it initializes (require the content root to be the git top level, parse `origin`) before hosted services start and remains the shared entry point for every git command. `JobQueue` is likewise one singleton that is both a `BackgroundService` and the admission API used by the webhook path. Because both are resolved through factory lambdas from the singleton registration, the hosted service and the injected collaborator are the same object — a detail that matters if you are tempted to make either transient.
+
+Startup is deliberately eager about credentials: `GitHubService` and `ProviderResolver` are resolved immediately after build so that a missing PEM file or an unconfigured provider fails the start instead of the first job. Two other startup behaviors are deliberately forgiving. The startup git sync is best-effort and bounded to ten seconds, because a missed push delivery must not prevent the app from starting. And `WebhookEventProcessor` itself is a lazy singleton, constructed on the first delivery — so a failure in that factory surfaces as a failed webhook request, not a failed deployment. See [Startup, Composition, and Configuration Binding](startup-and-composition.md) for the composition mechanics and [Running, Configuration, and Deployment](../operations/running-and-deployment.md) for the operator view.
 
 ## Domain ownership
 
@@ -133,7 +142,7 @@ sequenceDiagram
 
 Webhook → queue → agent: intake stays synchronous, while workspace preparation and the agent run happen on a queue worker.
 
-Two serialization layers keep this safe without locks in the intake layer: `JobQueue` rejects a key that is already in flight (so a repeated label/edit event cannot start a second run for the same issue), and `ImplementSpec` funnels every workspace preparation through a single static semaphore because there is only one repository whose index and `main` ref may be touched at a time. Because the queue key is released in a `finally` block, a failed run does not block the issue forever — but it also registers no retry; another qualifying event is required.
+Two serialization layers keep this safe without locks in the intake layer. `JobQueue` rejects a key that is already in flight, so a repeated label/edit event cannot start a second run for the same issue while the first is still queued or running. `ImplementSpec` additionally funnels every workspace preparation through a single static semaphore because there is only one repository whose index and `main` ref may be touched at a time — and that semaphore is what makes the queue's degree of parallelism (ten) irrelevant to git safety. Because the queue key is released in a `finally` block, a failed run does not block the issue forever — but it also registers no retry; another qualifying event is required.
 
 A successful run ends at a log line. `ImplementSpec` records the worktree path, the short git status of the agent's changes, and the agent's response text. There is no commit, no push, and no pull request in the code today; that gap against the PRD is documented in [Product Intent vs. Implemented Behavior](../concepts/product-intent-and-gaps.md) rather than being a missing wiring detail.
 
@@ -163,5 +172,7 @@ The architecture is small enough that extension happens at four seams, in roughl
 2. **New job kinds** — implement `IJob` with a stable `Key` and enqueue through `JobQueue.TryAdd`. The queue is type-agnostic and will create the DI scope, apply concurrency, dedupe, and isolate failures for you.
 3. **New agent roles** — derive from `AgentRole`, override `Configure`, and get an `IChatClient` from `ProviderResolver` per run. Note the current disposal contract: the run owns and disposes its chat client.
 4. **New GitHub writes** — extend `GitHubService`, which today exposes only comment-posting and closing with reason `not_planned`. Anything broader (labels, PRs, merges) is new surface, not a configuration toggle.
+
+All four seams share one constraint implied by the domain table: nothing in the process composes two repositories at once, so any new job kind that touches git must either go through `ImplementSpec`-style serialization or declare why it is safe not to.
 
 For the trace with per-hop state and the failure branch details, continue with [Feature Issue to Agent Workspace](../workflows/feature-implementation.md) and [Webhook Intake and Event Routing](../integrations/github-webhooks.md); for a task-oriented entry point see the [Quickstart](../quickstart.md).
