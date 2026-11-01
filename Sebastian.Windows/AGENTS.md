@@ -39,7 +39,28 @@ Include the documentation pages you used in your change summary. A UI change mad
 
 ## Run
 
-From the repository root:
+Development **must** use watch mode. Reactor's hot reload only runs under
+`dotnet watch`; a plain `dotnet run` gives no reload loop.
+
+```powershell
+cd Sebastian.Windows
+$env:Platform = "x64"
+$env:WinAppRunUseExecutionAlias = "true"
+dotnet watch run
+```
+
+`WinAppRunUseExecutionAlias=true` is required: this is a packaged app, and without it
+the WinApp launcher activates it by AUMID, which drops the environment `dotnet watch`
+needs to load its hot-reload agent.
+
+Hot reload does **not** work reliably in this packaged setup: after a save,
+`dotnet watch` prints "C# and Razor changes applied", but the running window keeps the
+old UI — observed on `App.cs` and `Pages/HomePage.cs`, and navigating away and back does
+not help. Restart instead: stop the watch process and start it again (or press `Ctrl+R`
+in the watch terminal), then verify the window actually changed. Do not trust the watch
+log as proof a change landed.
+
+Outside development, a one-off run without hot reload is fine:
 
 ```powershell
 dotnet run --project Sebastian.Windows -p:Platform=x64
