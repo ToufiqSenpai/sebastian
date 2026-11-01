@@ -69,8 +69,8 @@ Ukuran berhasil:
 - Link ke chat, run, dan PR disimpan di tabel terpisah, bukan field ticket.
 - Blocked adalah badge dari run terakhir, bukan field ticket atau kolom kanban.
 - GitHub hanya untuk kode: branch, commit, PR, review komentar, dan merge.
-- Hard rules tetap berlaku: tidak ada auto-merge, agent tidak approve karyanya sendiri, merge hanya atas aksi eksplisit, budget per run/hari, dan detail security tidak ditulis di kanal publik.
-- Verifikasi build/test/lint dijalankan host dan hasilnya disimpan sebagai evidence, bukan hanya klaim agent.
+- Hard rules tetap berlaku: tidak ada auto-merge, agent tidak approve karyanya sendiri, merge hanya atas aksi eksplisit, dan detail security tidak ditulis di kanal publik.
+- Verifikasi build/test/lint dijalankan host; hasilnya menentukan gate integrasi dan dicatat di log, bukan hanya klaim agent.
 - Non-goal PRD 0.1 tentang dashboard web direvisi: kanban sekarang in-scope; dashboard analytics tetap out.
 - Keputusan PRD 0.1 #4 (state di label, tanpa database) digantikan oleh database ticket.
 - Scope v1 tidak mencakup: chat multi-sesi, multi-repo, deploy/release automation, agent evals, board terpisah per tipe, edit spec langsung, multi-user.
