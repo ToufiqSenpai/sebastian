@@ -12,7 +12,7 @@ class App : Component
     static string ToTag(Route route) => route switch
     {
         Route.Home => "home",
-        Route.WorkBoard => "workboard",
+        Route.Kanban => "kanban",
         Route.Project project => $"project:{project.Name}",
         Route.Settings => NavigationViewElement.SettingsTag,
         _ => "home",
@@ -21,7 +21,7 @@ class App : Component
     static Route ToRoute(string tag) => tag switch
     {
         "home" => new Route.Home(),
-        "workboard" => new Route.WorkBoard(),
+        "kanban" => new Route.Kanban(),
         var value when value.StartsWith("project:", StringComparison.Ordinal) =>
             new Route.Project(value["project:".Length..]),
         NavigationViewElement.SettingsTag => new Route.Settings(),
@@ -31,11 +31,12 @@ class App : Component
     public override Element Render()
     {
         var nav = UseNavigation<Route>(new Route.Home());
+        var wide = UseBreakpoint(900);
 
         var content = NavigationHost(nav, route => route switch
         {
             Route.Home => Component<HomePage>(),
-            Route.WorkBoard => Component<PlaceholderPage, PlaceholderPageProps>(new("Work board")),
+            Route.Kanban => Component<PlaceholderPage, PlaceholderPageProps>(new("Kanban")),
             Route.Project project => Component<PlaceholderPage, PlaceholderPageProps>(new(project.Name)),
             Route.Settings => Component<PlaceholderPage, PlaceholderPageProps>(new("Settings")),
             _ => Component<HomePage>(),
@@ -50,7 +51,7 @@ class App : Component
         var navView = (NavigationView(
                 [
                     NavItem("Home", icon: "Home", tag: "home"),
-                    NavItem("Work board", icon: "ViewAll", tag: "workboard"),
+                    NavItem("Kanban", icon: "ViewAll", tag: "kanban"),
                     NavItemHeader("Projects"),
                     NavItem("sebastian", icon: "Folder", tag: "project:sebastian"),
                     NavItem("acme-web", icon: "Folder", tag: "project:acme-web"),
@@ -60,7 +61,9 @@ class App : Component
                 IsPaneOpen = true,
                 IsSettingsVisible = true,
             })
-            .PaneDisplayMode(NavigationViewPaneDisplayMode.Left)
+            .PaneDisplayMode(wide
+                ? NavigationViewPaneDisplayMode.Left
+                : NavigationViewPaneDisplayMode.LeftCompact)
             .OpenPaneLength(300)
             .PaneToggleButtonVisible(false)
             .BackButtonVisible(false)
