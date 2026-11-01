@@ -3,10 +3,9 @@ type: quickstart-router
 title: Sebastian Wiki Quickstart
 description: Task-routing entry point for the Sebastian wiki — what the service is, the single request path from GitHub webhook to job queue to issue worktree to agent run, and which page to open for intake, queueing, git workspace, agent, configuration, operations, and testing work.
 tags: [quickstart, navigation, task-routing, architecture, github-webhooks, job-queue, git-worktrees, agent]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
+  - id: openwiki-source-6d4b4e707b8d60b6ccfa3425
+    resource: repo://.github/workflows/openwiki-update.yml
   - id: openwiki-source-8037e2358a2c4f9b2c722a11
     resource: repo://AGENTS.md
   - id: openwiki-source-d14cb4231320f903c4c26a78
@@ -31,7 +30,10 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-c13b20e41fd15a696ab1eb84
     resource: repo://tests/Sebastian.Tests/Sebastian.Tests.csproj
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Sebastian Wiki Quickstart
@@ -56,10 +58,10 @@ The one path that matters: intake decides, the queue admits and dedupes, workspa
 
 Four hops, four owners, and each hop is the only place its decision is made:
 
-1. **Intake** — `src/Webhooks/GitHubWebhookProcessor.cs`. Filters issue actions, requires an open issue labeled `feature`, runs `SpecTemplateValidator`, and either posts a comment plus closes the issue or hands an `ImplementSpec` job to the queue. Push events skip the queue entirely and call `git.SyncMainAsync` inline.
+1. **Intake** — `src/Webhooks/GitHubWebhookProcessor.cs`. Filters issue actions (`opened`, `labeled`, `edited`, `reopened`), requires an open issue labeled `feature`, runs `SpecTemplateValidator`, and either posts a comment plus closes the issue or hands an `ImplementSpec` job to the queue. Push events skip the queue entirely and call `git.SyncMainAsync` inline.
 2. **Admission** — `src/Jobs/JobQueue.cs` over the `IJob` contract in `src/Jobs/IJob.cs`. An unbounded channel, an in-flight key (`{owner}/{repository}#{issueNumber}`) that suppresses duplicate work, `MaxConcurrentJobs = 10`, and one DI scope per job.
 3. **Workspace** — `Git` (`src/Libs/Git.cs`) executes the commands; `ImplementSpec.PrepareWorkspaceAsync` holds all the policy: fetch `origin`, refuse a dirty/ahead/not-on-`main` mirror, fast-forward, then create or reuse `.sebastian/workspaces/<issue>` on branch `sebastian/issue-<n>`.
-4. **Agent** — `src/Agent/Roles/ImplementationAgent.cs` declares capabilities (one confined shell tool, a regex deny-list, a 10-minute timeout, no web search); `ImplementSpec.BuildPrompt` declares what this one run must do. The run's only product is uncommitted files in the worktree plus a log line — nothing is committed, pushed, or turned into a PR.
+4. **Agent** — `src/Agent/Roles/ImplementationAgent.cs` declares capabilities (one confined shell tool, a regex deny-list, a 10-minute timeout, no web search, no file memory); `ImplementSpec.BuildPrompt` declares what this one run must do. The run's only product is uncommitted files in the worktree plus a log line — nothing is committed, pushed, or turned into a PR.
 
 ## Route by task
 
@@ -85,18 +87,30 @@ Read the row that matches what you are changing. Each page is the single place t
 
 ## Before you touch anything
 
-Two invariants explain most of the surprises in this codebase:
+Two invariants explain most of the surprises in this codebase.
 
-- **It is one process for one repository.** Sebastian must start from the root of the clone it serves, `origin` must parse to the `owner/repo` its GitHub App is installed on, and an issue event for any other repository fails instead of being redirected. Local `main` is a read-only mirror — never a workspace.
-- **Nothing in the process commits or pushes.** The git layer has no such primitive, the agent is instructed not to run git commands, and the HTTP surface is `/health` plus the webhook endpoint. Adding a third capability is an architectural change, not a configuration one.
+**One process serves one repository, and it must be started from that repository's own root.**
+
+- `Git`'s constructor takes `IHostEnvironment.ContentRootPath` and uses it as the working directory for every git command; `StartAsync` compares it against `git rev-parse --show-toplevel` and throws — *"Sebastian must run from the repository root. Content root is '…', git root is '…'."* — before the host ever listens. Once that holds, `origin` is parsed into a `RepositoryIdentity` (`owner`/`name`) and becomes the instance's identity.
+- That identity is enforced at the only place a job could act on the wrong repo: `ImplementSpec.PrepareWorkspaceAsync` compares the issue's `owner`/`repository` — taken from the **webhook payload** — with `git.Repository` and throws `"Issue repository '<owner>/<repo>' does not match local origin '<owner>/<name>'."` on any mismatch. Intake itself never checks the payload's repository, so a delivery for a foreign repository gets as far as a queued job, then fails and disappears into one `Job {Key} failed` Error line. Local `main` is a read-only mirror — never a workspace.
+
+**Nothing in the process commits or pushes.**
+
+- The git layer has no commit, push, branch-delete, or PR primitive. `SyncMainAsync` only fetches and fast-forwards `main`; worktree creation only adds a branch (`worktree add -B sebastian/issue-<n> … main`).
+- The agent is told twice, in two places that must stay aligned: the `ImplementationAgent` instructions (*"Never run git commands, commit, push, or create pull requests."*) and the `BuildPrompt` rules (*"Do not run git commands, commit, push, or create pull requests."*). The shell tool's regex deny-list covers the obvious git escapes (`git push|reset|clean|checkout --`), but `git commit`, `git add`, and `git branch` are not in it — the prohibition is a prompt-level contract plus the absence of any follow-up step, not a hard sandbox.
+- The HTTP surface is exactly `/health` and the webhook endpoint. Adding a third capability, or any code path that turns agent work into a commit, is an architectural change, not a configuration one.
 
 ## Verifying a change
 
-There is no solution file and no test workflow. Build the product and the suite separately:
+There is no solution file, so build the product and the test suite as two separate projects:
 
 ```bash
 dotnet build Sebastian.csproj
 dotnet test tests/Sebastian.Tests/Sebastian.Tests.csproj
 ```
 
-The test project is a *less strict* compilation than the product (`tests/**` is excluded from the web project), so a clean `dotnet test` does not prove analyzer or AOT cleanliness — see [Code Conventions and Build Constraints](concepts/codebase-conventions.md) for what the product build enforces.
+The test project is a *less strict* compilation than the product (`tests/**` is excluded from the web project via `DefaultItemExcludes`, and the test csproj sets none of `TreatWarningsAsErrors`, `AnalysisLevel`, `PublishAot`), so a clean `dotnet test` does not prove analyzer or AOT cleanliness — the `dotnet build` above is the stricter gate. See [Code Conventions and Build Constraints](concepts/codebase-conventions.md) for what the product build enforces.
+
+The only GitHub workflow in the repo is the scheduled OpenWiki page refresh (`.github/workflows/openwiki-update.yml`); it does not build or test the service, so CI is not a substitute for running both commands locally.
+
+Integration tests shell out to a real `git` binary, so `git` must be on `PATH` for `dotnet test` to be meaningful.

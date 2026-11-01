@@ -3,9 +3,6 @@ type: product-intent-mapping
 title: Product Intent vs. Implemented Behavior
 description: Maps the intent stages and hard rules in docs/PRD.md onto the code that exists today, marking each PRD proposition as implemented, partial, or not implemented so a change can tell roadmap from regression.
 tags: [product-intent, prd, gaps, roadmap, scope, safety-rules, triage]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-ea70eb6c045047448e446296
     resource: repo://.gitignore
@@ -35,12 +32,15 @@ sources:
     resource: repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs
   - id: openwiki-source-8a717290a8315456a0f1fc7e
     resource: repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Product Intent vs. Implemented Behavior
 
-`docs/PRD.md` is written in Indonesian and is *intent* documentation: a v0.1 draft describing the product the author wants. It is not a behavioral spec, it is not enforced by the build, and parts of it describe things this repository does not do yet. Per the repository instructions in [`AGENTS.md`](../../AGENTS.md), source and tests are authoritative — when this page and the code disagree, the code wins and this page is the thing to fix.
+`docs/PRD.md` is written in Indonesian and is *intent* documentation: a v0.1 draft describing the product the author wants. It is not a behavioral spec, it is not enforced by the build, and parts of it describe things this repository does not do yet. Per the repository instructions in [`AGENTS.md`](../../AGENTS.md) — and echoed by [Sebastian Wiki Quickstart](../quickstart.md) — source and tests are authoritative; when this page and the code disagree, the code wins and this page is the thing to fix.
 
 This page exists because the PRD and the code disagree in ways that are easy to misread. A coding agent that opens `docs/PRD.md` first can reasonably conclude that a validation gate, a `needs-triage` hop, label transitions, PR creation, and cost limits are supposed to be there and were lost. They were not lost. They are roadmap. Treat their absence as unimplemented intent, not as a regression to repair on sight.
 
@@ -50,7 +50,7 @@ Today the system implements **one** gate and **one** terminal stage:
 
 > an open issue labeled `feature` → check the seven required markdown sections → either comment-and-close, or (only if it also carries `ready-for-agent`) run the agent in a worktree and log the result.
 
-Everything else in the PRD — bug routing, triage, label writing, commit, push, PR, review, merge commands, cost caps — has no code behind it. The PRD's stages 1–6 collapse in practice to two: a synchronous webhook gate and a fire-and-forget agent job.
+Everything else in the PRD — bug routing, triage, label writing, commit, push, PR, review, merge commands, cost caps — has no code behind it. The PRD's stages 1–6 (`docs/PRD.md` §3.1) collapse in practice to two: a synchronous webhook gate and a fire-and-forget agent job.
 
 ```mermaid
 flowchart TD
@@ -71,42 +71,45 @@ The only path the code implements end to end; the PRD's bug branch, `needs-triag
 Two ordering consequences are easy to miss and matter when changing intake:
 
 - **Validation outranks approval.** The section check runs before the `ready-for-agent` check and returns, so an issue a maintainer already approved with `ready-for-agent` is still closed as `not_planned` if a required section is empty.
-- **Approval is not verified, only read.** `HasLabel` is a case-insensitive membership test on the event payload. Nothing checks *who* applied the label, so the PRD's "only a maintainer moves it here" is a convention, not a control.
+- **Approval is not verified, only read.** `HasLabel` is a case-insensitive membership test on the event payload. Nothing checks *who* applied the label, so the PRD's "only a maintainer moves it here" (§3.1.3–3.1.4) is a convention, not a control.
 
 ## Intent-to-code mapping
 
-Status legend: **implemented** = the code does this and it is pinned by a test or is directly observable; **partial** = a real mechanism exists but is narrower than the PRD sentence; **absent** = no code exists.
+Status legend: **implemented** = the code does this and it is pinned by a test or is directly observable; **partial** = a real mechanism exists but is narrower than the PRD sentence; **absent** = no code exists; **n/a** = the rule cannot be violated because the capability it constrains does not exist.
 
 | PRD intent (`docs/PRD.md`) | Status | What actually exists | Proof |
 | --- | --- | --- | --- |
-| Issues are the single intake surface (§3.1.1) | partial | Only `IssuesEvent` (opened/labeled/edited/reopened) and `PushEvent` are overridden; every other GitHub event falls through to the base processor | `src/Webhooks/GitHubWebhookProcessor.cs` |
-| Validation with per-label requirements, `feature` vs. `bug` (§3.1.2) | partial | Section-completeness only, `feature` only; no reproduction, evidence, or bug semantics | `src/GitHub/Issues/SpecTemplateValidator.cs` |
-| Every closure records its reason (§3.1.2) | implemented | One close path posts the missing-section comment, then closes | `src/GitHub/GitHubService.cs` |
-| `needs-triage` waiting state (§3.1.3) | absent | No triage routing, no triage labels, no ambiguity handling | `src/Webhooks/GitHubWebhookProcessor.cs` |
-| `ready-for-agent` as the last gate (§3.1.4) | partial | The label is a required precondition for enqueue; the bot never writes labels and never verifies the actor | `src/Webhooks/GitHubWebhookProcessor.cs` |
-| Implementation on a branch with tests (§3.1.5) | partial | Each issue gets worktree `sebastian/issue-<n>`; tests are run by the agent on instruction, never verified by the host | `src/Agent/ImplementSpec.cs` |
-| Pull request as the terminal state (§3.1.6) | absent | No PR creation, no PR webhook handling, no PR write API | `src/GitHub/GitHubService.cs` |
+| Issues are the single intake surface (§3.1 step 1) | partial | Only `IssuesEvent` (opened/labeled/edited/reopened) and `PushEvent` are overridden; every other GitHub event falls through to the base processor | `src/Webhooks/GitHubWebhookProcessor.cs` |
+| Validation with per-label requirements, `feature` vs. `bug` (§3.1 step 2) | partial | Section-completeness only, `feature` only; no reproduction, evidence, or bug semantics | `src/GitHub/Issues/SpecTemplateValidator.cs` |
+| Every closure records its reason (§3.1 step 2) | implemented | One close path posts the missing-section comment, then closes | `src/GitHub/GitHubService.cs` |
+| `needs-triage` waiting state (§3.1 step 3) | absent | No triage routing, no triage labels, no ambiguity handling | `src/Webhooks/GitHubWebhookProcessor.cs` |
+| `ready-for-agent` as the last gate (§3.1 step 4) | partial | The label is a required precondition for enqueue; the bot never writes labels and never verifies the actor | `src/Webhooks/GitHubWebhookProcessor.cs` |
+| Implementation on a branch with tests (§3.1 step 5) | partial | Each issue gets worktree `sebastian/issue-<n>`; tests are run by the agent on instruction, never verified by the host | `src/Agent/ImplementSpec.cs` |
+| Pull request as the terminal state (§3.1 step 6) | absent | No PR creation, no PR webhook handling, no PR write API | `src/GitHub/GitHubService.cs` |
 | Commit and push before the PR (§4) | absent | `Git` has no `commit`/`push` verb; the prompt forbids both | `src/Libs/Git.cs` |
-| Review, and `merge` only on explicit command (§3.1.6, §4) | absent | No comment/PR event handling at all, so no command surface exists | `src/Webhooks/GitHubWebhookProcessor.cs` |
+| Review, and `merge` only on explicit command (§3.1 step 6, §4) | absent | No comment/PR event handling at all, so no command surface exists | `src/Webhooks/GitHubWebhookProcessor.cs` |
 | Per-run and per-day cost limits (§4) | absent | No budget fields in configuration, no token/cost accounting | `src/Configuration/SebastianConfig.cs` |
 | Never approve its own PR (§4) | n/a | Vacuously true: the process cannot approve anything | `src/GitHub/GitHubService.cs` |
 | Never edit or delete others' comments (§4) | n/a | Vacuously true: only comment creation exists | `src/GitHub/GitHubService.cs` |
+| Never close someone else's issue without a recorded reason (§4) | n/a | The only close is the spec-gate close, and it always posts a comment first | `src/Webhooks/GitHubWebhookProcessor.cs` |
 | Never write security details to public channels (§4, §10) | mitigated structurally | The agent has no GitHub tool and never posts; the only comment is a fixed template naming missing sections | `src/Agent/Roles/ImplementationAgent.cs` |
-| `main` protected; local `main` is a read-only mirror (§4, §5.7) | implemented | ff-only sync, with hard refusal on dirty, ahead, or non-`main` local states | `src/Libs/Git.cs` |
-| Webhook signature verification (§5.1) | implemented | `MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` | `Program.cs` |
-| Label-only state, no database (§5.4) | implemented | No persistence layer; state lives in GitHub plus `.sebastian/workspaces` | `Program.cs` |
-| One repository at a time (§2, §5) | implemented | Owner/name cross-check throws on a foreign repository | `src/Agent/ImplementSpec.cs` |
+| `main` protected; local `main` is a read-only mirror (§4, §5 row 7) | implemented | ff-only sync, with hard refusal on dirty, ahead, or non-`main` local states | `src/Libs/Git.cs` |
+| Webhook signature verification (§5 row 1) | implemented | `MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` | `Program.cs` |
+| Label-only state, no database (§5 row 4) | implemented | No persistence layer; state lives in GitHub plus `.sebastian/workspaces` | `Program.cs` |
+| One repository at a time (§2 non-goals, §5) | implemented | Owner/name cross-check throws on a foreign repository | `src/Agent/ImplementSpec.cs` |
+| Start agent only from a clean local `main` (§5 row 7) | implemented | `FindMirrorProblemAsync` refuses not-on-`main`, tracked changes, and local commits ahead of `origin/main` | `src/Libs/Git.cs` |
+| Comment language follows the issue, maintainer tone (§5 row 6) | absent | The single comment is a fixed English format string; no language detection | `src/Webhooks/GitHubWebhookProcessor.cs` |
 
 ## The absent stages, stated plainly
 
 These PRD propositions have **no** implementation. Do not "restore" them as if wiring were dropped; adding any of them is new feature work with a design decision attached.
 
-1. **Bug triage and the `bug` label.** An issue labeled `bug` without `feature` is ignored by the early return, so it is never implemented and never closed. The PRD's triage-trigger list (security, business logic, data, public contract, infrastructure, cross-module, intermittent, ambiguous, false positive) exists only as prose.
+1. **Bug triage and the `bug` label.** An issue labeled `bug` without `feature` is ignored by the early return, so it is never implemented and never closed. The PRD's triage-trigger list in §5 (security, business logic, data, public contract, infrastructure, cross-module, intermittent, ambiguous, false positive) exists only as prose.
 2. **`needs-triage` automation and all label transitions.** There is exactly one label write in the whole codebase: none. The two label constants are read-only filters. Nothing moves an issue between states, so the PRD state machine is enforced entirely by humans.
 3. **Commit and push.** `Git` exposes `fetch`, `merge --ff-only`, `worktree add/prune`, `status`, `rev-parse`, `rev-list`, `remote get-url`, and `branch --show-current`. That is the vocabulary. The agent's changes stay uncommitted in the worktree and are only described in a log line.
-4. **PR creation.** `ProcessPullRequestWebhookAsync` is not overridden and no PR REST operation is used; the Octokit surface in this repository is issues-only.
+4. **PR creation.** The processor does not override a pull-request handler and no PR REST operation is used; the Octokit surface in this repository is issues-only.
 5. **Review and merge commands.** The processor logs the event type and delegates to `base.ProcessWebhookAsync`, so a `merge` comment does nothing at all. There is no command parser anywhere.
-6. **Cost limits.** `SebastianConfig` has exactly two sections, `GitHub` and `Agent`, and the agent section carries only provider name, endpoint, API key, and model id. A runaway run is bounded only by the shell's ten-minute per-command timeout.
+6. **Cost limits.** `SebastianConfig` has exactly two sections, `GitHub` and `Agent`; the agent section holds a provider name, a list of providers (name, optional endpoint, API key), and the selected model id. A runaway run is bounded only by the shell's ten-minute per-command timeout.
 
 ## What *is* enforced, and how
 
@@ -114,17 +117,17 @@ The safety story is worth splitting by mechanism, because the mechanisms have ve
 
 **Enforced in the host (structural).** The webhook secret is verified before the processor runs. `PrepareWorkspaceAsync` refuses to proceed when the issue's repository does not match the parsed `origin`, when local `main` is not checked out, when tracked changes exist, or when local `main` is ahead of `origin/main`; it fast-forwards `main` with `--ff-only` and never resolves conflicts. Worktrees are created under `.sebastian/workspaces/<issue>` and reused rather than recreated, so uncommitted agent output survives a restart. Concurrency is bounded twice: `JobQueue` admits at most ten jobs in parallel and dedupes on the `owner/repo#issue` key, while `PrepareLock` serializes fetch/fast-forward/worktree work for the single repository.
 
-**Enforced in the agent sandbox (policy).** `ImplementationAgent` builds a `LocalShellExecutor` confined to the worktree, with a scrubbed environment (`CleanEnvironment`, only two `DOTNET_*` variables), a ten-minute command timeout, and a deny-list covering `rm -rf`-style deletion, `git push|reset|clean|checkout --`, `gh`, network fetchers (`curl`, `wget`, `ssh`, `scp`), and host-level destructive commands. This is also the code-level answer to the PRD's prompt-injection risk: a hostile issue body cannot reach credentials through the agent's own shell. Note what the deny-list does *not* cover — `git commit` is absent from it, so "no git" is prompt-enforced for commit and denial-enforced only for the verbs that could publish.
+**Enforced in the agent sandbox (policy).** `ImplementationAgent` builds a `LocalShellExecutor` confined to the worktree, with a scrubbed environment (`CleanEnvironment`, only two `DOTNET_*` variables), a ten-minute command timeout, and a deny-list covering `rm -rf`-style deletion, `git push|reset|clean|checkout --`, `gh`, network fetchers (`curl`, `wget`, `ssh`, `scp`), and host-level destructive commands. This is also the code-level answer to the PRD's prompt-injection risk (§10): a hostile issue body cannot reach credentials through the agent's own shell. Note what the deny-list does *not* cover — `git commit` is absent from it, so "no git" is prompt-enforced for commit and denial-enforced only for the verbs that could publish.
 
 **Enforced only by the prompt (soft).** The task prompt tells the agent to treat the issue body as requirements rather than instructions, make the smallest complete change, add or update tests, not add dependencies, not touch files outside the workspace, not run git, commit, push, or create PRs, and to stop and explain if the spec is ambiguous. None of those rules is verified after the run: the only post-run observation is `git.GetStatusAsync` plus a log entry containing the agent's response text.
 
-**Not enforced anywhere.** The PRD's "quiet" rule for security content. The mitigation is architectural — the agent has no GitHub write capability, so the only public text the system can emit is the fixed missing-sections comment. That mitigation disappears the moment someone adds a tool that posts agent output to GitHub, so treat such a change as security-relevant.
+**Not enforced anywhere.** The PRD's "quiet" rule for security content (§4, §10). The mitigation is architectural — the agent has no GitHub write capability, so the only public text the system can emit is the fixed missing-sections comment. That mitigation disappears the moment someone adds a tool that posts agent output to GitHub, so treat such a change as security-relevant.
 
 ## The `.archify/` directory
 
 `.archify/` holds design-time artifacts — workflow sketches and candidate diagrams produced while thinking about the design. It is listed in [`.gitignore`](../../.gitignore) (line 6), it is excluded from wiki tooling by `.openwikiignore`, and no source file references the path. It is not runtime behavior, not a build dependency, and not evidence of an implemented stage. If a diagram there shows a `needs-triage` node, the node describes intent.
 
-The PRD itself is likewise informal: it is a v0.1 draft whose section numbering jumps from §5 to §10, and it labels its own decisions "belum dipilih" (not yet chosen) in places. Read it as a backlog written by the product owner.
+The PRD itself is likewise informal: it is a v0.1 draft dated 29 October 2026, its section numbering jumps from §5 to §10, and it calls the agent framework choice "belum dipilih" (not yet chosen) even though the code has settled on the Microsoft Agent Framework harness with an OpenAI-compatible chat client. Read it as a backlog written by the product owner, not as a description of the build.
 
 ## Changing this contract
 
@@ -133,7 +136,7 @@ When you intentionally implement one of the absent stages, the change is cross-c
 - New intake behavior belongs in `GitHubWebhookProcessor`; new write operations must be added to `GitHubService`, which is currently a deliberately thin two-method surface.
 - New git behavior that encodes a rule (branching, committing, pushing) belongs in the caller `ImplementSpec`, keeping `Git` a pure command runner. The current design has no `push` primitive at all, so adding one is boundary work, not a one-line addition.
 - Any commit/push/PR stage must confront the prompt rules and the shell deny-list together, or the agent will remain forbidden from doing exactly what the new stage requires.
-- There are **no tests** for `GitHubWebhookProcessor` or `GitHubService`. The behavior pinned by tests is spec validation (`SpecTemplateValidatorTests`) and workspace preparation (`ImplementSpecTests`: reuse of an existing worktree, recreation after removal, rejection of dirty `main`, rejection of a foreign repository). A change to intake therefore lands without a regression net unless you add one.
+- There are **no tests** for `GitHubWebhookProcessor` or `GitHubService`. The behavior pinned by tests is spec validation (`SpecTemplateValidatorTests`), workspace preparation (`ImplementSpecTests`: reuse of an existing worktree, recreation after removal, rejection of dirty `main`, rejection of a foreign repository), and queue admission (`JobQueueTests`: the ten-job concurrency cap, duplicate-key rejection). A change to intake therefore lands without a regression net unless you add one.
 - Keep the PRD edit and this page in step. A gap row that stays "absent" after the code ships is worse than no page: it actively misleads the next agent.
 
 ## Where to go next

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:736547d9b8e3cd3856249c20324f1706f7d8f175df2b9ed626ef9c59f2b0a30c",
+  "pageVersion": "sha256:b03b20a3cdc59a840073aedfa2771d8a76887957ccc600263fd0b66ad108399c",
   "claims": [
     {
       "id": "claim_b1071aaa4f6e45db92b21a886af00487",
@@ -145,10 +145,60 @@
           "version": "repo-lines-v1:sha256:a522e16ab9af19bcbb9a97b57ea73b0c743c224180fbb244109aa01955c700cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjN2UyNDVkMTlkZjkzYTJlZTJlMTMyZGUyYjQ1NTE5MmM5NzcyYjc5ZDRhYmRiMmEwZjFlNGVmY2ZjYmQxNjRiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3M2ZiYWZkNDY0ODUwNjg0MTNkYzNhMDllNDJmYjdkNmI4MzAzMTc0OTJhZjM0ZDczMmFiYmVhZDc2ZWM1MmUwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjNjc4Mjc0MDMxZGM2ODk1MDgwNzAyMDgyNTMzZDQ5NWZlM2JhMGIxOWQ0ZmZiZTMyYzg0Yjc5YmE3OTAwNDgyIn0"
         }
       ]
+    },
+    {
+      "id": "claim_bf83b9246e0849cfaf8d972de62369ab",
+      "statement": "Only a line whose trimmed form starts with the literal `## ` opens a section in SpecTemplateValidator, so a required section name written at `#` or `###` level (or in any refilled markdown that drops the two hashes) never satisfies the contract, which is why the coupled markdown template must keep every heading at level 2.",
+      "evidence": [
+        {
+          "resource": "repo://skills/to-spec/SKILL.md#L19-L73",
+          "version": "repo-lines-v1:sha256:59282577a06f0f4851f5a4c2410c05f5d05008ac57c9de600a4112199563c2b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyODVhNjJkNjYyZTc5MTQzZjVkZmU2M2ViYTMwMzZlYzk5MTgyZjNlNzMyYTBkM2JlMzUzZGM1MDJjMzRiMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3ZWExMThiMjg1OWY0OTBlZmRiMzhjZjAyZGMzMmU2OWI4MDgzYjljY2U4NGUwYjYxNzMxODQ4MTY1NjE2NTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiZWFhODYxZDg4MjE5ZDY5OTAxNTY3ZDQ4YjVlMWUzOGRjMDg3MzdkZGFhYzJiYjA3NjY2NDk0MDVkMjczNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L22-L30",
+          "version": "repo-lines-v1:sha256:9e532282d53127da8e82a026d574f41e3976ca7d88abed7f1f4778c9a492b6dd:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTJmZTY1ODY4YTQ4ZDI1Yjc5MTgyN2RiZGRlY2JkZDJhNmIwZWZkMWJjMjM2ZWYxZGNiZmEyMDJjNjA0OTU3NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTUyMmM0MmNkMTljNmQwM2Q4MDhjNDUyNzIwNTUyODI1YjdlYTFjNWI0OTFiMjE4NTExY2FjNzQxNWNmOWQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjBkZjg1MjAwNDMwMjAyOWQ5MWRmNDY2Y2U5NDhkZTc5ZTE5YTExODY1ZWNlNjU0YmY1ZTQ5ZWQ0NDA3NmJjYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmQ0MzQ5MjZiYjE4NGNmZTc5YzQ5MWViM2FmZjQ0OTI5MzY2NDQ5N2NmMGZhODM2Zjc3NTA4MGYyMmZlNWQzYyJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L86-L103",
+          "version": "repo-lines-v1:sha256:db68c0d10eafc36191a269a4941bdf8153d6756ab72d40471079ae8d31d769a0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ2MzU0YjEzZjJlOWI5ZTk3ZWQ3ZWZlOGVkM2JiNjhkOWNiNzc4YWIwYTZkNWIyNzJiNTliNzQwMGIyMzI4NWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YWQyNjcxMmQ5YzYwMGZmMTRhYTg0ZDJjMTNhY2YwMGRiMjk1M2RhODA1NjBhOTYzYzE3ODMzMWQzYzIxOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c9841d4734942a19f1992b489a23058",
+      "statement": "Filler detection is asymmetric within `IsEmptyContent`: an HTML comment is rejected only by prefix (`StartsWith(\"<!--\")`, so a single-line comment is empty while its continuation lines count as content), whereas the GitHub placeholder is rejected only by full case-insensitive equality with `_No response_`, so a lightly altered placeholder reads as a real answer.",
+      "evidence": [
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L43-L46",
+          "version": "repo-lines-v1:sha256:8f2d5d169d3c9525e24f8c9491a493ca0b86c25216947055fc858c4cea4681d5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWUxNzNjZGMxNmNiNzU2NDllYTdmM2E4N2U4MzRmNWFjMDlmZmU0OTlhNDQ2MzA5NWY4NWI4Yjk1MzJiNjkzNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2U4MTVhMWQ0ZjhhMjM2MjFkMjIyYmZkODY3MTE3NWJkYmNkMDA2MThlNjI2Y2VkODY3MWVhMjFiMTZhMTNjZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDNmNjc3Y2QwYWI4OTE1OTg3MjFkNWE5MDkzZjJmOWMxMWM3MzBjZDI2MzRmMDcxZGUzZWRlNGIzMGViMzJjZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L46-L68",
+          "version": "repo-lines-v1:sha256:b894fc4cba05d7178d9e40593a3451ba917cb1e82ef7192b8c0201771c607c19:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhOTQzNDg5YmQyYWJiOWQyMmQxY2FhOWRiMjg1MDkyZjVjNzRjZWY1NDVmNzUxYjNmNDAwYWQyNjQ3YzNhN2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4YzJlNjQ3MzY2ZWQ3ZWQ5MzZiODJjYzgwZDczZDViOWQwZjE1MmZkMTI2NzI4ZWNkNzcyY2ViNjRmM2JkZWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d3ac7a8f86294d8794352170146fd558",
+      "statement": "skills/to-spec/SKILL.md is not part of the .NET build or test surface — it lives outside the project files and no test or analyzer reads it — so the `<spec-template>` fence (lines 19–73, ending with `## Further Notes`) and RequiredSections drift without any build or test failure, leaving the \"Keep in sync\" comment as the only coupling.",
+      "evidence": [
+        {
+          "resource": "repo://skills/to-spec/SKILL.md#L19-L73",
+          "version": "repo-lines-v1:sha256:59282577a06f0f4851f5a4c2410c05f5d05008ac57c9de600a4112199563c2b3:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQyODVhNjJkNjYyZTc5MTQzZjVkZmU2M2ViYTMwMzZlYzk5MTgyZjNlNzMyYTBkM2JlMzUzZGM1MDJjMzRiMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3ZWExMThiMjg1OWY0OTBlZmRiMzhjZjAyZGMzMmU2OWI4MDgzYjljY2U4NGUwYjYxNzMxODQ4MTY1NjE2NTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiZWFhODYxZDg4MjE5ZDY5OTAxNTY3ZDQ4YjVlMWUzOGRjMDg3MzdkZGFhYzJiYjA3NjY2NDk0MDVkMjczNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/GitHub/Issues/SpecTemplateValidator.cs#L5-L15",
+          "version": "repo-lines-v1:sha256:2b89dcdd8da4b4e51b8ccf81f933447094cbc36d1f8dfea71e80865608cb5b77:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlYjc2YTc1MDFiMTg5MDkyZGIwZGUyNTBiZDZjZWYzNTUxY2VlZWJkYmMyYzAxNzcyMDlkODEyZDk0NzkzMWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5NTkyODBmNjE1NmMxZjY1MWI1MjJiMWIxODYxNjNiNjZkYjQ1YWRiZmE5YmM2NzFiZWQwNzM1MjllZWMxZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzZTQ0MTAxYzU1YmJhYTkwODRjOWViZjJiOTE4MDk5OTM1NWE1NjY5NWU4NzA0YjU5YmE5NmY2ODYxMGQ0ODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzNzk5N2ZkNTY2MDA0ODQ4NTI2YWM3MjBiMzE4Zjk4NmQwNzU5ZjIzMDQxZjc4ZjI4ZTg0ZmEzNTFkNmE2MmYifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs#L7-L16",
+          "version": "repo-lines-v1:sha256:f211dda27615f8c1308aa6dd59da8a5ecf356051b77bef200547b0b3cd6f22e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3ZTI0NWQxOWRmOTNhMmVlMmUxMzJkZTJiNDU1MTkyYzk3NzJiNzlkNGFiZGIyYTBmMWU0ZWZjZmNiZDE2NGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5NTkyODBmNjE1NmMxZjY1MWI1MjJiMWIxODYxNjNiNjZkYjQ1YWRiZmE5YmM2NzFiZWQwNzM1MjllZWMxZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjczZmJhZmQ0NjQ4NTA2ODQxM2RjM2EwOWU0MmZiN2Q2YjgzMDMxNzQ5MmFmMzRkNzMyYWJiZWFkNzZlYzUyZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlOTQ2N2Y5NTkzNTc2MzM4OThkZWY4NDZiM2U4ZTQzNzA3ZTk2NDIwZTk3OWZjYTRhMDdjMzY2ODg3NzIxM2IifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-11-01T14:54:06.427Z"
   }
 }

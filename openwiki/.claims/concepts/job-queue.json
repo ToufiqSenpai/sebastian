@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:d11eb11eedfe0bf7009d75911619a2828b94866f76bd3b0d64f059a6f9a10b95",
+  "pageVersion": "sha256:98830cff3e87f00de7104c96ddd278bce32bb4eb717f149f002fb287337543c4",
   "claims": [
     {
       "id": "claim_c6ede3d6bc4a43639adcb79ede77f070",
       "statement": "JobQueue is a single singleton that is simultaneously the admission API called by the webhook path and the BackgroundService the host starts, so TryAdd writes into the same Channel that ExecuteAsync drains; Program.cs registers it with AddSingleton<JobQueue>() plus AddHostedService(sp => sp.GetRequiredService<JobQueue>()) to guarantee that identity.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L27-L28",
+          "resource": "repo://Program.cs#L30-L31",
           "version": "repo-lines-v1:sha256:5233762eb4788dea0e1358f7d1164e13882352680def038f6a23b4eb5cd19f41:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIwOGQ2ODNmY2FlNzkzMjk2YzJiODA3MzBiMGQ2ODU4NTA4ZTg0ZWYwMmI5MTFlYzU2YWVhNTI0NjFhYmQyYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNThkN2U3MWVmOTQyNDk5ZmFhNGZiMWFiNmU0NWYxNTI0ZmI2YmJmNWU2MDU2ZTJmMzc0YTRiM2VkMTIzNDY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjc2OWQ1NWE1YzkzNjk3ZTk4MWExMzcwMDA4MzZjZWYyZTBlOTE5ZmIwYzZhY2UxMjI2YTUxNjNmYThmZjk2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjRkMzgzNzBjMjY0Nzg0ZGY2NmM2MjA4YjA5ZWNkMjU5NTA3ZmY4ZjQyMGVlMTY3Y2EzMjJlMDk3YmE0NTQ1MiJ9"
         },
         {
@@ -109,7 +109,7 @@
       "statement": "Each job runs inside an AsyncServiceScope created inside the handler (after dequeue and after a concurrency slot exists) and disposed with await using before the finally releases the key; because every meaningful collaborator (Git, GitHubService, ProviderResolver, JobQueue) is a root singleton, the scope does not produce per-job copies of them and its real contribution is scoped-lifetime services and deterministic disposal.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L19-L28",
+          "resource": "repo://Program.cs#L22-L31",
           "version": "repo-lines-v1:sha256:18f8a3f5f75a746282936aa86706d377e9e6f5ecbc9ec222267e48f4ea9be623:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4ZDdlNzFlZjk0MjQ5OWZhYTRmYjFhYjZlNDVmMTUyNGZiNmJiZjVlNjA1NmUyZjM3NGE0YjNlZDEyMzQ2OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0ZDM4MzcwYzI2NDc4NGRmNjZjNjIwOGIwOWVjZDI1OTUwN2ZmOGY0MjBlZTE2N2NhMzIyZTA5N2JhNDU0NTIifQ"
         },
         {
@@ -179,10 +179,56 @@
           "version": "repo-lines-v1:sha256:20d87d23b781017b6119b78cc85ed6e0972bb98abc0892467e6ec76a510e7990:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiM2VmMTRiNDAwZDcwMmJmYWRlNThlMzQyN2I1NmRjMDkxMDg4MWVmMTI3M2YwYzNlNDQ2ZTkxYTY4ZDE3N2Y3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
         }
       ]
+    },
+    {
+      "id": "claim_bb4866d777554c21b6cd42e3dcd2576f",
+      "statement": "The admission/consumer identity is load-bearing at the registration site: Program.cs registers one JobQueue singleton, exposes that same instance as the hosted service via a factory lambda, and passes that same instance to the GitHubWebhookProcessor factory, so a generic AddHostedService<JobQueue>() or an extra registration would produce a hosted service draining a channel no caller writes to — a failure that is silent, since every TryAdd would return true and log a start line while no job ever runs.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L30-L39",
+          "version": "repo-lines-v1:sha256:5af140ffb2af044846b52064ad3241c9e1ea73ea4d1dd86cab00005d0e4d78de:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViMDhkNjgzZmNhZTc5MzI5NmMyYjgwNzMwYjBkNjg1ODUwOGU4NGVmMDJiOTExZWM1NmFlYTUyNDYxYWJkMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1N2MxZWViZTFjNjczYzVkOWFlNGJlNjE4ZDBmNTMzNWY2Y2VkOWZmMTc0YzkwNzc1ZmQwODEyYWVhMmJjNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3NjlkNTVhNWM5MzY5N2U5ODFhMTM3MDAwODM2Y2VmMmUwZTkxOWZiMGM2YWNlMTIyNmE1MTYzZmE4ZmY5NjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIifQ"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L10-L33",
+          "version": "repo-lines-v1:sha256:851b8ff3a2c75d1e1d8badce3b8383666f4d180ee6c3e7019357a528d2cca9c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhMDI1YzE5Mjg5ZDM2ODBiNmEyOWEwODFjN2ViYTQ2NjAxYzNhOTFmNzZjODAwOGM5YzlhYWM0MWJlZDg0YzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2OTUzNzdmM2VjMzBkMzQyZmFjNTQ5OGIyZjRhODg3ZmVjYzNiODEzY2JlODQzYzI5NmE0OTk3NWUyM2M5NGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZDM4MWRiMWQ0NmJmMzJiMzJiNTliMzQ5NTU1ZmUxNTNhODZkNGUwNzBlYmRmNTkxYmZlZmM0ZjIxY2M1NjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b61940bb9b9f4c32ade00909365af556",
+      "statement": "The queue's delivery guarantee is in-memory and at-most-once: nothing is persisted, so a restart empties both the channel and the in-flight set and recovery depends on GitHub redelivery or a re-trigger, while the in-flight key suppresses duplicates only while a job is queued or running and is not a 'this issue was already processed' record — once the finally removes it, the next qualifying event starts a fresh run even after a success or failure.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L16-L17",
+          "version": "repo-lines-v1:sha256:9997dc40cd3e7b3ee6af594dd779addd42a7cfdd179019ac29199c3e63881140:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ0Yjc1OGUyZWRhNjVmZDE1YzU5MDc3ZDk1MmNhMTZmOGU4OWRjMjE3YjgxOGNjOWJkMThjZTUwNmU2NTQ0MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTgzOTZiNmMxMjVhZmU2MjM4YmZjMTgxYjQxMzE5ZGFhNDVmOTFlNzY2ZWIzMzhjNmY4MjI3ZTJkNmQ4M2MzZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTBlODA1YzczN2ZlNTM1MDJmNTVhODM5YzNmYjE5MjYwNTU3YTk4ZTVlNWQzM2FiMGMzMzMwZDJkNWY3N2UyYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjFlNjg4MmY2NjRmYTllZWJmZDk2M2EzZDY3MjU2Y2ZiNjhiNDM4NjQyMGMwYzcyYmZkNjcwNGQwNjI5YzVhMCJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L70-L73",
+          "version": "repo-lines-v1:sha256:267e537b064ea4110efa0d4c7d076de97f79c28aa07e2534746ed65aaf40d4ee:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjhkNmJiYjIxM2FhNGNjYmRlZGZmMTZmYmJlMjVmOWIzZmNkMTlhZWUxM2JiYTc5MzdlYzQ2ZjUwMjM0NDIzNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGRiMzM5YzE3ZDRjYzU0ZTcwYzRmY2ZlY2I2MTFiYjllN2QzNjNmMjViMThlMDkyM2ExZDMwNmNjOTU5MjRlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjNhMDAxNGJmMWUxMWFiN2UwYWYwOGI2ZGM2MmE4ZGFlNGVkNzQ1MTViNjIyMjFmMjU2NTgyYWQyZTk0YjdlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzkxNWI5Mzg2MzdiM2FjZGE1MjQ1Y2YwNzE5ODNhODYwMDQzNTc0MDYyZDM5NWQwMGU2MDM1NTA2Y2QxNDRlYSJ9"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L84-L101",
+          "version": "repo-lines-v1:sha256:fdd2d4f2a8483fade318c2d81bd6a1e7c75efbaa56a6bd9229386427af16fbde:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmM2UyZTEzOGQ0M2ZjMWUyNDkxMDliZWE3MmIwMDFhZmRhNjE3ZTMxZTk0MjQzOWY4N2NmNThiZTg2ZGNjZGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3edb80dbfc754b0ca176a34eb3435716",
+      "statement": "At shutdown the two classes of unfinished work leave different residue in the in-flight set: buffered jobs that never start keep their keys (unobservable in production because the writer is already completed and nothing can be admitted again, visible only if the same JobQueue instance is used after StopAsync), whereas running jobs that honour cancellation are routed through the handler's finally and have their keys removed; adding a graceful drain would therefore also require moving the cancellation of stoppingToken, not just dropping TryComplete.",
+      "evidence": [
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L35-L39",
+          "version": "repo-lines-v1:sha256:59644f0274d12cecd5ddf024e3ed1abd5b2e408edbf90b2d3892f0d4b4af5e7c:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWM4YjdiMTI3Yzg4NGEyMmI3OTlmYmMzZDQzZmEzM2M0MDFmM2I2Yjk2MWIwMTVhNjQ0YTU4ZDhlODhiYWYyMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDgwZWFhNjZlNWUzMWM2MTU4MDI3ZDc2NDBjN2RhNGEyM2M0OGI0MzU0ZDUxYzVkOTVjMTEwN2Q0MGFhNTZjZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmVmMDA0YjY0NzE1NWEzNDQ0ZjBhY2Y4OTZjZjM3NDg5MGVkNjE4MDhhNjc4MGU0M2E4ZDBkZjRkZjVjMjYyOCJ9"
+        },
+        {
+          "resource": "repo://src/Jobs/JobQueue.cs#L46-L78",
+          "version": "repo-lines-v1:sha256:d6518f144b76c7ca55a9a5f461fe4cb4c707e1528601213e9a1b05eb748e0a87:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhODBmYTU1NjMxY2IwMmU3OGRmYzZmMjI2ZTkyZTY2ZGU5YTVkMzZkZGQ2MzRkOTk4NTEwYjlkZmUxOTdmMzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5ZWM5MDQxMmUwYTFjMTIxZGQ1ZDZhZGY1MGVjZDllMTdhMGQ0N2E0MGQzNTJkZmJiMGIwYjZkYmRkZGZjYTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwN2FjZTYyYzRiOGFmYmI0ZWM1MDg3OTFlODdkN2JjNTE0NDdjMTUzMGMyMmEzMjY5ZDYyNDM4NGU5ODQwOWMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-11-01T14:54:06.427Z"
   }
 }

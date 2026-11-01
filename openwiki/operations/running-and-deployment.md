@@ -1,16 +1,15 @@
 ---
 type: operations-runbook
 title: Running, Configuration, and Deployment
-description: Operator runbook for self-hosting Sebastian — the pre-flight checklist derived from code, the hierarchical configuration tree and how to supply it, the startup gates with their exact failure messages, webhook delivery through a public tunnel with /health as liveness only, the log lines worth watching, the on-disk workspace layout and what deleting it destroys, and the AOT publish posture.
-tags: [operations, deployment, configuration, prerequisites, startup, webhooks, tunnel, disk-layout, aot-publish, logging, runbook]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
+description: Operator runbook for self-hosting Sebastian — the pre-flight checklist derived from code, the committed appsettings.json template with its {env:NAME} placeholders and the configuration tree behind it, the startup gates with their exact failure messages, webhook delivery through a public tunnel with /health as liveness only, the log lines worth watching, the on-disk workspace layout and what deleting it destroys, and the AOT publish posture.
+tags: [operations, deployment, configuration, environment-placeholders, prerequisites, startup, webhooks, tunnel, disk-layout, aot-publish, logging, runbook]
 sources:
   - id: openwiki-source-6d4b4e707b8d60b6ccfa3425
     resource: repo://.github/workflows/openwiki-update.yml
   - id: openwiki-source-ea70eb6c045047448e446296
     resource: repo://.gitignore
+  - id: openwiki-source-ede59da55b0d48006223d1c0
+    resource: repo://appsettings.json
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
   - id: openwiki-source-3bf67c20a76eb7fa3cac2e6e
@@ -21,6 +20,8 @@ sources:
     resource: repo://src/Agent/ProviderResolver.cs
   - id: openwiki-source-12def67a8b093c0022f290e7
     resource: repo://src/Agent/Roles/ImplementationAgent.cs
+  - id: openwiki-source-7709fb6d7a3503104984ea26
+    resource: repo://src/Configuration/EnvironmentPlaceholders.cs
   - id: openwiki-source-c011dda0b85bc515c2bfb12c
     resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
@@ -33,19 +34,26 @@ sources:
     resource: repo://src/Libs/RepositoryIdentity.cs
   - id: openwiki-source-c50ef9f06b01c87779c3983c
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+  - id: openwiki-source-7468e4bacf37515653b4d440
+    resource: repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Running, Configuration, and Deployment
 
-Sebastian is one long-lived process, started by hand on a machine that stays up, pointed at one clone of one repository. There is no installer, no container image, no systemd unit, no Helm chart, and no deploy pipeline in this repository — the only workflow under `.github/workflows` is a documentation job (see [the scheduled OpenWiki workflow](#the-scheduled-openwiki-workflow-is-documentation-only)). Everything an operator needs to supply is therefore either **configuration**, **a git checkout in a specific shape**, or **a process supervisor** they choose themselves.
+Sebastian is one long-lived process, started by hand on a machine that stays up, pointed at one clone of one repository. There is no installer, no container image, no systemd unit, no Helm chart, and no deploy pipeline in this repository — the only workflow under `.github/workflows` is a documentation job (see [The scheduled OpenWiki workflow is documentation only](#the-scheduled-openwiki-workflow-is-documentation-only)). Everything an operator needs to supply is therefore either **configuration**, **a git checkout in a specific shape**, or **a process supervisor** they choose themselves.
 
-This page is the operational view: what to check before starting, what the process tells you when a check fails, how deliveries reach it from GitHub, what it writes to disk, and what you must not delete.
+This page is the operational view: what to check before starting, which environment variables the committed settings file requires, what the process tells you when a check fails, how deliveries reach it from GitHub, what it writes to disk, and what you must not delete.
 
 ```mermaid
 flowchart TD
-    P["Pre-flight: repository root, origin, clean main, secrets, provider, tunnel"] --> B["Start the host from the repository root"]
-    B --> V{"Options validation of SebastianConfig"}
+    P["Pre-flight: repository root, origin, clean main, secrets exported, provider, tunnel"] --> B["Start the host from the repository root"]
+    B --> X{"ExpandEnvironmentPlaceholders over the merged config tree"}
+    X -->|"unset or blank variable"| X1["InvalidOperationException naming key and variable, process exits"]
+    X -->|pass| V{"Options validation of SebastianConfig"}
     V -->|fail| V1["OptionsValidationException naming the failed member, process exits"]
     V -->|pass| E{"Eager resolution of GitHubService and ProviderResolver"}
     E -->|throw| E1["PEM or provider exception, process exits"]
@@ -72,76 +80,93 @@ Each row is enforced by code, so a missing item is not a matter of opinion. The 
 | `main` checked out locally | `Git.BaseBranch`/`Git.BaseRef` are hardcoded to `main`; any other default branch needs a code change | `Local main is not checked out (current branch: '<branch>'). Run Sebastian from main.` |
 | No tracked changes in `main` | the mirror is treated as read-only; agent work happens in worktrees | `Local main has uncommitted tracked changes. Commit or stash them, or move them to a branch.` |
 | No local-only commits on `main` | the base must be the reviewed `origin/main`, and there is no merge strategy | `Local main has <n> commit(s) not on origin/main. Move them to a branch: git branch wip/local && git reset --hard origin/main` |
-| `GitHub:AppId` ≥ 1 | used by the installation token provider; `[Range(1, int.MaxValue)]` | validation failure (an absent value binds to `0`) |
-| `GitHub:InstallationId` | string-valued in the token provider — configure it as a string, not a number | validation failure when blank |
-| `GitHub:PrivateKeyPath` | a **path** to the App's private key PEM; it is read with `File.ReadAllText` and imported with `ImportFromPem` | file or crypto exception during eager resolution |
-| `GitHub:WebhookSecret` | the HMAC verification secret passed to `MapGitHubWebhooks`; the entire trust boundary | validation failure when blank; a mismatch later rejects every delivery |
-| At least one provider with `ApiKey` | `ProviderResolver` refuses an empty list, and `ApiKey` is `[Required]` (whitespace rejected) | `At least one agent provider must be configured.` at startup |
-| `Agent:General:Provider` names a configured provider | selection is case-insensitive by `Name`; duplicate names are rejected | `Agent provider '<name>' is not configured.` or `Agent provider '<name>' is configured more than once.` |
+| `GITHUB_APP_ID` exported | supplies `GitHub:AppId`, which is `[Range(1, int.MaxValue)]`; the placeholder also has to be parseable as an `int` | placeholder exception if unset; validation failure (or a bind error) if it is not a positive integer |
+| `GITHUB_INSTALLATION_ID` exported | `GitHub:InstallationId` is string-valued in the token provider — the variable's text is passed through | placeholder exception if unset or blank |
+| `GITHUB_PRIVATE_KEY_PATH` exported | a **path** to the App's private key PEM; it is read with `File.ReadAllText` and imported with `ImportFromPem` | placeholder exception if unset; file or crypto exception during eager resolution |
+| `GITHUB_WEBHOOK_SECRET` exported | the HMAC verification secret passed to `MapGitHubWebhooks`; the entire trust boundary | placeholder exception if unset; a mismatch later rejects every delivery |
+| `DEEPSEEK_API_KEY` exported (or the placeholder rewritten) | supplies `Agent:Providers:0:ApiKey`, which is `[Required]` (whitespace rejected) and which `ProviderResolver` refuses to see empty | placeholder exception if unset; validation failure if blank |
+| `Agent:General:Provider` names a configured provider | selection is case-insensitive by `Name`; duplicate names are rejected. The template already pairs `deepseek` with a `deepseek` entry | `Agent provider '<name>' is not configured.` or `Agent provider '<name>' is configured more than once.` |
 | `Agent:General:Model` | passed unchanged to `GetChatClient`; never validated against the endpoint | startup succeeds; the first job fails |
 | A publicly reachable webhook URL | GitHub must be able to POST deliveries; the PRD's first decision is "webhook + tunnel", with the PC and the tunnel up 24/7 and signatures mandatory | deliveries never arrive; nothing in the log says so |
 
 Two of these are only *shape*-checked at startup. The App id / installation id / private key combination is exercised for the first time on the first GitHub REST call, and the API key and model id for the first time inside the first agent run — see [Why `/health` cannot be a readiness check](#health-is-liveness-not-readiness).
 
-## Configuration: one bound tree, supplied from the environment
+## Configuration: a committed template of placeholders over one bound tree
 
 Configuration is a single options object, `SebastianConfig`, bound with `.Bind(builder.Configuration).ValidateOnStart()` and validated by a source-generated validator built from DataAnnotations attributes on the tree. The property names *are* the keys, so the key tree is fixed at compile time:
 
 | Key path | Rule |
 | --- | --- |
-| `GitHub:WebhookSecret` | `[Required]` string |
-| `GitHub:AppId` | `int`, `[Range(1, int.MaxValue)]` |
-| `GitHub:PrivateKeyPath` | `[Required]` string — a path, never key material |
-| `GitHub:InstallationId` | `[Required]` string |
-| `Agent:Name` | `[Required]` string — the agent's display name |
-| `Agent:General:Provider` | `[Required]` string, matched case-insensitively against provider names |
-| `Agent:General:Model` | `[Required]` string |
-| `Agent:Providers:<index>:Name` | `[Required]`, unique case-insensitively |
-| `Agent:Providers:<index>:Endpoint` | optional, must be an absolute URI, defaults to `https://api.openai.com/v1` |
-| `Agent:Providers:<index>:ApiKey` | `[Required]` |
+| `GitHub:WebhookSecret` | `[Required]` string — placeholder `{env:GITHUB_WEBHOOK_SECRET}` |
+| `GitHub:AppId` | `int`, `[Range(1, int.MaxValue)]` — placeholder `{env:GITHUB_APP_ID}`, resolved as text then converted by the binder |
+| `GitHub:PrivateKeyPath` | `[Required]` string — a path, never key material; placeholder `{env:GITHUB_PRIVATE_KEY_PATH}` |
+| `GitHub:InstallationId` | `[Required]` string — placeholder `{env:GITHUB_INSTALLATION_ID}` |
+| `Agent:Name` | `[Required]` string — the agent's display name; literal `Sebastian` in the template |
+| `Agent:General:Provider` | `[Required]` string, matched case-insensitively against provider names; literal `deepseek` in the template |
+| `Agent:General:Model` | `[Required]` string; literal `deepseek-v4.1-flash` in the template |
+| `Agent:Providers:<index>:Name` | `[Required]`, unique case-insensitively; literal `deepseek` in the template |
+| `Agent:Providers:<index>:Endpoint` | optional, must be an absolute URI, defaults to `https://api.openai.com/v1`; literal `https://api.deepseek.com/v1` in the template |
+| `Agent:Providers:<index>:ApiKey` | `[Required]` — placeholder `{env:DEEPSEEK_API_KEY}` |
 
 Nested sections carry `[ValidateObjectMembers]` and the provider list carries `[ValidateEnumeratedItems]`, so a missing section or a bad list element is reported as a validation failure on the parent rather than surfacing as a null dereference later.
 
-**How to supply it.** The host uses the stock `WebApplication.CreateBuilder(args)` stack. This repository commits **no `appsettings.json`**, no `appsettings.{Environment}.json`, and no `launchSettings.json`, so the values must arrive as environment variables, user secrets, or command-line arguments. Environment variables use `__` as the section separator and a numeric segment for list indices:
+**How to supply it.** `appsettings.json` **is** committed, and it is a template rather than a settings file: every secret is the whole-value expression `{env:NAME}`, while non-secret tuning is a literal.
+
+```json
+{
+  "GitHub": {
+    "WebhookSecret": "{env:GITHUB_WEBHOOK_SECRET}",
+    "AppId": "{env:GITHUB_APP_ID}",
+    "PrivateKeyPath": "{env:GITHUB_PRIVATE_KEY_PATH}",
+    "InstallationId": "{env:GITHUB_INSTALLATION_ID}"
+  },
+  "Agent": {
+    "Name": "Sebastian",
+    "General": { "Provider": "deepseek", "Model": "deepseek-v4.1-flash" },
+    "Providers": [
+      { "Name": "deepseek", "Endpoint": "https://api.deepseek.com/v1", "ApiKey": "{env:DEEPSEEK_API_KEY}" }
+    ]
+  }
+}
+```
+
+The very first statement after `WebApplication.CreateBuilder(args)` is `builder.Configuration.ExpandEnvironmentPlaceholders()`. That extension scans the merged configuration for values that both start with `{env:` and end with `}`, reads the variable named between them, and appends the resolved values as a final in-memory layer. So what an operator must actually provide is the five variables the committed template names — nothing more:
 
 ```
-# Derived from the binding tree in src/Configuration/SebastianConfig.cs.
-# No settings file exists in this repository; supply these in the process environment
-# (or user secrets / command line) before starting the host.
-GitHub__WebhookSecret=<hmac-secret>
-GitHub__AppId=<app-id>
-GitHub__PrivateKeyPath=<absolute-or-relative-path-to-pem>
-GitHub__InstallationId=<installation-id-as-string>
-Agent__Name=Sebastian
-Agent__General__Provider=<provider-name>
-Agent__General__Model=<model-id>
-Agent__Providers__0__Name=<provider-name>
-Agent__Providers__0__ApiKey=<api-key>
-Agent__Providers__0__Endpoint=<https://host/v1>
+# Names come from the placeholder text in the committed appsettings.json, not from the key tree.
+GITHUB_WEBHOOK_SECRET=<hmac-secret>
+GITHUB_APP_ID=<app-id>
+GITHUB_PRIVATE_KEY_PATH=<absolute-or-relative-path-to-pem>
+GITHUB_INSTALLATION_ID=<installation-id-as-string>
+DEEPSEEK_API_KEY=<api-key>
 ```
 
-That block is illustrative of the key shape only — nothing in the repository enumerates variable names. Two operational consequences are worth stating plainly:
+Four operational consequences are worth stating plainly:
 
-- **A `.env` file does nothing.** `.gitignore` lists `.env` and `.env.*` (allowing `.env.example` back in), but no env-file package is referenced and nothing in code loads one. Values must actually be present in the process environment.
-- **Key material is ignored by extension**, not by directory: `*.pem`, `*.key`, `*.pfx`, `*.p12`, `*.snk`, `*.user`, plus `appsettings.Development.json`. That is exactly why `GitHub:PrivateKeyPath` is a path rather than an inline key.
+- **A missing variable is a startup failure, and it names both sides.** `EnvironmentPlaceholders` throws `InvalidOperationException` — `Environment variable '<NAME>' for configuration key '<key>' is not set.` — for an unset **or whitespace-only** variable, before options binding is even configured. Because detection is whole-value only, inline interpolation such as `Bearer {env:TOKEN}` is *not* expanded and binds verbatim.
+- **`__`-style environment overrides are shadowed, not equivalent.** `GitHub__WebhookSecret=…` still works for a *key*, but it does not satisfy the placeholder: the scan of the merged tree throws over the unset `GITHUB_WEBHOOK_SECRET` regardless of what else supplies that key, and whenever the placeholder does resolve, the appended in-memory layer wins. To change or add a secret, edit the placeholder expression in `appsettings.json` (or delete it) rather than inventing a second route. User secrets and command-line arguments behave the same way, and `appsettings.Development.json` is the only committed-by-omission file in the chain (it is git-ignored).
+- **A `.env` file does nothing.** `.gitignore` lists `.env` and `.env.*` (allowing `.env.example` back in), but no env-file package is referenced and nothing in code loads one. Values must actually be present in the process environment — `export` them in the launching shell, in the supervisor's environment block, or use `docker --env-file`. Check with `printenv` before debugging the app.
+- **Key material is ignored by extension**, not by directory: `*.pem`, `*.key`, `*.pfx`, `*.p12`, `*.snk`, `*.user`, plus `appsettings.Development.json`. That is exactly why `GitHub:PrivateKeyPath` is a path rather than an inline key, and why no secret value is ever committed.
 - **Configuration is frozen for the process lifetime.** Nothing injects `IOptionsMonitor<T>` or `IOptionsSnapshot<T>`, and the webhook secret is read once at composition time. Changing any value, including the secret, requires a restart; a running process keeps verifying against the value it started with.
 
-Add a new setting as a three-part change: a bindable property on the tree, a validation attribute if it is mandatory, and a consumer that reads it from `IOptions<SebastianConfig>`. Do not introduce a second options type bound by reflection — the project publishes AOT and relies on the generated binder.
+Add a new setting as a three-part change: a bindable property on the tree, a validation attribute if it is mandatory, and a consumer that reads it from `IOptions<SebastianConfig>` — plus, if it is a secret, a `{env:NAME}` placeholder in `appsettings.json` instead of a literal. Do not introduce a second options type bound by reflection — the project publishes AOT and relies on the generated binder. The binding mechanics and the placeholder precedence chain are covered in [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md).
 
 ## Startup sequence and what a failed start looks like
 
 The order is not cosmetic: each gate runs before the previous one's consumer can observe anything, and the process only reaches `app.RunAsync()` — which is what opens the listener — after every gate has passed.
 
-1. **Options validation.** `ValidateOnStart()` is registered, and `Program.cs` additionally reads `IOptions<SebastianConfig>.Value` immediately after `Build()`, so validation runs before any hosted service. A blank required member or an `AppId` below 1 produces an `OptionsValidationException` that names the failed member(s) — there is no partial start.
-2. **Eager credential resolution.** Two lines resolve `GitHubService` and `ProviderResolver` before endpoints are mapped, with the comment *"Construct the services now so missing credentials fail at startup."* Both validate by construction: `GitHubService` reads and imports the PEM and builds the token provider; `ProviderResolver` admits the provider list, selects one entry, and parses the endpoint.
-3. **Repository identity.** `Git.StartAsync` runs as the first hosted service and enforces the clone's shape. These checks are not cancellable — they are called with `CancellationToken.None` — so a hanging `git` here blocks startup with no timeout.
-4. **Bounded mirror sync.** `git fetch --prune origin`, the mirror guards, and a `merge --ff-only origin/main` under a linked token cancelled after ten seconds.
-5. **Queue and endpoints.** `JobQueue` starts consuming the channel; `app.RunAsync()` binds and serves `/health` plus the webhook route.
+1. **Placeholder expansion.** Before options are registered, `ExpandEnvironmentPlaceholders()` turns `{env:NAME}` into values or throws. A machine with none of the five variables set never gets past this step.
+2. **Options validation.** `ValidateOnStart()` is registered, and `Program.cs` additionally reads `IOptions<SebastianConfig>.Value` immediately after `Build()`, so validation runs before any hosted service. A blank required member or an `AppId` below 1 produces an `OptionsValidationException` that names the failed member(s) — there is no partial start.
+3. **Eager credential resolution.** Two lines resolve `GitHubService` and `ProviderResolver` before endpoints are mapped, with the comment *"Construct the services now so missing credentials fail at startup."* Both validate by construction: `GitHubService` reads and imports the PEM and builds the token provider; `ProviderResolver` admits the provider list, selects one entry, and parses the endpoint.
+4. **Repository identity.** `Git.StartAsync` runs as the first hosted service and enforces the clone's shape. These checks are not cancellable — they are called with `CancellationToken.None` — so a hanging `git` here blocks startup with no timeout.
+5. **Bounded mirror sync.** `git fetch --prune origin`, the mirror guards, and a `merge --ff-only origin/main` under a linked token cancelled after ten seconds.
+6. **Queue and endpoints.** `JobQueue` starts consuming the channel; `app.RunAsync()` binds and serves `/health` plus the webhook route.
 
 Failure messages an operator will actually see, verbatim from the code:
 
 | Symptom | Source | Timing |
 | --- | --- | --- |
+| `Environment variable '<NAME>' for configuration key '<key>' is not set.` | `EnvironmentPlaceholders` | before options validation |
 | `OptionsValidationException` naming the member (blank `WebhookSecret`, `PrivateKeyPath`, `InstallationId`, `Name`, `Provider`, `Model`, provider `Name`/`ApiKey`; `AppId` < 1) | generated `ValidateSebastianConfig` | before any hosted service |
 | File-system exception from `File.ReadAllText` at `PrivateKeyPath` | `GitHubService` constructor | eager resolution |
 | `CryptographicException` from `ImportFromPem` on a non-RSA / malformed PEM | `GitHubService` constructor | eager resolution |
@@ -153,7 +178,7 @@ Failure messages an operator will actually see, verbatim from the code:
 | `git remote get-url origin failed: <stderr>` | the generic git command runner | hosted service start |
 | `Could not parse the origin remote URL.` | `Git.EnsureRepositoryAsync` + `RepositoryIdentity.Parse` | hosted service start |
 
-Note the asymmetry between step 1 and the rest: validation failures are reported as one aggregated options error, while every other gate is a raw exception that ends the process. Both look the same from outside — a non-zero exit and a stack trace on stderr with no listener — and both require fixing the configuration or the checkout and starting again. The composition-level reasoning behind the ordering lives in [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md); the provider rules are in [Model Provider Resolution](../concepts/model-providers.md) and the credential chain in [GitHub App Authentication and Issue Writes](../integrations/github-app-client.md).
+Note the asymmetry between the first two rows and the rest: placeholder and validation failures are reported as one exception naming the key or member, while every other gate is a raw exception that ends the process. Both look the same from outside — a non-zero exit and a stack trace on stderr with no listener — and both require fixing the environment or the checkout and starting again. The provider rules are in [Model Provider Resolution](../concepts/model-providers.md) and the credential chain in [GitHub App Authentication and Issue Writes](../integrations/github-app-client.md).
 
 ### What a successful start does *not* guarantee
 
@@ -169,7 +194,7 @@ The ten-second startup sync is deliberately best-effort: `SyncMainAsync` catches
 app.MapGet("/health", () => "ok");
 ```
 
-The endpoint returns a constant. It does not inspect the mirror's freshness, the queue depth, the number of in-flight jobs, whether the last sync succeeded, or whether either credential chain actually works. Its only meaningful signal is "the process is up far enough to serve HTTP" — which, because of the fail-fast gates, does mean configuration validated and the repository shape was accepted at start.
+The endpoint returns a constant. It does not inspect the mirror's freshness, the queue depth, the number of in-flight jobs, whether the last sync succeeded, or whether either credential chain actually works. Its only meaningful signal is "the process is up far enough to serve HTTP" — which, because of the fail-fast gates, does mean placeholders resolved, configuration validated, and the repository shape was accepted at start.
 
 Treat it accordingly: point a supervisor's liveness probe at `/health`, do **not** treat it as proof that the agent can work. Concretely, all of the following can be true while `/health` returns `ok`:
 
@@ -186,16 +211,17 @@ There is no readiness endpoint, no metrics endpoint, and no dashboard; the log a
 Each step below is checkable against a log line or a GitHub effect, without inventing any tooling that the repository does not have.
 
 1. **Check the checkout before starting.** `git rev-parse --show-toplevel` must print the directory you will run from; `git remote -v` must show `origin`; `git branch --show-current` must print `main`; `git status --porcelain --untracked-files=no` must be empty; `git rev-list --count origin/main..main` must be `0`. `.sebastian/` being present and untracked is fine — the dirty check deliberately ignores untracked files.
-2. **Start the host with the working directory set to that root**, with the configuration present in its environment.
-3. **Confirm the identity line** `Using repository {owner}/{repository} on main` at Information. Its absence means step 3 of the sequence above (repository identity) did not complete.
-4. **Confirm mirror state.** Either `Local main already matches origin/main` or `Fast-forwarded local main from <before> to <after>`. A `Skipped local main sync: …` or `Local main sync failed` warning means the host is up on a mirror you should inspect by hand.
-5. **Confirm liveness** by requesting `/health` through the same public URL the webhook will use — that single check verifies the tunnel and the port mapping at once.
-6. **Smoke-test intake** with a `feature`-labeled issue whose body is missing required sections. Correct behavior is a comment listing the missing sections, the issue closed as `not_planned`, and `Webhook {EventType} ({Event})` in the log. This also proves the GitHub App credentials, because the comment and close are the first REST calls the process makes. The spec contract itself belongs to [Issue Spec Contract and Validation Gate](../concepts/spec-validation.md).
-7. **Smoke-test the agent path** by adding `ready-for-agent` to a complete feature issue, then watching `Started implementation for {Repository}#{Number}` (Information) and `Implementation completed for {Repository}#{IssueNumber} at {Path}. Git status: {Status}. Agent response: {Response}` (Information). A `Job {Key} failed` line at **Error** with no comment on the issue is the agent-path failure signature; see [Failure Handling, Restart Behavior, and Known Races](failure-handling.md).
+2. **Check the environment.** `printenv GITHUB_WEBHOOK_SECRET GITHUB_APP_ID GITHUB_PRIVATE_KEY_PATH GITHUB_INSTALLATION_ID DEEPSEEK_API_KEY` must print five non-blank values, and `GITHUB_APP_ID` must be digits. A single missing one aborts startup before anything else.
+3. **Start the host with the working directory set to that root**, with those variables exported into its environment.
+4. **Confirm the identity line** `Using repository {owner}/{repository} on main` at Information. Its absence means the repository-identity gate did not complete.
+5. **Confirm mirror state.** Either `Local main already matches origin/main` or `Fast-forwarded local main from <before> to <after>`. A `Skipped local main sync: …` or `Local main sync failed` warning means the host is up on a mirror you should inspect by hand.
+6. **Confirm liveness** by requesting `/health` through the same public URL the webhook will use — that single check verifies the tunnel and the port mapping at once.
+7. **Smoke-test intake** with a `feature`-labeled issue whose body is missing required sections. Correct behavior is a comment listing the missing sections, the issue closed as `not_planned`, and `Webhook {EventType} ({Event})` in the log. This also proves the GitHub App credentials, because the comment and close are the first REST calls the process makes. The spec contract itself belongs to [Issue Spec Contract and Validation Gate](../concepts/spec-validation.md).
+8. **Smoke-test the agent path** by adding `ready-for-agent` to a complete feature issue, then watching `Started implementation for {Repository}#{Number}` (Information) and `Implementation completed for {Repository}#{IssueNumber} at {Path}. Git status: {Status}. Agent response: {Response}` (Information). A `Job {Key} failed` line at **Error** with no comment on the issue is the agent-path failure signature; see [Failure Handling, Restart Behavior, and Known Races](failure-handling.md).
 
 ## Webhook delivery through a public tunnel
 
-Sebastian has no authentication middleware. The webhook endpoint is anonymous, and every delivery is verified against the HMAC secret passed to `MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` before the processor runs. The secret is the entire trust boundary; a wrong signature is rejected by the endpoint middleware and never reaches Sebastian's own logging.
+Sebastian has no authentication middleware. The webhook endpoint is anonymous, and every delivery is verified against the HMAC secret passed to `MapGitHubWebhooks(secret: config.GitHub.WebhookSecret)` before the processor runs. The secret is the entire trust boundary; a wrong signature is rejected by the endpoint middleware and never reaches Sebastian's own logging. Because the secret comes from `{env:GITHUB_WEBHOOK_SECRET}`, a missing variable is a startup failure rather than a silently anonymous endpoint.
 
 Operationally that means:
 
@@ -204,7 +230,7 @@ Operationally that means:
 - **Subscribe the App to at least `issues` and `push`.** Those are the only two handlers the processor overrides; `push` is what keeps the mirror fresh between restarts, and `issues` is the only trigger for agent work.
 - **A failed delivery is retried by GitHub, not by Sebastian.** Intake has no `try`/`catch` and no idempotency: a comment that succeeds followed by a close that fails leaves an open issue carrying a "Closed: …" comment, and a redelivery posts a second identical comment. Any exception on the intake path makes the delivery fail.
 - **Webhook latency is design-relevant.** Push deliveries run `git fetch` and a possible fast-forward synchronously inside the request, so a slow remote shows up as a slow delivery.
-- **Changing the secret requires a restart**, since it is captured at composition time.
+- **Changing the secret requires a restart** — and also a change to the placeholder or the environment, since the value is captured at composition time.
 
 Delivery routing and the label gates are documented in [Webhook Intake and Event Routing](../integrations/github-webhooks.md).
 
@@ -231,7 +257,7 @@ The layout is `Path.Combine(git.Root, ".sebastian", "workspaces")` plus the inva
 
 **The deletion rule is the one operational fact that cannot be recovered.** Nothing in the pipeline commits, pushes, or opens a pull request: a run's product is the uncommitted state of that worktree, reported through `git -C <worktree> status --short` and written into the completion log line. Deleting `.sebastian/workspaces/<issue>` therefore destroys the only copy of that work — there is no git history to restore it from. The same rule in the other direction: because an existing worktree is returned untouched, removing the directory is also the only supported way to reset a run that is stuck on a stale base.
 
-Other ignored paths an operator may want to know about: `bin/`, `obj/`, `tests/**/bin`, `tests/**/obj`, and `.archify/` (design-time). Restart, shutdown, and reuse semantics are covered in detail in [Failure Handling, Restart Behavior, and Known Races](failure-handling.md) and [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
+Other ignored paths an operator may want to know about: `bin/`, `obj/`, `tests/**/bin`, `tests/**/obj`, `.archify/` (design-time), and `.agents`. Restart, shutdown, and reuse semantics are covered in detail in [Failure Handling, Restart Behavior, and Known Races](failure-handling.md) and [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
 
 ## Logs to watch
 
@@ -251,7 +277,7 @@ Logging is source-generated (`[LoggerMessage]`) and configured by nothing in thi
 | Information | `Implementation completed for {Repository}#{IssueNumber} at {Path}. Git status: {Status}. Agent response: {Response}` | the run's only artifact record |
 | Error | `Job {Key} failed` (with exception) | a job died; no retry, and nothing is written to the issue |
 
-Three lines are **Debug** and therefore invisible at default verbosity, which is worth remembering before concluding that an event was ignored: `Local main sync cancelled` (a truncated startup sync), `Implementation already running for {Repository}#{Number}` (a duplicate delivery dropped rather than queued), and `Issue {Repository}#{Number} closed; missing spec sections: {Sections}` (an invalid spec closed without any Information-level trace). Raising verbosity is a configuration change on the default host logging stack (the standard `Logging:*` keys, e.g. `Logging__LogLevel__Default=Debug` in the environment) — no such section is committed here.
+Three lines are **Debug** and therefore invisible at default verbosity, which is worth remembering before concluding that an event was ignored: `Local main sync cancelled` (a truncated startup sync), `Implementation already running for {Repository}#{Number}` (a duplicate delivery dropped rather than queued), and `Issue {Repository}#{Number} closed; missing spec sections: {Sections}` (an invalid spec closed without any Information-level trace). Raising verbosity is a configuration change on the default host logging stack (the standard `Logging:*` keys, e.g. `Logging__LogLevel__Default=Debug` in the environment) — no such section is committed here. A placeholder failure, by contrast, is not logged at all: it surfaces as an unhandled exception on stderr.
 
 ## Concurrency and resource limits
 
@@ -284,7 +310,7 @@ No publish command is documented in the repository. Publishing natively follows 
 dotnet publish Sebastian.csproj -c Release -r <rid>
 ```
 
-A native AOT publish additionally needs a C toolchain and linker for the target platform on the publishing machine. The resulting binary still needs `git` on `PATH`, read access to `origin`, outbound HTTPS to the GitHub REST API, and outbound HTTPS to the configured provider endpoint.
+A native AOT publish additionally needs a C toolchain and linker for the target platform on the publishing machine. The publish output also needs, next to the binary, the committed `appsettings.json` — it is a plain content file in a web SDK project, and without it no placeholder is present to expand and only `__`-style environment keys would bind. The resulting deployment still needs `git` on `PATH`, the five environment variables, read access to `origin`, outbound HTTPS to the GitHub REST API, and outbound HTTPS to the configured provider endpoint.
 
 ## The scheduled OpenWiki workflow is documentation only
 
@@ -294,7 +320,7 @@ It is **not part of running Sebastian** and is not a deployment path: it never b
 
 ## Related pages
 
-- [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) — the composition root, binding mechanics, and the fail-fast contract in full.
+- [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) — the composition root, placeholder expansion and precedence, binding mechanics, and the fail-fast contract in full.
 - [Model Provider Resolution](../concepts/model-providers.md) — every provider-list rule and why the chat client is built per job.
 - [GitHub App Authentication and Issue Writes](../integrations/github-app-client.md) — what the App id, installation id, and PEM are used for, and the only two writes the system makes.
 - [Webhook Intake and Event Routing](../integrations/github-webhooks.md) — delivery verification, label gates, and in-request latency.

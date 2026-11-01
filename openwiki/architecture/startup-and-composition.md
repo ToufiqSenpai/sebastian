@@ -1,14 +1,13 @@
 ---
 type: architecture-startup-composition
 title: Startup, Composition, and Configuration Binding
-description: How Program.cs composes Sebastian — options binding with a source-generated validator, deliberate singleton factory registrations that share one instance with each hosted service, why credentials are constructed eagerly, how configuration keys map to SebastianConfig, and exactly what fails at startup versus later.
-tags: [startup, dependency-injection, configuration-binding, options-validation, aot, secrets, fail-fast]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
+description: How Program.cs composes Sebastian — {env:NAME} placeholder expansion before options binding, options binding with a source-generated validator, the committed appsettings.json template, deliberate singleton factory registrations that share one instance with each hosted service, the eager resolutions that fail startup, and exactly what fails at boot versus on the first job.
+tags: [startup, dependency-injection, configuration-binding, environment-placeholders, options-validation, aot, secrets, fail-fast]
 sources:
   - id: openwiki-source-ea70eb6c045047448e446296
     resource: repo://.gitignore
+  - id: openwiki-source-ede59da55b0d48006223d1c0
+    resource: repo://appsettings.json
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
   - id: openwiki-source-3bf67c20a76eb7fa3cac2e6e
@@ -17,6 +16,8 @@ sources:
     resource: repo://src/Agent/ImplementSpec.cs
   - id: openwiki-source-815a573c061c6efd30bc89a6
     resource: repo://src/Agent/ProviderResolver.cs
+  - id: openwiki-source-7709fb6d7a3503104984ea26
+    resource: repo://src/Configuration/EnvironmentPlaceholders.cs
   - id: openwiki-source-c011dda0b85bc515c2bfb12c
     resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
@@ -31,37 +32,100 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-5b02b033021548a1c1fc0ba0
     resource: repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs
+  - id: openwiki-source-7468e4bacf37515653b4d440
+    resource: repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs
   - id: openwiki-source-7f9ac1665b935b4f858f87e0
     resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
   - id: openwiki-source-c13b20e41fd15a696ab1eb84
     resource: repo://tests/Sebastian.Tests/Sebastian.Tests.csproj
   - id: openwiki-source-cebf243b519f1af286c1277d
     resource: repo://tests/Sebastian.Tests/TestRepository.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Startup, Composition, and Configuration Binding
 
-`Program.cs` is the entire composition root: about fifty lines that build the host, bind and validate configuration, register four singleton collaborators, expose two of them as hosted services, and map two endpoints. There is no `Startup` class, no module/extension method split, and no registration site anywhere else in the repository — every `AddSingleton`, `AddHostedService`, and endpoint mapping lives in that one file. Read it as the answer to "what exists at runtime"; read every other type as something it chooses to construct.
+`Program.cs` is the entire composition root: about fifty lines that build the host, expand `{env:NAME}` placeholders, bind and validate configuration, register four singleton collaborators, expose two of them as hosted services, eagerly construct the credential-bearing services, and map two endpoints. There is no `Startup` class, no module/extension method split, and no registration site anywhere else in the repository — every `AddSingleton`, `AddHostedService`, and endpoint mapping lives in that one file. Read it as the answer to "what exists at runtime"; read every other type as something it chooses to construct.
 
 ```mermaid
 flowchart TD
-    A["WebApplication.CreateBuilder builds IConfiguration"] --> B["AddOptions Bind SebastianConfig plus ValidateOnStart plus ValidateSebastianConfig"]
-    B --> C["builder.Build creates the container"]
-    C --> D["Read IOptions value: bind then validate"]
-    D -->|invalid| X1["OptionsValidationException, process exits"]
-    D -->|valid| E["Resolve GitHubService and ProviderResolver eagerly"]
-    E -->|missing PEM, unreadable key, bad provider set| X2["Constructor throws, process exits"]
-    E --> F["MapGet health plus MapGitHubWebhooks with WebhookSecret"]
-    F --> G["Host start runs the ValidateOnStart validator"]
-    G --> H["Git.StartAsync: content root equals git top level, parse origin"]
-    H -->|not the repo root or unparsable origin| X3["InvalidOperationException, host aborts"]
-    H --> I["Git.StartAsync: bounded 10 second main sync, failures only warn"]
-    I --> J["JobQueue starts consuming the channel"]
-    J --> K["Server accepts health checks and webhook deliveries"]
+    A["WebApplication.CreateBuilder loads appsettings.json, env vars, args"] --> B["ExpandEnvironmentPlaceholders: resolve {env:NAME} into in-memory layer"]
+    B -->|variable unset or blank| X0["InvalidOperationException naming key and variable, process exits"]
+    B --> C["AddOptions Bind SebastianConfig plus ValidateOnStart plus ValidateSebastianConfig"]
+    C --> D["builder.Build creates the container"]
+    D --> E["Read IOptions value: bind then validate"]
+    E -->|invalid| X1["OptionsValidationException, process exits"]
+    E -->|valid| F["Resolve GitHubService and ProviderResolver eagerly"]
+    F -->|missing PEM, unreadable key, bad provider set| X2["Constructor throws, process exits"]
+    F --> G["MapGet health plus MapGitHubWebhooks with WebhookSecret"]
+    G --> H["Host start runs the ValidateOnStart validator"]
+    H --> I["Git.StartAsync: content root equals git top level, parse origin"]
+    I -->|not the repo root or unparsable origin| X3["InvalidOperationException, host aborts"]
+    I --> J["Git.StartAsync: bounded 10 second main sync, failures only warn"]
+    J --> K["JobQueue starts consuming the channel"]
+    K --> L["Server accepts health checks and webhook deliveries"]
 ```
 
-Startup phases in execution order, with the three points where a misconfiguration stops the process instead of surfacing later.
+Startup phases in execution order, with the four points where a bad environment or misconfiguration stops the process instead of surfacing later. Note the ordering at the top: placeholder expansion runs on the raw `ConfigurationManager` *before* the options binding is registered, so the orchestrator's environment, not the ambient environment provider alone, is what every bound value — including non-string settings — ends up holding.
+
+## Expanding `{env:NAME}` placeholders before binding
+
+The very first statement after `CreateBuilder` is:
+
+```csharp
+// appsettings.json stores {env:NAME} placeholders so secrets stay out of git.
+builder.Configuration.ExpandEnvironmentPlaceholders();
+```
+
+`EnvironmentPlaceholders.ExpandEnvironmentPlaceholders(this ConfigurationManager)` is a ~30-line extension in `src/Configuration`. It enumerates every entry of the configuration as flat `Key:Sub:Key` / value pairs, selects the values that are *whole-value* placeholders — `StartsWith("{env:")` **and** `EndsWith('}')` — extracts the name between them, and appends one in-memory collection containing the resolved values via `configuration.AddInMemoryCollection(resolved)`.
+
+Four properties of this design matter operationally:
+
+- **The placeholder text is replaced before anything is bound.** Binding still happens later against `builder.Configuration`, but the in-memory layer added last wins provider precedence, so `SebastianConfig` sees the resolved string rather than `{env:...}`. Without this step, `[Required]` on `WebhookSecret` would happily accept the literal placeholder text and the process would boot with a webhook secret that is literally the string `{env:GITHUB_WEBHOOK_SECRET}`.
+- **Values are still text at expansion time, which is why non-string settings work.** The code says so inline: *"Values are still text here, so int settings such as GitHub:AppId work too."* A whole-value placeholder is substituted inside the configuration string layer, and `GitHub:AppId` is then parsed from `"{env:GITHUB_APP_ID}"` → the resolved digits by the binder's `int` conversion. If the resolved value is not parseable as an `int`, that conversion — not this code — fails during binding.
+- **Whole-value placeholders are the only supported form.** The code marks this as a deliberate shortcut: *"shortcut: whole-value placeholders only; extend if inline interpolation is needed."* `Bearer {env:TOKEN}` or `prefix-{env:SUFFIX}` will not be expanded and will bind verbatim, because detection requires the value to *start* with `{env:` and *end* with `}`. Whole-value substitution is also what makes the mechanism type-agnostic: there is no string surgery on a partially-resolved value, no risk of accidentally building `"Bearer "` around a numeric env var, and the resolved string is delivered to the binder untouched for its own conversion. Inline interpolation would require deciding what "the value" means for every type in the tree (numbers, URIs, lists), so the narrow form is the one that is safe to reason about — treat its absence as a supported limitation, not a bug.
+- **A missing or blank variable fails startup.** If `Environment.GetEnvironmentVariable(name)` returns null or whitespace (and the name is non-empty), the extension throws `InvalidOperationException` with both pieces of information: `"Environment variable '{name}' for configuration key '{key}' is not set."` An empty placeholder name (`"{env:}"`) resolves to null and therefore throws the same way. This is stricter than the options validator would be on its own: a blank variable would otherwise produce a blank `string` that `[Required]` catches (with a less specific message) for required keys, but would silently pass for an *optional* key such as `Agent:Providers:0:Endpoint`. Unset means unset — there is no fallback to "leave the placeholder in place".
+
+Resolution failure is covered by `EnvironmentPlaceholdersTests`: `PlaceholderIsResolvedFromEnvironment` shows a resolved key and an untouched literal key side by side, and `MissingEnvironmentVariableFails` asserts the exception message contains both the variable name and the configuration key. Two gaps are not covered: there is no test for a *blank* (whitespace-only) variable, and none for the non-string path — no test proves `GitHub:AppId` actually parses from a resolved placeholder, even though `appsettings.json` ships `AppId` in exactly that form. If you add interpolation support or change the detection rule, add tests for the typed binding too.
+
+## The configuration template: `appsettings.json` ships placeholders, never secrets
+
+`appsettings.json` **is** committed, and it is the reference shape of every key plus a pointer to the environment variable that supplies it:
+
+```json
+{
+  "GitHub": {
+    "WebhookSecret": "{env:GITHUB_WEBHOOK_SECRET}",
+    "AppId": "{env:GITHUB_APP_ID}",
+    "PrivateKeyPath": "{env:GITHUB_PRIVATE_KEY_PATH}",
+    "InstallationId": "{env:GITHUB_INSTALLATION_ID}"
+  },
+  "Agent": {
+    "Name": "Sebastian",
+    "General": { "Provider": "deepseek", "Model": "deepseek-v4.1-flash" },
+    "Providers": [
+      { "Name": "deepseek", "Endpoint": "https://api.deepseek.com/v1", "ApiKey": "{env:DEEPSEEK_API_KEY}" }
+    ]
+  }
+}
+```
+
+The split is deliberate and visible in the file: every **secret** (webhook secret, app id, key path, installation id, API key) is a placeholder, while non-secret tuning (`Agent:Name`, the selected provider and model, the endpoint URL) is a literal. The environment variable names are chosen and named here, not derived from the key tree — `Agent:Providers:0:ApiKey` arrives through `DEEPSEEK_API_KEY`, so renaming a provider entry means editing this file's placeholder expression, not renaming an environment variable.
+
+There is still no `launchSettings.json` and no committed `appsettings.Development.json`. The resulting precedence is the stock `WebApplication.CreateBuilder(args)` chain — `appsettings.json` (now present, with unresolved placeholder text), optional `appsettings.{Environment}.json`, user secrets in Development, environment variables, command-line arguments — and then the placeholder layer is appended last and wins. Configuration is therefore complete only when the placeholders above resolve: on a machine with none of those variables set, the process fails in `ExpandEnvironmentPlaceholders` before the options binding is even configured. Local Development overrides go through user secrets or a git-ignored `appsettings.Development.json`.
+
+`.gitignore` encodes the secrets policy that goes with this file:
+
+- `.env` and `.env.*` are ignored (with `!.env.example` allowed back in), alongside `appsettings.Development.json`.
+- Key material is ignored by extension: `*.pem`, `*.key`, `*.pfx`, `*.p12`, `*.snk`, `*.user`. `GitHub:PrivateKeyPath` points at a PEM that must never be committed, which is exactly why the setting is a path rather than an inline key.
+- Runtime state (`bin/`, `obj/`, `.sebastian/`), the design-time `.archify/` folder, and `.agents` are ignored too.
+
+Note the gap this creates: the `.env` entry protects a local file from being committed, but **nothing in the project loads a `.env` file** — there is no env-file package in `Sebastian.csproj` and no loader in code. Inside Sebastian those values must actually be present in the process environment; a `.env` file only takes effect if whatever launches the app (a `docker --env-file`, a CI step, a shell wrapper) exports it first. Because `appsettings.json` now references variables explicitly, a `dotenv`-style launch habit is easy to mistake for working configuration — check `printenv` before debugging the app.
+
+Two consequences follow from expansion happening last and unconditionally. First, the alternative default-source routes still work for any *key*, but they do not satisfy a placeholder: overriding `GitHub:WebhookSecret` on the command line or in user secrets does not stop `ExpandEnvironmentPlaceholders` from throwing over an unset `GITHUB_WEBHOOK_SECRET`, because the throw happens while scanning the merged tree, before precedence is ever consulted. Every `{env:...}` expression in `appsettings.json` must have a non-blank environment variable behind it, or you must remove the expression. Second, the names come from the placeholder text rather than from `__`-separated key mapping, so direct environment-variable override (`GitHub__WebhookSecret=...`) is shadowed by the in-memory layer whenever the corresponding placeholder also resolves.
 
 ## Configuration: one bound tree, one generated validator
 
@@ -113,18 +177,6 @@ Treat a new config field as a three-part change: a bindable public property on t
 
 Nothing in the codebase injects `IOptionsMonitor<T>` or `IOptionsSnapshot<T>`; every consumer takes `IOptions<SebastianConfig>` and reads `.Value`. `Program.cs` additionally reads the value once at composition time and passes `config.GitHub.WebhookSecret` into `MapGitHubWebhooks`. Configuration is therefore frozen for the lifetime of the process, including the webhook secret — changing any setting requires a restart. Do not introduce `IOptionsMonitor` for one field without deciding what happens to the already-mapped webhook signature check.
 
-## Where the values come from, and where secrets live
-
-There is **no committed `appsettings.json`** in this repository, and no `launchSettings.json`. The host therefore relies on the default `WebApplication.CreateBuilder(args)` stack — optional `appsettings.json` / `appsettings.{Environment}.json`, user secrets in the Development environment, environment variables, then command-line arguments — and in a real deployment that means environment variables or user secrets.
-
-`.gitignore` encodes the secrets policy:
-
-- `.env` and `.env.*` are ignored (with `!.env.example` allowed back in), alongside `appsettings.Development.json`.
-- Key material is ignored by extension: `*.pem`, `*.key`, `*.pfx`, `*.p12`, `*.snk`, `*.user`. `GitHub:PrivateKeyPath` points at a PEM that must never be committed, which is exactly why the setting is a path rather than an inline key.
-- Runtime state (`bin/`, `obj/`, `.sebastian/`) and the design-time `.archify/` folder are ignored too.
-
-Note the gap this creates: the `.env` entry protects a local file from being committed, but **nothing in the project loads a `.env` file** — there is no env-file package in `Sebastian.csproj` and no loader in code. Those values must actually be present in the process environment (or supplied through user secrets, or the command line); writing a `.env` and expecting Sebastian to read it does nothing. Environment variable names follow the tree with `__` as the separator, so `GitHub:WebhookSecret` corresponds to `GitHub__WebhookSecret` and `Agent:Providers:0:ApiKey` to `Agent__Providers__0__ApiKey`.
-
 ## The service graph
 
 | Registration | Shape | Constructed when | Purpose |
@@ -173,6 +225,7 @@ Everything below throws *before the process serves a webhook*, which is the poin
 
 | Failure | Where | Timing | Observable symptom |
 | --- | --- | --- | --- |
+| Placeholder variable unset or blank, or empty placeholder name | `ExpandEnvironmentPlaceholders` | before binding is configured | `"Environment variable '<name>' for configuration key '<key>' is not set."` |
 | Missing `GitHub` or `Agent` section, blank `WebhookSecret` / `PrivateKeyPath` / `InstallationId` / `Name` / `Provider` / `Model` / provider `Name` / `ApiKey`, `AppId` below 1 | generated `ValidateSebastianConfig` | reading `IOptions.Value` right after `Build()`, and again at host start | `OptionsValidationException` naming the failed member |
 | No providers configured | `ProviderResolver` ctor | eager resolution | `"At least one agent provider must be configured."` |
 | Same provider `Name` twice (case-insensitive) | `ProviderResolver` ctor | eager resolution | `"Agent provider '<name>' is configured more than once."` |
@@ -195,18 +248,20 @@ Because `Git` is registered before `JobQueue`, the repository invariant is check
 
 ## Changing startup safely
 
-- **Add a setting** by extending the `SebastianConfig` tree with a bindable property plus validation, then consume it through `IOptions<SebastianConfig>`. Do not add a second options type bound by reflection, and do not add a committed `appsettings.json` containing real secrets.
+- **Add a setting** by extending the `SebastianConfig` tree with a bindable property plus validation, then consume it through `IOptions<SebastianConfig>`. If it is a secret, add a `{env:NAME}` placeholder to `appsettings.json` rather than a literal value; if it is non-secret tuning, a literal is in keeping with the existing file. Do not add a second options type bound by reflection.
 - **Make something fail fast** by resolving it eagerly next to `GitHubService` / `ProviderResolver`, not by hoping a constructor runs. The eager list is an explicit, intentional list — appending to it is how a new credential class joins the fail-fast contract.
 - **Add a hosted service that others inject** using the same two-descriptor factory pattern so there is exactly one instance; a plain `AddHostedService<T>()` creates an object nothing else can reach.
 - **Keep constructor work cheap and side-effect-free for singletons that are not eagerly resolved**, because `WebhookEventProcessor` is constructed on the first delivery and a throw there is a failed request, not a failed deployment.
 - **Order matters.** Hosted services start in registration order; if a new service depends on the repository guard having run, register it after `Git`.
+- **Mind placeholder expansion when you touch configuration sources.** It runs on `builder.Configuration` after the builder has loaded its default sources and before binding, and it adds a layer with the highest precedence. Any custom configuration source added *after* that call is shadowed for keys a placeholder also resolves; any source added *before* it is eligible to have its values rewritten as placeholders.
 
 ## Test coverage for this page
 
 The startup-time failure modes are pinned at the unit level rather than end to end:
 
 - `ProviderResolverTests` asserts the missing-provider, duplicate-name, and empty-list `InvalidOperationException`s by constructing `ProviderResolver` with `Options.Create(config)`, and asserts whitespace-only `ApiKey` is rejected by the generated `ValidateSebastianConfig` — i.e. the fail-fast messages and the validator are both protected.
-- `ImplementSpecTests` and `JobQueueTests` construct `Git` and `JobQueue` directly (`new(new TestHostEnvironment(path), logger)`), so the DI composition itself is never exercised.
-- There is no `WebApplicationFactory` in the test project and no integration test of `Program.cs`; nothing in the suite would fail if the eager-resolution block, a hosted-service factory, or the `WebhookEventProcessor` registration were removed. Changes to composition need manual verification against a real repository.
+- `EnvironmentPlaceholdersTests` pins placeholder resolution and the missing-variable failure, including the exception message, but not blank-variable handling and not typed binding such as `GitHub:AppId`.
+- `ImplementSpecTests` and `JobQueueTests` construct `Git` and `JobQueue` directly (`new(new TestHostEnvironment(path), logger)` / `new(services, NullLogger<JobQueue>.Instance)`), so the DI composition itself is never exercised.
+- There is no `WebApplicationFactory` in the test project and no integration test of `Program.cs`; nothing in the suite would fail if the placeholder-expansion call, the eager-resolution block, a hosted-service factory, or the `WebhookEventProcessor` registration were removed. Changes to composition need manual verification against a real repository.
 
 See [GitHub App Authentication and Issue Writes](../integrations/github-app-client.md) for the credential chain behind `GitHubService`, [Model Provider Resolution](../concepts/model-providers.md) for provider selection semantics, [Running, Configuration, and Deployment](../operations/running-and-deployment.md) for the operator checklist, and [System Overview and Runtime Topology](overview.md) for where these objects fit in the request path.

@@ -3,16 +3,17 @@ type: integration-github-app-client
 title: GitHub App Authentication and Issue Writes
 description: How Sebastian authenticates outbound GitHub REST calls — the PEM path to RSA key to installation-token to Kiota request adapter chain wired in GitHubService — and the only two writes it performs, posting an issue comment and closing an issue as not_planned, with their exact payloads, failure semantics, and extension boundary.
 tags: [github-app, authentication, installation-token, kiota, octokit, issue-writes, idempotency, extension-points]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
+  - id: openwiki-source-ede59da55b0d48006223d1c0
+    resource: repo://appsettings.json
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
   - id: openwiki-source-3bf67c20a76eb7fa3cac2e6e
     resource: repo://Sebastian.csproj
   - id: openwiki-source-b5cf04fcd9c2585d8cde1706
     resource: repo://src/Agent/ImplementSpec.cs
+  - id: openwiki-source-7709fb6d7a3503104984ea26
+    resource: repo://src/Configuration/EnvironmentPlaceholders.cs
   - id: openwiki-source-c011dda0b85bc515c2bfb12c
     resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
@@ -21,7 +22,10 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-5b02b033021548a1c1fc0ba0
     resource: repo://tests/Sebastian.Tests/Agent/ProviderResolverTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # GitHub App Authentication and Issue Writes
@@ -78,12 +82,20 @@ Two details of this chain matter operationally:
 - **`InstallationId` is a `string`, not an `int`.** `AppId` gets numeric range validation; the installation id only gets `[Required]`, so `GitHub:InstallationId="abc"` binds and validates cleanly. There is no parse of that value anywhere in Sebastian — whatever is wrong with it surfaces when the SDK first needs a token, not at startup.
 - **The `RSA` key is a long-lived field, and is disposed only at shutdown.** The key is imported once and never re-read, so rotating the app private key requires a process restart. The credential chain therefore describes the *entire* lifetime of the process, not just its first minute.
 
+### The environment-variable path behind those settings
+
+All four GitHub settings reach the constructor through `{env:...}` placeholders in the committed `appsettings.json` — `AppId` ← `{env:GITHUB_APP_ID}`, `PrivateKeyPath` ← `{env:GITHUB_PRIVATE_KEY_PATH}`, `InstallationId` ← `{env:GITHUB_INSTALLATION_ID}` (and `WebhookSecret` ← `{env:GITHUB_WEBHOOK_SECRET}` for the inbound side). `Program.cs` calls `ExpandEnvironmentPlaceholders()` before any options registration, and a placeholder whose variable is unset or whitespace-only throws `InvalidOperationException` naming both the variable and the configuration key. Two consequences for this page:
+
+- **A bad credential value is caught before the constructor for the wrong reason.** An unset variable fails in expansion, not in the validator or the PEM read; the message points at `GITHUB_PRIVATE_KEY_PATH`, not at `GitHub:PrivateKeyPath`.
+- **A resolvable-but-wrong value is not.** A path that points at the wrong file, or a valid PEM for a different App, sails through expansion and only fails later — at `ImportFromPem`, or on the first REST call. The placeholder layer expands text; it never checks that the text is coherent with the other three settings. See [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for the full precedence and shadowing rules.
+
 ### What fails at startup, and what does not
 
 `Program.cs` resolves `GitHubService` eagerly right after `Build()` — `_ = app.Services.GetRequiredService<GitHubService>();` under the comment *"Construct the services now so missing credentials fail at startup."* Because the constructor is the authentication work, eager resolution converts construction failures into deployment failures:
 
 | Failure | Where it throws | Timing | Symptom |
 | --- | --- | --- | --- |
+| A `{env:...}` variable for the GitHub section unset or blank | `ExpandEnvironmentPlaceholders` | before options binding exists | `InvalidOperationException` naming variable and key |
 | `PrivateKeyPath` missing, unreadable, or a directory | `File.ReadAllText` in the ctor | eager resolution after `Build()` | file-system exception (`FileNotFoundException` / `UnauthorizedAccessException`) |
 | File exists but carries no usable PEM key | `RSA.ImportFromPem` | eager resolution | crypto exception from the import |
 | Blank `PrivateKeyPath` / `InstallationId`, `AppId` below 1 | generated `ValidateSebastianConfig` | first `IOptions.Value` read, before the ctor runs | `OptionsValidationException` |
@@ -91,7 +103,7 @@ Two details of this chain matter operationally:
 
 There is no network call during construction, so a well-formed-but-wrong credential set is exactly the class of failure that eager construction *cannot* catch. See [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for the full fail-fast contract and where `GitHubService` sits in it.
 
-Secret hygiene is handled outside this class: `PrivateKeyPath` is a path precisely so key material never appears in configuration, and `.gitignore` excludes `*.pem`, `*.key`, `*.pfx`, `*.p12`, `*.snk`. Because it is a bare path, `File.ReadAllText` resolves it against the process working directory, not `IHostEnvironment.ContentRootPath` — for this app both are the repository root, but that assumption is implicit in the code.
+Secret hygiene is handled outside this class, in two places: `appsettings.json` stores only placeholder expressions for all four GitHub settings (app id and installation id included, not just the key), so no credential value is committed; and `.gitignore` excludes `*.pem`, `*.key`, `*.pfx`, `*.p12`, `*.snk` so the PEM that `PrivateKeyPath` names cannot be committed either. Because `PrivateKeyPath` is a bare path, `File.ReadAllText` resolves it against the process working directory, not `IHostEnvironment.ContentRootPath` — `Git.StartAsync` requires the content root to equal the git root, which for this app is the repository root, but the client itself does not verify that and does not use the environment abstraction at all.
 
 ## The two write operations
 
@@ -151,11 +163,11 @@ The intake close path through the client: two sequential authenticated calls, no
 
 ### Failure and lifetime semantics to preserve
 
-- **No error handling, no retry, no logging.** `GitHubService` takes no `ILogger`, wraps nothing in `try`/`catch`, and has no idempotency key. A non-success response surfaces as an SDK exception that propagates through `GitHubWebhookProcessor` (which also has no `try`/`catch`) and fails the webhook request. Retrying a comment POST inside this class would be unsafe without a dedupe check, because comment creation is not idempotent: a redelivered webhook runs the same two calls again.
+- **No error handling, no retry, no logging.** `GitHubService` takes no `ILogger`, wraps nothing in `try`/`catch`, and has no idempotency key. A non-success response surfaces as an SDK exception that propagates through `GitHubWebhookProcessor` (which also has no `try`/`catch`) and fails the webhook request. Retrying a comment POST inside this class would be unsafe without a dedupe check, because comment creation is not idempotent: a redelivered webhook runs the same two calls again. `CloseIssueAsync` is incidentally idempotent (`state: closed` on an already-closed issue is a no-op) — the comment is the call that duplicates.
 - **Partial outcomes are possible in both directions.** A failure on the comment leaves the issue open and untouched; a failure on the close leaves a posted comment on an open issue. Nothing reconciles the two.
-- **The caller's `CancellationToken` is forwarded**, so a client-aborted webhook delivery can cancel a write in flight — a third way to end up with one of the two effects applied.
-- **The class is a root singleton**, constructed once and shared by every webhook request (and, through the per-job DI scope, by any job that resolves it, landing on the same instance). There is one `HttpClientRequestAdapter` for the whole process.
-- **Disposal releases the adapter, then the key:**
+- **The caller's `CancellationToken` is forwarded** to both calls, so a client-aborted webhook delivery can cancel a write in flight — a third way to end up with one of the two effects applied.
+- **The class is a root singleton**, constructed once and shared by every webhook request (and, through the per-job DI scope, by any job that resolves it, landing on the same instance). There is one `HttpClientRequestAdapter` for the whole process, so every authenticated call in the process serializes through the same Kiota transport.
+- **Disposal releases the adapter, then the key, in that order:**
 
   ```csharp
   public void Dispose()
@@ -166,7 +178,7 @@ The intake close path through the client: two sequential authenticated calls, no
   }
   ```
 
-  `_client` is not disposed separately — the adapter is the transport object, and disposing it is the step that releases the HTTP pipeline. The container owns the lifecycle: because `GitHubService` is registered as a singleton and implements `IDisposable`, the host disposes it as the service provider shuts down.
+  `_client` is not disposed separately — the adapter is the transport object, and disposing it is the step that releases the HTTP pipeline that holds the token provider. Disposing the `RSA` key first would leave the adapter's auth provider holding a disposed signer, so the order is load-bearing rather than stylistic. The container owns the lifecycle: because `GitHubService` is registered as a singleton and implements `IDisposable`, the host disposes it as the service provider shuts down.
 
 ## The thin surface, and how it extends
 
@@ -178,7 +190,9 @@ What does not exist anywhere in the codebase, and cannot be reached by configura
 - **Pull request operations of any kind.** No PR creation, no PR comments, no PR review, no merge. `ProcessPullRequestWebhookAsync` is not overridden, and no pull-request REST path is used. The PRD's "PR is the terminal state" stage is absent from the code, not misconfigured — see [Product Intent vs. Implemented Behavior](../concepts/product-intent-and-gaps.md).
 - **Comment editing or deletion.** Only creation exists, which is what makes the PRD's "never edit or delete others' comments" vacuously true.
 
-Adding any of these means changing two things together: new methods (and new payload types) in `GitHubService`, and the caller in `GitHubWebhookProcessor`. Note that there is no test seam either — the class is `internal sealed` with no `IGitHubService`, and no test in the suite references it, so exercising new write behavior in a unit test requires extracting an interface or injecting the transport *before* the first write operation is added, not after.
+**Adding a third write operation is an architectural change, not an incremental one.** It requires, at minimum, a new method with a new generated payload type on `GitHubService`, a caller in `GitHubWebhookProcessor` (or a new processor override and its registration in the `Program.cs` factory), and a decision the current design never had to make: whether the operation is idempotent under webhook redelivery, since nothing in the transport offers deduplication. Write operations outside issue comments and `not_planned` closure also widen the App's effective permission from "comment and close on one issue type" to whatever a verified delivery names, because the surface has no interface to wrap or constrain it.
+
+There is no test seam either: the class is `internal sealed` with no `IGitHubService` and no injected transport, and no test in the suite references it. Exercising new write behavior in a unit test requires extracting an interface or injecting the request adapter *before* the first write operation is added, not after — the Kiota adapter is created inside the constructor, so there is currently no point at which a fake can be supplied.
 
 `Program.cs` needs no change for new methods: `GitHubService` is resolved by the container and passed into the `WebhookEventProcessor` factory, so the dependency graph only changes if the new write needs a collaborator this class does not have today.
 
@@ -188,13 +202,20 @@ The type names at the top of the file are not style:
 
 ```csharp
 using GitHubAppAuthProvider = global::GitHub.Octokit.Client.Authentication.AppInstallationAuthProvider;
+using GitHubAppTokenProvider = global::GitHub.Octokit.Client.Authentication.GitHubAppTokenProvider;
 using GitHubClient = global::GitHub.GitHubClient;
 using GitHubHttpAdapter = global::Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter;
+using GitHubInstallationTokenProvider = global::GitHub.Octokit.Client.Authentication.AppInstallationTokenProvider;
 using GitHubRequestAdapter = global::GitHub.Octokit.Client.RequestAdapter;
 using IssueCommentBody = global::GitHub.Repos.Item.Item.Issues.Item.Comments.CommentsPostRequestBody;
+using IssueUpdateBody = global::GitHub.Repos.Item.Item.Issues.Item.WithIssue_numberPatchRequestBody;
+using IssueUpdateState = global::GitHub.Repos.Item.Item.Issues.Item.WithIssue_numberPatchRequestBody_state;
+using IssueUpdateStateReason = global::GitHub.Repos.Item.Item.Issues.Item.WithIssue_numberPatchRequestBody_state_reason;
 ```
 
-The file's own namespace is `Sebastian.GitHub`, so inside it the bare identifier `GitHub` binds to `Sebastian.GitHub` and a plain `using GitHub.Octokit...` would not resolve to the SDK at all. Every SDK type is therefore reached through `global::`, and the aliases give the generated, deeply nested body types (`CommentsPostRequestBody`, `WithIssue_numberPatchRequestBody`) readable local names. Reuse the aliases when extending the file; adding an inline fully qualified `global::GitHub.Repos...` reference works but makes the two payloads hard to compare. The aliases also disambiguate the two similarly named SDK types (`GitHubAppTokenProvider` vs `AppInstallationTokenProvider`), which differ by exactly one word and have different roles.
+The file's own namespace is `Sebastian.GitHub`, so inside it the bare identifier `GitHub` binds (at least as a namespace candidate) to `Sebastian.GitHub` and a plain `using GitHub.Octokit...` would not resolve to the SDK. Every SDK type is therefore reached through `global::`, and the aliases give the generated, deeply nested body types (`CommentsPostRequestBody`, `WithIssue_numberPatchRequestBody`) and their enum types readable local names — `IssueUpdateState` and `IssueUpdateStateReason` exist purely so the two-letter enum members fit in the `CloseIssueAsync` object initializer.
+
+The aliases also disambiguate the two similarly named token types, which differ by one word and have different roles: `GitHubAppTokenProvider` is the *instance* passed in as the fourth constructor argument, while `GitHubInstallationTokenProvider` (aliasing `AppInstallationTokenProvider`) is the composite that owns the app id, key, and installation id. `GitHubAppAuthProvider` is the adapter-facing wrapper around the latter. Reuse these aliases when extending the file; adding an inline fully qualified `global::GitHub.Repos...` reference works but makes the two payloads hard to compare.
 
 ### AOT and reflection: only what the code shows
 
@@ -202,7 +223,7 @@ The file's own namespace is `Sebastian.GitHub`, so inside it the bare identifier
 
 ## Tests
 
-Nothing pins this class. `tests/Sebastian.Tests` contains no reference to `GitHubService`, `PostCommentAsync`, or `CloseIssueAsync`; the closest coverage is the generated validator test that constructs a `GitHubConfig` to prove a blank API key is rejected (`BlankApiKeyIsRejectedByGeneratedValidator`), plus the spec-template tests that pin the *input* to the close path. The consequence is specific: the `not_planned` reason, the comment ordering, and the absence of retry all rest on review alone, and any change to them — or to how the two calls fail — needs manual verification against a real installation.
+Nothing pins this class. `tests/Sebastian.Tests` contains no reference to `GitHubService`, `PostCommentAsync`, or `CloseIssueAsync` — the test project only sees it at all through `InternalsVisibleTo`, and never uses that access for this type. The closest coverage is the generated validator test that constructs a `GitHubConfig` to prove a blank API key is rejected (`BlankApiKeyIsRejectedByGeneratedValidator`), plus the spec-template tests that pin the *input* to the close path. The consequence is specific: the `not_planned` reason, the comment ordering, the alias wiring, the disposal order, and the absence of retry all rest on review alone, and any change to them — or to how the two calls fail — needs manual verification against a real installation.
 
 ## Where to go next
 

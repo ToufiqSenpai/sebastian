@@ -5,7 +5,7 @@ description: How Sebastian runs as one long-lived, single-repository ASP.NET Cor
 tags: [architecture, runtime-topology, aspnet-core, job-queue, github-webhooks, self-hosted]
 verified:
   - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
+    at: 2026-11-01T14:54:06.427Z
 sources:
   - id: openwiki-source-ea70eb6c045047448e446296
     resource: repo://.gitignore
@@ -35,18 +35,18 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-abc13e7f25ce7fa26e27952a
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
 ---
 
 # System Overview and Runtime Topology
 
-Sebastian is a single self-hosted ASP.NET Core process (`net10.0`, published AOT) that turns GitHub issue events into agent work. It is deliberately one process, one repository, and one long-running host: there is no scheduler, no worker fleet, no database, and no dashboard. Everything the process remembers between deliveries lives in git, in GitHub (issue labels, body, comments, state), and in the untracked `.sebastian/` folder — the in-memory job queue is the only volatile piece.
+Sebastian is a single self-hosted ASP.NET Core process (`net10.0`, published AOT) that turns GitHub issue events into agent work. It is deliberately one process, one repository, and one long-running host: there is no database, no scheduler, no worker fleet, and no dashboard. Everything the process remembers between deliveries lives in git, in GitHub (issue labels, body, comments, state), and in the untracked `.sebastian/` folder — the in-memory job queue is the only volatile piece.
 
-The process must be started from the root of the clone it operates on: `Git` refuses to start when the content root is not the git top level, and every later workspace operation is derived from that clone. A single installation therefore serves exactly one repository, and an issue event arriving for any other repository is rejected rather than redirected.
+Two structural constraints follow from that sentence and shape every other decision on this page. First, the process must be started from the root of the clone it operates on: `Git` refuses to start when the content root is not the git top level, and every later workspace operation is derived from that clone, so a single installation serves exactly one repository. Second, because there is no external store, the host itself must be the only writer of `main` and of the agent workspaces; the serialization discussed below is the price of that.
 
 ## Process shape
 
-The whole host is wired in `Program.cs`: configuration binding plus a generated validator, four singleton collaborators, two hosted services, and two HTTP endpoints.
+The whole host is wired in `Program.cs`: configuration binding plus a generated validator, four singleton collaborators (`GitHubService`, `ProviderResolver`, `Git`, `JobQueue`), two hosted services, and two HTTP endpoints.
 
 ```mermaid
 flowchart TD
@@ -131,7 +131,7 @@ sequenceDiagram
     end
 ```
 
-Webhook → queue → agent: intake stays synchronous, while workspace preparation and the agent run happen on a queue worker.
+Webhook → processor → queue → workspace → agent: intake stays synchronous, while workspace preparation and the agent run happen on a queue worker.
 
 Two serialization layers keep this safe without locks in the intake layer: `JobQueue` rejects a key that is already in flight (so a repeated label/edit event cannot start a second run for the same issue), and `ImplementSpec` funnels every workspace preparation through a single static semaphore because there is only one repository whose index and `main` ref may be touched at a time. Because the queue key is released in a `finally` block, a failed run does not block the issue forever — but it also registers no retry; another qualifying event is required.
 
@@ -141,7 +141,7 @@ A successful run ends at a log line. `ImplementSpec` records the worktree path, 
 
 There is no database, and state is deliberately spread across three places the system already trusts:
 
-- **Git**, inside the clone: local `main` is a read-only mirror fast-forwarded to `origin/main` at startup and on push deliveries, and each issue gets a worktree at `.sebastian/workspaces/<issue>` on branch `sebastian/issue-<n>`.
+- **Git**, inside the clone: local `main` is a read-only mirror fast-forwarded to `origin/main` at startup and on push deliveries, and each issue gets a worktree at `.sebastian/workspaces/<issue>` on branch `sebastian/issue-<n>`, created from `main`.
 - **GitHub**: the `feature` and `ready-for-agent` labels, the issue body that carries the spec, the comments the system posts, and the closed state it sets. Labels are the workflow's memory — they record the present, not a history.
 - **The local `.sebastian/` folder**, which is gitignored: agent worktrees and whatever uncommitted work the agent produced. Deleting it destroys that work, which is also why an existing worktree directory is reused rather than recreated.
 

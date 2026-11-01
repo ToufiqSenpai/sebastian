@@ -3,9 +3,6 @@ type: workflow-trace
 title: "Workflow: Feature Issue to Agent Workspace"
 description: The end-to-end trace from a GitHub issues delivery to a logged git status — the action/state/label guards, the seven-section spec gate and its close-as-not_planned branch, the enqueue-or-suppress decision on the owner/repo#issue key, PrepareWorkspace under the static PrepareLock, and the agent session that leaves only uncommitted work in .sebastian/workspaces.
 tags: [workflow, end-to-end, webhooks, job-queue, git-worktree, agent, concurrency, state]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-b5cf04fcd9c2585d8cde1706
     resource: repo://src/Agent/ImplementSpec.cs
@@ -19,9 +16,14 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-abc13e7f25ce7fa26e27952a
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
+  - id: openwiki-source-7f9ac1665b935b4f858f87e0
+    resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
   - id: openwiki-source-cebf243b519f1af286c1277d
     resource: repo://tests/Sebastian.Tests/TestRepository.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Workflow: Feature Issue to Agent Workspace
@@ -75,7 +77,7 @@ sequenceDiagram
             JOB->>AG: CreateChatClient, CreateAgent, CreateSessionAsync
             JOB->>AG: RunAsync with a prompt built from title and body
             AG-->>JOB: response text
-            JOB->>GIT: GetStatusAsync in the worktree
+            JOB->>GIT: GetStatusAsync, git status --short in the worktree
             JOB->>JOB: LogCompleted with git status and response
         end
     end
@@ -248,7 +250,9 @@ At default log verbosity, the tracer for all of this is four lines: `Webhook Iss
 
 ## What the tests cover
 
-`ImplementSpecTests` drives `PrepareWorkspaceAsync` directly against a real temporary repository (bare `origin`, clone, seeded commit) — the `internal` seam that exists so workspace policy can be tested without a model provider:
+Two test classes split the post-intake half of the trace, and both are designed to run without a model provider, a network call, or a GitHub credential.
+
+`ImplementSpecTests` drives `PrepareWorkspaceAsync` directly — the `internal` seam that exists so workspace policy is testable — against a disposable `TestRepository` (bare `origin`, clone, seeded `README.md` commit, per-test temp root under `sebastian-tests/`):
 
 | Test | Pinned step of this workflow |
 | --- | --- |
@@ -257,6 +261,12 @@ At default log verbosity, the tracer for all of this is four lines: `Webhook Iss
 | `RejectsDirtyMain` | step 4 refuses to proceed on a dirty mirror |
 | `RejectsForeignRepository` | step 2 rejects an issue whose owner does not match `origin` |
 
-`JobQueueTests` pins both admission and failure isolation: `RunsAtMostTenJobsConcurrently` (the ten-slot cap), `ContinuesAfterJobFailure` (an exception in one job neither escapes the handler nor stops the loop), and `RejectsDuplicateKeyWhileJobRuns` (the key is held for the run and released afterwards).
+`JobQueueTests` pins the queue hop with a minimal `TestJob` that signals completion from its own `finally`:
+
+| Test | Pinned property |
+| --- | --- |
+| `RunsAtMostTenJobsConcurrently` | the `MaxConcurrentJobs = 10` cap: 12 admitted jobs start in batches of ten |
+| `ContinuesAfterJobFailure` | a job that throws neither escapes the handler nor stops the loop |
+| `RejectsDuplicateKeyWhileJobRuns` | the key is held for the run's duration and released afterwards |
 
 Nothing tests `GitHubWebhookProcessor`, and nothing runs the trace end to end: the guards and their ordering, the exact comment and `not_planned` close, the enqueue path, the suppression path, the prompt, and `LogCompleted` are all unpinned. See [Testing Strategy and Harness](../testing/test-strategy.md) for the full gap map and the manual verification recipe.

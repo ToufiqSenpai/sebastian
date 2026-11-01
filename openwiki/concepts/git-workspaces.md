@@ -1,14 +1,13 @@
 ---
 type: git-workspace-model
 title: Git Mirror and Worktree Model
-description: How Sebastian pins itself to one repository — the content-root-equals-toplevel invariant, RepositoryIdentity parsing of origin, local main as a read-only mirror fast-forwarded to origin/main at startup (10s bound) and on push webhooks, the FindMirrorProblemAsync guards and their exact messages, the static PrepareLock, and per-issue worktrees under .sebastian/workspaces that are reused rather than recreated.
-tags: [git, worktree, mirror, invariants, concurrency, repository-identity, workspace-lifecycle]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
+description: How Sebastian pins itself to one repository — the content-root-equals-toplevel invariant, RepositoryIdentity parsing of origin, local main as a read-only mirror fast-forwarded to origin/main at startup (10s bound) and on push webhooks, the FindMirrorProblemAsync guards and their exact messages, the static PrepareLock, per-issue worktrees under .sebastian/workspaces that are reused rather than recreated, and the conventions of the git process wrapper itself.
+tags: [git, worktree, mirror, invariants, concurrency, repository-identity, workspace-lifecycle, process-execution]
 sources:
   - id: openwiki-source-ea70eb6c045047448e446296
     resource: repo://.gitignore
+  - id: openwiki-source-d14cb4231320f903c4c26a78
+    resource: repo://Program.cs
   - id: openwiki-source-b5cf04fcd9c2585d8cde1706
     resource: repo://src/Agent/ImplementSpec.cs
   - id: openwiki-source-12def67a8b093c0022f290e7
@@ -25,9 +24,14 @@ sources:
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
   - id: openwiki-source-7c31089473197981c73c8de7
     resource: repo://tests/Sebastian.Tests/Libs/RepositoryIdentityTests.cs
+  - id: openwiki-source-5e64375607ba0d18722854dc
+    resource: repo://tests/Sebastian.Tests/TestHostEnvironment.cs
   - id: openwiki-source-cebf243b519f1af286c1277d
     resource: repo://tests/Sebastian.Tests/TestRepository.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Git Mirror and Worktree Model
@@ -53,9 +57,9 @@ Everything below follows from one fact: there is a single repository, a single l
 | `git rev-parse --show-toplevel` equals `IHostEnvironment.ContentRootPath` | `InvalidOperationException`: `"Sebastian must run from the repository root. Content root is '<path>', git root is '<path>'."` |
 | `git remote get-url origin` parses via `RepositoryIdentity.Parse` | `InvalidOperationException`: `"Could not parse the origin remote URL."` (a missing remote surfaces earlier as `git remote get-url origin failed: <stderr>` from the generic runner) |
 
-Comparison is done by `PathEquals`, which full-paths and trims trailing separators both sides and compares `OrdinalIgnoreCase` only on Windows. The invariant is checked with `CancellationToken.None`, deliberately: this is not cancellable startup work.
+The root the runner uses is fixed in the constructor: `_root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(environment.ContentRootPath))`, exposed as `Git.Root` and used as every child process's `WorkingDirectory`. Comparison against `--show-toplevel` is done by `PathEquals`, which full-paths and trims trailing separators both sides and compares `OrdinalIgnoreCase` only on Windows. The invariant is checked with `CancellationToken.None`, deliberately: this is not cancellable startup work.
 
-The result is stored in `Git.Repository` (`RepositoryIdentity?`) and logged as `Using repository {Owner}/{Repository} on main`. That property is the *only* thing that later proves the clone's identity, which is why `PrepareWorkspaceAsync` treats a null `Repository` as "not started yet" rather than as an empty value.
+The result is stored in `Git.Repository` (`RepositoryIdentity?`) and logged as `Using repository {Owner}/{Repository} on {BaseBranch}`. That property is the *only* thing that later proves the clone's identity, which is why `PrepareWorkspaceAsync` treats a null `Repository` as "not started yet" rather than as an empty value.
 
 ### RepositoryIdentity: the smallest possible remote parser
 
@@ -67,7 +71,7 @@ The result is stored in `Git.Repository` (`RepositoryIdentity?`) and logged as `
 4. Otherwise treat it as scp-like: everything after the first `:`; no `:` at all → `null`.
 5. Split on `/`, drop empty entries, and take the last two segments as owner and name; fewer than two segments → `null`.
 
-So `https://github.com/owner/repo.git`, `https://github.com/owner/repo`, `git@github.com:owner/repo.git`, and `ssh://git@github.com/owner/repo.git` all yield `owner`/`repo`, while `""`, `not-a-remote`, and `https://github.com/only-owner` yield `null`. `RepositoryIdentityTests` pins exactly those seven cases as a `[Theory]`. Deeper paths collapse to the last two segments, which is what makes `ssh://host/group/sub/repo.git` behave like `sub/repo` — good enough for the one repo this process serves, and the reason `Program.cs` can validate `owner/repository` on an issue event at all.
+So `https://github.com/owner/repo.git`, `https://github.com/owner/repo`, `git@github.com:owner/repo.git`, and `ssh://git@github.com/owner/repo.git` all yield `owner`/`repo`, while `""`, `not-a-remote`, and `https://github.com/only-owner` yield `null`. `RepositoryIdentityTests` pins exactly those seven cases as two `[Theory]` methods. Deeper paths collapse to the last two segments, which is what makes `ssh://host/group/sub/repo.git` behave like `sub/repo` — good enough for the one repo this process serves, and the reason `Program.cs` can validate `owner/repository` on an issue event at all.
 
 ## Mirror sync: fetch, check, count, fast-forward
 
@@ -135,7 +139,7 @@ The same function — `FindMirrorProblemAsync` — is consumed by two callers th
 Why the sync path swallows and the prepare path throws:
 
 - **The sync path runs on the critical path of things that must not fail.** Startup must complete even when the machine is offline, the remote is unreachable, or a developer left `main` dirty — otherwise a pushed commit that arrives while the host was down would leave the service unable to boot. The push webhook is the same: the delivery must be acknowledged even if the fetch times out or the fast-forward is rejected, and the `// shortcut:` comment on the ten-second bound states the accepted consequence plainly (*"a missed push webhook must not prevent the app from starting"*). `OperationCanceledException` is caught separately and logged at Debug because the 10-second timeout firing is an expected outcome, not an incident — and the runner already killed the child process tree before rethrowing.
-- **The prepare path runs immediately before an agent starts writing code.** Starting an agent on a base that is not the reviewed `main` silently corrupts the only artifact the system produces. There is no safe degraded mode, so the job fails, `JobQueue` logs `Job {Key} failed`, and the in-flight key is released — another qualifying issue event is required to retry. This is also why the mirror check is repeated per job instead of trusting the startup sync or the last push webhook: the mirror may have been left dirty at any point in between.
+- **The prepare path runs immediately before an agent starts writing code.** Starting an agent on a base that is not the reviewed `main` silently corrupts the only artifact the system produces. There is no safe degraded mode, so the job fails, `JobQueue` logs `Job {Key} failed` at Error, and the in-flight key is released in the job's `finally` — another qualifying issue event is required to retry. This is also why the mirror check is repeated per job instead of trusting the startup sync or the last push webhook: the mirror may have been left dirty at any point in between.
 
 The practical rule: **a mirror problem is a warning for the intake path and a hard error for the agent path.** See [Failure Handling](../operations/failure-handling.md) for how both land in logs and [Job Queue and Execution Semantics](job-queue.md) for what happens to the job after the throw.
 
@@ -150,7 +154,7 @@ The practical rule: **a mirror problem is a warning for the intake path and a ha
 private static readonly SemaphoreSlim PrepareLock = new(1, 1);
 ```
 
-`PrepareLock` is `static`, so it is shared by every `ImplementSpec` instance across every DI scope, not per job. With `JobQueue` running up to ten jobs concurrently, this is what guarantees that no two jobs fetch, fast-forward, or create a worktree at the same time. It is acquired first and released in a `finally`, and it deliberately covers the *entire* preparation — including the fetch — not just the worktree creation: fetching rewrites `origin/main`, and a fast-forward rewrites `main`, so those two must never interleave across jobs.
+`PrepareLock` is `static`, so it is shared by every `ImplementSpec` instance across every DI scope, not per job. With `JobQueue` running up to ten jobs concurrently (`MaxConcurrentJobs = 10` under `Parallel.ForEachAsync`), this is what guarantees that no two jobs fetch, fast-forward, or create a worktree at the same time. It is the *first* await in preparation — it precedes even the `git.Repository` null check — and it is released in a `finally`, and it deliberately covers the *entire* preparation, including the fetch, not just the worktree creation: fetching rewrites `origin/main`, and a fast-forward rewrites `main`, so those two must never interleave across jobs.
 
 The semaphore is **not** a repository-wide git lock. Once `PrepareWorkspaceAsync` returns, the lock is free, and the agent works entirely inside its own worktree, which git keeps on a separate branch with a separate index. Two agents can therefore edit and build simultaneously; only the mirror operations are serialized.
 
@@ -184,10 +188,10 @@ Every branch of `PrepareWorkspaceAsync`, including the three throws that make a 
 
 Each step, with the reasoning that is not obvious from the code:
 
-- **Identity cross-check.** `owner`/`repository` come from the webhook event; the comparison against `git.Repository` is `OrdinalIgnoreCase` on both parts, so `Owner/Repo` and `owner/repo` are the same repository. On mismatch: `"Issue repository '<owner>/<repository>' does not match local origin '<local.Owner>/<local.Name>'."` With the single-repository non-goal in [Product Intent vs. Implemented Behavior](product-intent-and-gaps.md), this message is the *only* thing standing between a misconfigured webhook and an agent working in the wrong clone.
+- **Identity cross-check, before any network work.** `owner`/`repository` come from the webhook event; the comparison against `git.Repository` is `OrdinalIgnoreCase` on both parts, so `Owner/Repo` and `owner/repo` are the same repository. It happens **before** the fetch: a foreign event is rejected without a single git subprocess, which is why `RejectsForeignRepository` runs against a repository that is never touched. On mismatch: `"Issue repository '<owner>/<repository>' does not match local origin '<local.Owner>/<local.Name>'."` With the single-repository non-goal in [Product Intent vs. Implemented Behavior](product-intent-and-gaps.md), this message is the *only* thing standing between a misconfigured webhook and an agent working in the wrong clone.
 - **Fetch, then check, then merge.** `FetchAsync("origin")` runs even though a push webhook may have synced seconds earlier — the guarantee is "as fresh as this job's fetch", not "as fresh as the last webhook". After the guard passes, `MergeFastForwardAsync(Git.BaseRef)` is called **unconditionally**, without a behind-count first. When local `main` already equals `origin/main` this is a no-op that exits zero; the state machine's `behind == 0` short-circuit exists only in the sync path, where it saves a process spawn per push webhook.
 - **Layout.** `workspaceRoot = Path.Combine(git.Root, ".sebastian", "workspaces")`, the worktree is `<workspaceRoot>/<issueNumber>`, and the branch is `sebastian/issue-<n>` (invariant-culture formatted number). `.sebastian/workspaces` is created on demand with `Directory.CreateDirectory`, so nothing has to pre-create the folder, and `.gitignore` keeps the whole `.sebastian/` tree out of the mirror.
-- **Reuse over recreation.** `if (Directory.Exists(worktreePath)) return worktreePath;` with the comment *"Reuse it: the previous run may hold uncommitted agent work that must not be deleted."* This is correct precisely because nothing in the pipeline commits: the agent's entire output is the uncommitted state of that worktree, which `RunAsync` later reports through `git -C <worktree> status --short`. Recreating the directory would destroy the previous run's product.
+- **Reuse over recreation.** `if (Directory.Exists(worktreePath)) return worktreePath;` with the comment *"Reuse it: the previous run may hold uncommitted agent work that must not be deleted."* The existence check is on the **directory**, not on git's worktree bookkeeping, so a directory that git no longer knows about is still treated as live. This is correct precisely because nothing in the pipeline commits: the agent's entire output is the uncommitted state of that worktree, which `RunAsync` later reports through `git -C <worktree> status --short`. Deleting and recreating the directory would destroy the previous run's product, so reuse is a data-preservation rule, not a performance shortcut.
 - **Prune then add.** Only when the directory is missing does it call `PruneWorktreesAsync` (dropping git's bookkeeping for worktrees removed by hand) and then `AddWorktreeAsync(worktreePath, branch, Git.BaseBranch)`, which is `git worktree add -B <branch> <path> main`. Two details matter: the start point is local `main` — the just-fast-forwarded mirror — not `origin/main`, so the worktree cannot start from an unsynced ref; and `-B` *creates or resets* the branch, so a leftover `sebastian/issue-<n>` ref from an earlier run is re-pointed at `main` rather than failing the command.
 
 ### The documented index.lock race
@@ -232,6 +236,18 @@ The accepted overlap: preparation holds `PrepareLock`, the webhook sync does not
 
 The last row is the operational consequence of "the pipeline never commits". There is no recovery path in code: nothing in the repository can re-create a run's changes from git history, because they were never in git history. Treat `.sebastian/workspaces` as the system's only durable artifact store.
 
+## The git process wrapper
+
+Every verb in `Git` funnels into one private `RunAsync`, and its conventions are the difference between a hang and a clean failure. They are not accidental and should be preserved by any new verb:
+
+- **`ProcessStartInfo.ArgumentList`, never a command string.** Each argument is added as a discrete list entry, so paths containing spaces and refspecs like `main..origin/main` need no quoting and cannot be misinterpreted. Helpers pass `IReadOnlyList<string>` literal arrays (`["rev-parse", "--show-toplevel"]`). The exception message joins the arguments with spaces purely for readability: `git <args> failed: <stderr>`.
+- **No shell, no window, no stdin.** `UseShellExecute = false`, `CreateNoWindow = true`, `RedirectStandardInput = false`, and `WorkingDirectory = _root` — so the default target of every command is the clone root unless a verb passes `-C <worktree>`.
+- **`GIT_TERMINAL_PROMPT=0`.** Set on the child environment, so a missing credential or an SSH host-key prompt fails immediately and non-zero instead of blocking a request thread forever. (Credentials themselves are out of scope: nothing pushes, so `fetch` only needs existing ambient auth.)
+- **Diagnostics come from stderr.** stdout is returned raw (trimmed by `RunTrimmedAsync` for scalar verbs), and stderr is what lands in the `InvalidOperationException` message. This is why the error text a caller sees is git's own explanation, not a generic "command failed".
+- **Cancellation kills the process tree.** Both streams are read concurrently with `ReadToEndAsync(cancellationToken)` while `WaitForExitAsync(cancellationToken)` is awaited; an `OperationCanceledException` from any of them triggers `TryKill(process)` — `Kill(entireProcessTree: true)` guarded by `HasExited` and an `InvalidOperationException` catch for the already-exited race — and then rethrows. Without the tree kill, a cancelled `fetch` could leave an orphaned `git-remote-https` holding the network and the `.git` lock.
+
+`TryKill` swallowing `InvalidOperationException` is the only place in the class that deliberately ignores a failure, and it is exactly the "process already exited" case where there is nothing left to do.
+
 ## What the git layer does not do
 
 This is a short list because the boundary is deliberate, and each omission is repeated in another layer:
@@ -239,7 +255,7 @@ This is a short list because the boundary is deliberate, and each omission is re
 - **No commit, no push, no pull request, no merge to a remote.** `Git` exposes `fetch`, `merge --ff-only`, `worktree add/prune`, `status`, `rev-parse`, `rev-list`, `remote get-url`, and `branch --show-current` — that is the entire vocabulary. There is no `commit`, `push`, or `checkout` verb anywhere in the class, and `ImplementSpec` never adds one; the successful run ends at a log line plus `GetStatusAsync`. The gap against the PRD is tracked in [Product Intent vs. Implemented Behavior](product-intent-and-gaps.md), not as missing wiring.
 - **No conflict resolution.** `--ff-only` is the only merge form used. Divergence is handled by refusing to proceed (guard message) or by failing the merge (warning), never by picking sides.
 - **No branch management beyond the issue branch.** Nothing deletes `sebastian/issue-<n>` when an issue closes, and nothing rebases an existing worktree onto newer `main` — a reused worktree stays on the tree it had.
-- **No interaction.** The runner sets `GIT_TERMINAL_PROMPT=0`, so an SSH or credential prompt fails fast instead of hanging a request; and `RunAsync` kills the whole process tree on cancellation before rethrowing the `OperationCanceledException`.
+- **No interaction.** Covered above under the process wrapper: `GIT_TERMINAL_PROMPT=0` fails prompts fast, and cancellation kills the whole tree.
 
 The agent is told the same thing twice, independently. `ImplementationAgent`'s fixed `Instructions` end with *"Never run git commands, commit, push, or create pull requests."*, and `ImplementSpec.BuildPrompt` repeats it per run as *"Do not run git commands, commit, push, or create pull requests."* alongside *"Do not modify files outside the workspace."* A shell deny-list backs the instruction for the destructive subset (`\bgit\s+(push|reset|clean|checkout\s+--)\b`). Guardrails are layered because the instruction is advisory — see [Agent Roles, Tools, and Sandbox Boundaries](agent-execution.md) for the enforced half and [Feature Issue to Agent Workspace](../workflows/feature-implementation.md) for the end-to-end trace.
 
@@ -257,7 +273,7 @@ Both ref names are hardcoded as `Git.BaseBranch = "main"` and `Git.BaseRef = "or
 
 ## Test coverage
 
-`ImplementSpecTests` drives `PrepareWorkspaceAsync` against a real temporary repository — `TestRepository.Create` builds a bare `origin`, clones it, seeds a `README.md`, and pushes, and `TestRepository.CreateGit` constructs `Git` with a `TestHostEnvironment` pointing at the clone. Four behaviors are pinned:
+`ImplementSpecTests` drives `PrepareWorkspaceAsync` against a real temporary repository — `TestRepository.Create` builds a bare `origin` (`git init --bare --initial-branch=main`), clones it over a `file://` URL, seeds a `README.md` and pushes, and `TestRepository.CreateGit` constructs `Git` with a `TestHostEnvironment` pointing at the clone. Each test calls `git.StartAsync` first, which is what populates `Git.Repository`. Four behaviors are pinned:
 
 | Test | Pinned behavior |
 | --- | --- |
@@ -268,4 +284,4 @@ Both ref names are hardcoded as `Git.BaseBranch = "main"` and `Git.BaseRef = "or
 
 `RepositoryIdentityTests` pins the four supported remote shapes and three invalid ones.
 
-What is *not* covered: there is no test of `SyncMainAsync` at all — not the ref filter, not the behind-count short-circuit, not the swallow-on-failure behavior, not the ten-second bound. The mirror sync is therefore the least-protected part of this page; a change to `FindMirrorProblemAsync`'s guards is covered indirectly (through `RejectsDirtyMain`), but a change to the sync state machine is not covered by anything. Verify it manually against a scratch clone with a pushed commit while the host is stopped.
+What is *not* covered: there is no test of `SyncMainAsync` at all — not the ref filter, not the behind-count short-circuit, not the swallow-on-failure behavior, not the ten-second bound. The mirror sync is therefore the least-protected part of this page; a change to `FindMirrorProblemAsync`'s guards is covered indirectly (through `RejectsDirtyMain`), the foreign-repository check is covered directly, and the "not initialized" throw is not covered at all (every test starts the hosted service first). Verify sync changes manually against a scratch clone with a pushed commit while the host is stopped.

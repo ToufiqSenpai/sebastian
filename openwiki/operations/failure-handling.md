@@ -1,11 +1,8 @@
 ---
 type: failure-handling-runbook
 title: Failure Handling, Restart Behavior, and Known Races
-description: Every failure path in Sebastian and its blast radius — the hard startup checks that abort the host, the ten-second bounded non-fatal mirror sync, the deliberate swallow points in the git runner, the mirror guards that fail a job, per-job exception isolation with no retry and no GitHub-visible signal, unguarded GitHub writes in intake, duplicate-key suppression, what a restart destroys, and the documented index.lock race.
+description: Every failure path in Sebastian and its blast radius — the hard startup checks that abort the host, the ten-second bounded non-fatal mirror sync, the deliberate swallow points in the git runner, the mirror guards that refuse workspace prep, per-job exception isolation where only a failed spec gate ever writes back to GitHub, unguarded GitHub writes in intake, duplicate-key suppression and queue loss on restart, and the documented index.lock race.
 tags: [failure-handling, blast-radius, restarts, cancellation, error-isolation, observability, git, known-races]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
@@ -25,12 +22,15 @@ sources:
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
   - id: openwiki-source-7f9ac1665b935b4f858f87e0
     resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Failure Handling, Restart Behavior, and Known Races
 
-Sebastian has no supervisor, no retry loop, no dead-letter queue, and no database. What it has is three different failure policies applied at three different layers, chosen deliberately and stated in comments where the code diverges from the obvious. Almost every operational surprise in this process traces back to knowing which of the three applies to the code path you are looking at:
+Sebastian has no supervisor, no retry loop, no dead-letter queue, and no database. What it has is three different failure policies applied at three different layers, chosen deliberately and stated in comments where the code diverges from the obvious, plus one unguarded path. Almost every operational surprise in this process traces back to knowing which of the four applies to the code path you are looking at:
 
 | Policy | Where it applies | What the user sees |
 | --- | --- | --- |
@@ -38,6 +38,8 @@ Sebastian has no supervisor, no retry loop, no dead-letter queue, and no databas
 | **Log and continue** | the mirror sync (`Git.SyncMainAsync`) on startup and on push deliveries, and every `git` process kill on cancellation | a `Warning` or `Debug` line; the webhook response is still a success |
 | **Throw to the queue** | workspace preparation and the agent run inside a job | one `Error` line `Job {key} failed`, in-flight key released, **no retry and no comment on the issue** |
 | **Nothing** (by omission) | the two GitHub REST calls in intake | exception escapes the webhook handler; the delivery fails |
+
+One deliberate write-back sits *outside* this table because it is not a failure of the process at all: the **spec gate** in intake is the only code path that ever calls GitHub to record an outcome, and it does so when *the issue* fails validation, not when Sebastian fails. Every agent-side and git-side failure — the three layers above — produces logs only; the issue is never touched. Keep that asymmetry in mind when reading the tables below.
 
 ```mermaid
 flowchart TD
@@ -228,7 +230,7 @@ finally
 Three operational facts follow, and they are the sharpest edges in the whole design:
 
 1. **There is no retry.** A failed job does not go back on the channel, gets no attempt count, and leaves no dead-letter record. Recovery requires GitHub to send another qualifying `issues` delivery — a re-label, an edit, a reopen. If nothing touches the issue, nothing runs. See [Job Queue and Execution Semantics](../concepts/job-queue.md).
-2. **A failed job is invisible to the issue author.** `ImplementSpec` resolves `Git` and `ProviderResolver` but never `GitHubService`; nothing in the job path posts a comment or changes a label. The only two GitHub writes in the codebase both live in the intake path, for invalid specs. So a job that fails on a dirty mirror, a broken `origin`, or an exhausted model quota leaves the issue sitting in `ready-for-agent` forever with a single Error line in the log as evidence. This is the most important blast-radius fact on this page.
+2. **A failed job is invisible to the issue author — only a failed spec gate writes back to GitHub.** `ImplementSpec` resolves `Git`, `IOptions<SebastianConfig>`, `ProviderResolver` and `ILogger` but never `GitHubService`; nothing in the job path posts a comment or changes a label. The two GitHub write methods (`PostCommentAsync`, `CloseIssueAsync`) are called from exactly one place in the codebase: the `missingSections.Count > 0` branch of `ProcessIssuesWebhookAsync`. So the *only* outcome ever recorded on GitHub is "your spec does not satisfy the template, here is the section list, closed as `not_planned`". A job that fails on a dirty mirror, a foreign `origin`, or an exhausted model quota leaves the issue sitting in `ready-for-agent` forever with a single Error line in the log as evidence. This is the most important blast-radius fact on this page: **agent and git failures are log-only by design, and no failure after the spec gate can ever reach the issue.**
 3. **The Error line carries nothing but the key.** `LogFailed` passes the exception but adds no context; the reason lives in whatever the job logged before throwing, which for a mirror guard is *nothing* — the guard message is only in the exception. Reading `Job owner/repo#1 failed` therefore always requires the exception detail from the log sink.
 
 ### Intake: the unguarded path
@@ -389,5 +391,28 @@ At the default `Information` level the complete set of visible lines is small, w
 | `Local main sync cancelled` | Debug | the ten-second bound or shutdown cut the sync short |
 
 So "started" without "completed" and without "failed" means the process died mid-run. "Started", then "failed" means look at the exception. Neither line at all, on an issue that visibly carries `ready-for-agent`, means the event was filtered before enqueue (wrong action, closed issue, missing `feature`) or suppressed as a duplicate — and at `Information` level none of those branches says anything.
+
+### Failure-to-symptom table
+
+One row per failure mode, read from the operator's side: what you see on screen or in the log, and where the reason actually lives.
+
+| Failure | Operator sees | Logged where | Fact on GitHub |
+| --- | --- | --- | --- |
+| Wrong content root, unparsable `origin`, bad config, unreadable PEM, bad provider selection | Process exits before `/health` answers; exception text names the offending path or provider | startup exception (host console), no `Information` job lines | nothing |
+| Startup mirror sync truncated by the ten-second bound, or sync cancelled at shutdown | clean startup, stale `main` | `Local main sync cancelled` at **Debug** — invisible at default verbosity | nothing |
+| Push to a non-`main` ref or a branch deletion | `Push {RefName} on {Repository}` Information line, no sync | the push line only; there is no "skipped ref" line | nothing |
+| Mirror problem during sync (dirty/other branch/ahead `main`, failed `fetch`/`merge`) | `Skipped local main sync: <reason>` or `Local main sync failed` | **Warning**, with the reason | nothing — the push delivery still succeeds |
+| `PrepareWorkspaceAsync` refuses (no `Git.Repository`, foreign repository, mirror problem, failed git command) | `Job {Key} failed` with the guard exception attached | **Error** from `LogFailed`; the reason exists only in the exception, no pre-throw log line | nothing — issue stays in `ready-for-agent` |
+| Agent run or trailing `git status` throws | `Job {Key} failed`; possibly a worktree full of partial work | **Error** from `LogFailed`; no `Implementation completed` line | nothing |
+| Model endpoint rejects the call (bad key, quota, unknown model) | `Job {Key} failed` on the first admitted run | **Error** from `LogFailed` | nothing |
+| Non-shutdown `OperationCanceledException` inside a job | `Job {Key} failed` — indistinguishable from any other throw | **Error** from `LogFailed` | nothing |
+| Shutdown-triggered cancellation, or buffered jobs abandoned by `StopAsync` | nothing; those issues never run again until re-delivered | **nothing at any level** | nothing |
+| Intake comment/close call throws | webhook delivery fails in GitHub's delivery list | an ASP.NET/SDK failure outside the app's loggers; no processor line for the failure | partial: comment without close, or duplicated comment on redelivery |
+| Invalid spec | issue commented and closed `not_planned` | `Issue {Repository}#{Number} closed; missing spec sections: …` at **Debug** | the only failure ever recorded on the issue |
+| Duplicate delivery | a Debug "already running" line, or nothing at `Information` | `Implementation already running for {Repository}#{Number}` at **Debug** | nothing; the event is dropped |
+
+**Silent by design** — do not treat these as bugs: intake GitHub write failures (they surface as failed deliveries, not as application exceptions), every git-side failure inside a job (the issue is never annotated), duplicate suppression, buffer loss at shutdown, and the missing completion line for a run that failed after the agent responded. **Silent by oversight** — the same behavior but worth closing: the Debug-only cancellation line for startup sync, the absence of any log for a ref other than `main`, and `TryKill`'s narrow exception filter.
+
+The two questions this table answers in one pass: *was the event even admitted?* (look for `Started implementation`) and *did the job fail or did the process?* ("failed" ⇒ look at the exception; neither ⇒ the process died or the event never arrived).
 
 The end-to-end path that produces these lines is traced in [Workflow: Feature Issue to Agent Workspace](../workflows/feature-implementation.md).

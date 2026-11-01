@@ -1,12 +1,11 @@
 ---
 type: agent-execution
 title: Agent Roles, Tools, and Sandbox Boundaries
-description: How the agent layer is split into role configuration and per-run task prompt — AgentRole building a HarnessAgent from an IChatClient, ImplementationAgent wiring one confined shell tool with a regex deny-list, a 10-minute command timeout and a scrubbed environment, file access with every approval gate disabled, and exactly who disposes what.
+description: How the agent layer is split into role configuration and per-run task prompt — AgentRole building a HarnessAgent from a per-run IChatClient, ImplementationAgent wiring one confined shell tool with a regex deny-list, a 10-minute command timeout and a scrubbed environment, file access with every approval gate disabled, and exactly who disposes what.
 tags: [agent, harness-agent, sandbox, shell-policy, security, lifecycle, prompt-construction]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
+  - id: openwiki-source-ede59da55b0d48006223d1c0
+    resource: repo://appsettings.json
   - id: openwiki-source-3bf67c20a76eb7fa3cac2e6e
     resource: repo://Sebastian.csproj
   - id: openwiki-source-b5cf04fcd9c2585d8cde1706
@@ -17,6 +16,8 @@ sources:
     resource: repo://src/Agent/Roles/AgentRole.cs
   - id: openwiki-source-12def67a8b093c0022f290e7
     resource: repo://src/Agent/Roles/ImplementationAgent.cs
+  - id: openwiki-source-c011dda0b85bc515c2bfb12c
+    resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-167226a05ed7e6303a82d168
     resource: repo://src/Jobs/JobQueue.cs
   - id: openwiki-source-08195758b0bf04f6d257000b
@@ -25,7 +26,10 @@ sources:
     resource: repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs
   - id: openwiki-source-b8b7242b27602133c8fabb3f
     resource: repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Agent Roles, Tools, and Sandbox Boundaries
@@ -79,7 +83,7 @@ A role that wants a tool must therefore decide on its own about approval, dispos
 
 ## ImplementationAgent: the capability envelope
 
-`ImplementationAgent(name, workspacePath)` is the only role in the repository, and it is the sole consumer of `Agent.Name` from configuration — the harness agent's display name is whatever `Agent:Name` binds to, while the model behind it comes from `ProviderResolver` (see [Model Provider Resolution](model-providers.md)).
+`ImplementationAgent(name, workspacePath)` is the only role in the repository, and it is the sole consumer of `Agent.Name` from configuration — the harness agent's display name is whatever `Agent:Name` binds to (`"Sebastian"` in `appsettings.json`), while the model behind it comes from `ProviderResolver` (see [Model Provider Resolution](model-providers.md)).
 
 The whole envelope is seven lines of `Configure`:
 
@@ -159,13 +163,14 @@ Each entry is a regex matched against the command:
 - `\b(Format-Volume|Clear-Disk|Initialize-Disk|Stop-Computer|Restart-Computer)\b` — disk destruction and host shutdown/reboot.
 - `\breg\s+(add|delete)\b` — registry writes.
 
-### What the policy does not cover — read this before relaxing it
+### What the deny-list does and does not guarantee
 
-The list is an **enumerated blocklist over a general-purpose shell**, not an allowlist. Three gaps matter:
+The list is an **enumerated regex blocklist over a general-purpose shell**, not an OS sandbox and not an allowlist. It inspects the command string the model asks to run; it does not constrain what the resulting process can do. Four gaps matter:
 
 - **`git commit`, `git add`, `git merge`, `git branch`, `git stash` are not denied.** Only the four destructive subcommands are. The prohibition on *all* git work is carried by prose in the role instructions and the task prompt, not by the policy. If you need that guarantee to be structural, it is not.
 - **Anything not named is executable.** Python, `dotnet`, `bash -c`, `New-Item`, arbitrary binaries all pass. The deny-list raises the cost of catastrophic commands; it does not restrict the agent to a known toolset.
 - **Regex matching is evadable by construction** — quoting, encoding, or writing a script file and executing it. Treat the list as damage limitation for accidents, never as an adversarial containment boundary.
+- **Command timeouts are per invocation.** Ten minutes bounds one shell call; a script that loops, or a long sequence of passing commands, is bounded only by the job's cancellation token.
 
 Both models of risk point the same way: the *absence* of credentials in the environment, the absence of a web-search tool, and the fact that the pipeline — not the agent — owns git and GitHub are stronger guarantees than the deny-list. Any edit to this block, to `AcknowledgeUnsafe`, or to the approval flags is a security change and warrants review as one.
 
@@ -224,7 +229,7 @@ Two further lifecycle facts:
 #pragma warning disable MEAI001 // Microsoft.Extensions.AI experimental extensions.
 ```
 
-Those two pragmas appear at the top of `AgentRole`, `ImplementationAgent`, and `ImplementSpec`; `AgentRoleTests` carries them too. `MEAI001` additionally appears in `ProviderResolver`, which uses the experimental `IChatClient` adapter but never the harness. Practical rule: the harness surface is confined to the two role files plus the job that drives them, so adding harness usage anywhere else means adding the pragma there — a visible, reviewable tripwire rather than an accident. Keeping it that way also keeps the blast radius of a breaking harness upgrade to three files.
+Those two pragmas appear at the top of `AgentRole`, `ImplementationAgent`, and `ImplementSpec`; `AgentRoleTests` carries them too. `MEAI001` additionally appears in `ProviderResolver`, which uses the experimental `IChatClient` adapter but never the harness, and that file opens with `#pragma warning disable OPENAI001` for the OpenAI client surface before its `using` directives. Practical rule: the harness surface is confined to the two role files plus the job that drives them, so adding harness usage anywhere else means adding the pragma there — a visible, reviewable tripwire rather than an accident. Keeping it that way also keeps the blast radius of a breaking harness upgrade to three files.
 
 ## What the tests actually pin
 
@@ -233,7 +238,7 @@ Those two pragmas appear at the top of `AgentRole`, `ImplementationAgent`, and `
 - **`CreateOptionsUsesConfigure`** drives a `FakeRole` through `CreateOptions()` and asserts the derived `Name` and `ChatOptions.Instructions`. This is a structural test: if `CreateAgent` stopped routing through `Configure`, or `Configure` stopped being called, every role would quietly lose its configuration.
 - **`ImplementationAgentConfiguresFileAccessAndShell`** constructs a real `ImplementationAgent` (with `await using`, over `Path.GetTempPath()`) and asserts the shape of the envelope: a non-null `FileAccessStore`, `FileAccessProviderOptions.DisableWriteTools == false` (writes stay enabled), exactly one `AIContextProvider` (the shell environment provider), and exactly one tool. Those four assertions are the guard rail against "hardening" the role by accidentally disabling write tools or dropping the shell.
 
-There is no test that exercises a real agent run, shells out through the executor, or verifies the deny-list behaviour. Changes to the shell options, the policy, or the prompt are therefore unverified by the suite — see [Testing Strategy and Harness](../testing/test-strategy.md).
+The join between role and job is likewise untested: the tested unit is `PrepareWorkspaceAsync` (worktree reuse, recreation, foreign repository and dirty-mirror rejection), while `RunAsync` itself is never driven by a test. There is no test that exercises a real agent run, shells out through the executor, or verifies the deny-list behaviour. Changes to the shell options, the policy, or the prompt are therefore unverified by the suite — see [Testing Strategy and Harness](../testing/test-strategy.md).
 
 ## Changing this safely
 

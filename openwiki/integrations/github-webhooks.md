@@ -3,16 +3,17 @@ type: integration-webhook-intake
 title: Webhook Intake and Event Routing
 description: How Sebastian receives GitHub App deliveries — MapGitHubWebhooks with the configured secret, the only two WebhookEventProcessor overrides (IssuesEvent and PushEvent), the issue action/state/label gates and their silent-ignore branches, push handling that runs SyncMainAsync inside the request, and the per-branch logging that makes the routing observable.
 tags: [github-webhooks, event-routing, intake, hmac-signature, labels, synchronization, latency, logging, extension-points]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
+  - id: openwiki-source-ede59da55b0d48006223d1c0
+    resource: repo://appsettings.json
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
   - id: openwiki-source-3bf67c20a76eb7fa3cac2e6e
     resource: repo://Sebastian.csproj
   - id: openwiki-source-b5cf04fcd9c2585d8cde1706
     resource: repo://src/Agent/ImplementSpec.cs
+  - id: openwiki-source-7709fb6d7a3503104984ea26
+    resource: repo://src/Configuration/EnvironmentPlaceholders.cs
   - id: openwiki-source-c011dda0b85bc515c2bfb12c
     resource: repo://src/Configuration/SebastianConfig.cs
   - id: openwiki-source-4ebc3939bf12ec338e2fdd2b
@@ -29,7 +30,10 @@ sources:
     resource: repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs
   - id: openwiki-source-7f9ac1665b935b4f858f87e0
     resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Webhook Intake and Event Routing
@@ -46,7 +50,7 @@ The *content* of the issue path — the seven required sections, the exact close
 
 ## The endpoint and how the processor is constructed
 
-`Program.cs` mounts two things and nothing else:
+`Program.cs` mounts two endpoints and nothing else:
 
 ```csharp
 app.MapGet("/health", () => "ok");
@@ -56,7 +60,7 @@ app.MapGitHubWebhooks(secret: config.GitHub.WebhookSecret);
 `MapGitHubWebhooks` comes from `Octokit.Webhooks.AspNetCore`. Only the secret argument is supplied, so the route itself is the library default and does not appear anywhere in this repository — read the library, not the code, if you need the path. Two properties follow from the call shape:
 
 - **No authentication middleware exists anywhere in the host.** The webhook route is anonymous; the HMAC secret from `GitHub:WebhookSecret` is the entire trust boundary. Signature verification happens inside the endpoint before dispatch, so `GitHubWebhookProcessor` only ever sees deliveries that matched the secret. A wrong or missing signature is rejected by the library and the processor is never invoked — that rejection is invisible in Sebastian's own logs.
-- **The secret is read once, at composition time**, and configuration is frozen for the process lifetime. Changing `GitHub:WebhookSecret` requires a restart; a running process keeps verifying against the value it started with. See [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for why `IOptionsMonitor` is deliberately absent.
+- **The secret is read once, at composition time**, and configuration is frozen for the process lifetime. Changing `GitHub:WebhookSecret` requires a restart; a running process keeps verifying against the value it started with. In practice the value arrives through the `{env:GITHUB_WEBHOOK_SECRET}` placeholder in `appsettings.json`, which `ExpandEnvironmentPlaceholders` resolves into the configuration before options binding and rejects outright if the variable is missing or blank — so a misconfigured secret is a startup failure, not a silently anonymous endpoint. See [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) for why `IOptionsMonitor` is deliberately absent.
 
 Registration is a factory over the public base type:
 
@@ -174,12 +178,12 @@ Every path a verified delivery can take. The only three branches that touch anyt
 | Event | Action | Issue state | Labels | Outcome |
 | --- | --- | --- | --- | --- |
 | `issues` | `opened`, `labeled`, `edited`, `reopened` | `open` | `feature`, spec incomplete | Comment naming missing sections, then close as `not_planned`; `Debug` log; never enqueued even if `ready-for-agent` is present |
-| `issues` | same four | `open` | `feature` + `ready-for-agent`, spec complete | `ImplementSpec` from the payload's title and body; `Information` when admitted, `Debug` when that key is already in flight |
+| `issues` | same four | `open` | `feature` + `ready-for-agent`, spec complete | `ImplementSpec` from the payload's title and body; `Information` when admitted, `Debug` when that key is already in flight. Nothing checks that the payload's repository is the one this instance clones — that mismatch surfaces later as a failed job |
 | `issues` | same four | `open` | `feature`, spec complete, no `ready-for-agent` | Nothing — the intended "waiting for a human" state; silent |
 | `issues` | same four | `open` | no `feature` (even with `ready-for-agent`) | Nothing; silent. `bug`-only issues are therefore never validated, implemented, or closed |
 | `issues` | same four | `closed` | any | Nothing; silent — a closed issue cannot be re-validated, so recovery needs `reopened` or a re-label |
 | `issues` | `closed`, `deleted`, `transferred`, `assigned`, `milestoned`, … | any | any | Nothing; silent |
-| `issues` | same four | `open` | `feature` | Nothing; silent defensive return (payload had no repository, owner, or name) |
+| `issues` | same four | `open` | `feature`, but payload lacks repository, owner, or name | Nothing; silent defensive return |
 | `push` | n/a | n/a | n/a | `Information` log line, then `SyncMainAsync` awaited inline; actual mirror update only for `refs/heads/main` |
 | `push` (any other branch, or a branch deletion) | n/a | n/a | n/a | `Information` log line, then an immediate no-op inside `Git` — branch pushes, including `sebastian/issue-<n>`, never update the mirror |
 | `pull_request`, `issue_comment`, `ping`, `workflow_run`, … | n/a | n/a | n/a | One `Information` delivery line, then base dispatch with no override: no effect. There is no command surface anywhere |
@@ -189,6 +193,8 @@ Two entries in that table are consequences of reading the payload rather than re
 
 - **A redelivery of an invalid-spec delivery repeats both writes.** The guard evaluates the `state` carried in the *payload*, so a redelivered "open, missing sections" event passes the state guard again and posts a second comment on the (now closed) issue. Comment creation is not idempotent and nothing dedupes on delivery id.
 - **A redelivery after a job finishes starts a second run.** `TryAdd` only rejects while that key is in flight; once the run completes the key is released, so the same delivery arriving later enqueues a fresh `ImplementSpec`.
+
+A third consequence is easy to miss because it is deferred rather than silent: intake is repository-agnostic. The processor acts on whichever `owner`/`name` the payload names — it never compares them with the origin remote that `Git` parsed at startup — so a `feature` issue in an unrelated repository that installs the app still gets validated, closed, or enqueued. For the close path that means a write against that other repository through the installation token. For the enqueue path the mismatch is caught only when the job runs: `ImplementSpec.PrepareWorkspaceAsync` throws, and `JobQueue` logs `Job {Key} failed` at `Error`. Either constrain the app installation to one repository, or add the comparison at intake where the failure is still cheap.
 
 ## Push routing: the documented synchronous exception
 
@@ -260,7 +266,7 @@ The escape hatch is already the right one: `JobQueue` is *the* place work may ha
 - **New GitHub write.** It belongs in `GitHubService`, which is a deliberately narrow two-method surface; the caller here composes the text and the ordering.
 - **New label semantics.** The two label constants are read-only filters and the codebase writes no labels. Adding a state transition is new feature work, described in [Product Intent vs. Implemented Behavior](../concepts/product-intent-and-gaps.md).
 
-The `// shortcut:` comment on the push handler is a recorded decision, not a defect: there are exactly three such markers in the repository (`Git.StartAsync`, `Git.SyncMainAsync`, and this one), and each names the condition that would justify upgrading it. Removing the behavior without replacing the comment destroys the only record of why the code deliberately blocks a request. See [Codebase Conventions and Change Checklist](../concepts/codebase-conventions.md).
+The `// shortcut:` comment on the push handler is a recorded decision, not a defect: there are exactly four such markers in the repository (`EnvironmentPlaceholders.ExpandEnvironmentPlaceholders`, `Git.StartAsync`, `Git.SyncMainAsync`, and this one), and each names the condition that would justify upgrading it. Removing the behavior without replacing the comment destroys the only record of why the code deliberately blocks a request. See [Codebase Conventions and Change Checklist](../concepts/codebase-conventions.md).
 
 ## Log line reference
 
@@ -272,7 +278,7 @@ The `// shortcut:` comment on the push handler is a recorded decision, not a def
 | `Debug` | `Implementation already running for {Repository}#{Number}` | `TryAdd` rejected the key |
 | `Debug` | `Issue {Repository}#{Number} closed; missing spec sections: {Sections}` | after both writes of the invalid-spec close path |
 
-Every template is a `[LoggerMessage]` partial method on the `partial` class, per the project's logging convention. `Information` is the effective default, so the three outcome lines that matter most for diagnosis are the two `Debug` ones; enabling `Debug` for `Sebastian.Webhooks` is what makes intake auditable. The git sync contributes its own lines through `Git`, documented in [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
+Every template is a `[LoggerMessage]` partial method on the `partial` class, per the project's logging convention. `Information` is the effective default, so the outcome lines that matter most for diagnosis are the two `Debug` ones; enabling `Debug` for `Sebastian.Webhooks` is what makes intake auditable. A rejected or mismatched-repository job adds a third level to the picture: `Error` `Job {Key} failed`, emitted by `JobQueue` once the run throws. The git sync contributes its own lines through `Git`, documented in [Git Mirror and Worktree Model](../concepts/git-workspaces.md).
 
 ## What is not tested
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:d56ce013411b365bb12bf9ce16233ba6e034979608619c83af5b211a5b476a86",
+  "pageVersion": "sha256:9344256ccca5e0d290e8db6d372108ee335aa76f3039be23480ac4dde7d79d06",
   "claims": [
     {
       "id": "claim_d654d83e34c54288a0317bc22bad58d1",
@@ -17,8 +17,8 @@
       "statement": "Program.cs is the entire composition root: it binds and validates SebastianConfig on start, registers GitHubService, ProviderResolver, Git and JobQueue as singletons, exposes Git and JobQueue as hosted services through those same instances, registers GitHubWebhookProcessor via a factory as the WebhookEventProcessor, and maps exactly two endpoints — GET /health returning \"ok\" and MapGitHubWebhooks with the configured secret (the only inbound integration and the trust boundary).",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L11-L49",
-          "version": "repo-lines-v1:sha256:55c780b60958294912167d4df7ef03f84d978eb4acaf0f5d177a37bcbb41a099:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://Program.cs#L11-L52",
+          "version": "repo-lines-v1:sha256:94cf220a8fd8099f1bdd03c3d8f530f7faaf70776dfcf985b10632936d9fcfea:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
     },
@@ -157,10 +157,108 @@
           "version": "repo-lines-v1:sha256:4e16b9aa2ad845f6dc3fa1c43708d1383dc683f69b3171595fdf51a1ce1bd916:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3MDY5MmJkNGVkNzRjMjlkZTA1YzY5NWEwNTE3MGE0YzI0YThmMjY2N2Q1NWJjNWZmNzQ0MjU4ZTM3ZWY3ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlOTk2NGRlNjdjMGIzYjM4ZjcwNGEyYmNlYjQwZjQ4MTQ4YTFiZjhlZjI5ZjRhYWMzYjEwZmU0NzJkNTgwM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzNzMxZDU4NDMxMDZhMDZlMmYyMGY4N2FiY2Q5ZjM3OGUzODZhNTE5ZTM1ZTc0MjIyZWExMTI4YjFmOWZkMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NDQ2ZGI5YmNmZWFhYzA3MzA2NTAyY2MxMTQ2NTEzMTBhZDZmMDJhZmUzMTk0Zjk4MWI2MGY4OTI5MDIxMmUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_8ab2779446e94600828156c364276fbb",
+      "statement": "Each issue delivery is routed by an ordered guard sequence in GitHubWebhookProcessor: only issues events with action opened, labeled, edited, or reopened whose issue is open and carries the case-insensitive label `feature` are processed; then an incomplete spec is commented and closed, and only a complete spec that also carries `ready-for-agent` is enqueued as an ImplementSpec job built from the payload's title and body. Push events bypass the queue and instead call git.SyncMainAsync inline in the webhook request.",
+      "evidence": [
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L32-L117",
+          "version": "repo-lines-v1:sha256:bb2d3069884f479ec04acc3cc5cd7fd8bd94e0e27dcd0d5c66c99c4681e17450:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1ZDExYjYwZDExZDQwNGM0YTU5OTYzNDMwZTAwYjNmMjBkYmZhMmZlNWE2NzEzNjI5Y2VkMzU4OWU2ZGRkOWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjFkMDZiZjk3NDA3ZTk2ODY2NTE2OTcwN2M2OTM2MjBmYmRkMDVkYzZlNmNmMzIyYzQ1NzdjZTQyYzQwYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmNGIwMTE0YzQ3NjQ2NWM0ZjgzMzg2MzFjMjg2YjJmOWFmNDE3Y2NlYTc0MDQyMzMzYTlmYTkxYzE5YjVkY2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c40316a32bc5469e8e32cc4d1c4fe6a8",
+      "statement": "Every job runs under PrepareWorkspaceAsync, which serializes on a static SemaphoreSlim, fetches origin, rejects a working copy that is not on main, has uncommitted tracked changes, or has commits ahead of origin/main, then fast-forwards main and creates or reuses the worktree .sebastian/workspaces/<issue> on branch sebastian/issue-<n> — reusing an existing directory untouched so a previous run's uncommitted agent work survives.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L63-L110",
+          "version": "repo-lines-v1:sha256:d1adcc5d278f63232d4ed568e5782aa0cd3c69d10eee1cd5850c4d89195203fc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxOTU5Y2Q4NmYwMTljY2FkNGFjOGNmZDRiYTA5MjNiMzY1NjUyYzI4NGIzNGI1ZTNkNjdmMDU0MjAyOWUwYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhMDJiZjRjNjQ2ODhmYWM0MTNkNmI4ODgwOWFiOGFlNzgxNDE5ODZkYTUwMDRjNmY2YjIzY2JjNmI3OWE1NjMifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L153-L173",
+          "version": "repo-lines-v1:sha256:81b2daf69aaa09e46e0e9a8016e58c6eb4e7737508cfe5c23914a8c00198e6ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZTZhMGQ5YjBmZjlkMDgwZThmODM5MmM4NzQ2ZThjNGE5NWM2NWJiN2NjNTVhNmNhYWMzMjY0MTU1ZTEwYTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkOGM4ZDUyMmQzOWZiZmUyYjViNTliNTYzMzY5YzllYzliOTNjM2U5MGQzODRjZDhiNDE3MjE1Mjg4ODc5YjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9d68564713104684b99db32225252214",
+      "statement": "The agent hop is split between capability and instruction: ImplementationAgent configures the harness with one confined shell tool (clean environment, 10-minute timeout, regex deny-list covering destructive removes, network clients, `gh`, and `git push|reset|clean|checkout --`), file access rooted at the worktree with approvals disabled, web search and file memory disabled, and execute mode; while ImplementSpec.BuildPrompt supplies the per-run task, requirements, and a rule forbidding git commands, commits, pushes, and outside-workspace edits.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L112-L132",
+          "version": "repo-lines-v1:sha256:9b6800bf753ee018f2eebd3dcee9ccd4efcf2bf77182bbcb3f22dc77baa8ffb9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmZmNkZTFhY2Y4Mzg5M2RiMDA0NTA2N2QxOTI2MDhhYTE2YmFjMTVmNDQ4MDdkMTJmNThmM2I4YzViOWYyMDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlMjdjNGIxM2QzMDQzMzE2MWU4NWVmNmIxN2UzYzdmMWYxNmZhNGY1NDc0ODQ4NzBlZWRkYjFhY2NmZTFlNDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxYWRlYWY0M2Y3OGRjNGQyMDQwMDM0NzA4MDk1NDU4ZDA4NzkyNWJlODk4OWU3N2M5ZmY0OWI1YTk1ZTU5MzEifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L14-L71",
+          "version": "repo-lines-v1:sha256:4c724d4b0c2a2ad70902e0c34ce9349376fe7aa5baa6800d7dea7a7845ed19cd:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViMjM1Mjg5MWZlMDJlNDgxOTI1NTBiN2E1Nzk3MDM0YzcxMzRhYWRkNWVhNjY1YjhhMzA1MjM2Y2JkZjkxM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5YzEzNTkwNjY1NjMyM2QxYzVlYTQxNjU0ZWU2NmFmYjU4NWFjZGNmYWVhY2ExMjFkNWUzMGJmMTkzZWVkZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0YTUzYzZmMWI1Y2E2OTE2OTdlM2Q0MmZmYWM5Yzc4NTQyYjc0MDgyODlmMmMxNmZkZDYyMTFhNGQ2ZmQ0YjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_64e3c9f54fe946c78963cacb97428db0",
+      "statement": "A run produces no repository side effect beyond uncommitted files in the worktree: the job ends by reading `git status --short` there and emitting a single Information log line with the path, status, and agent response — the git layer exposes fetch, ff-only merge, worktree add/prune, and status but no commit, push, or pull-request operation, and the job never resolves GitHubService, so no result is written back to the issue.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L35-L60",
+          "version": "repo-lines-v1:sha256:85ec316adc8c49c8692c7f5023466425d4e2adf1d79a046ff871655f06110832:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3ZGVmOWJiNmU0M2NlYjc1Y2M4MzM0NmI3ZTE3ZmQzNWIwNGI1ZTFjMzIxODQ2OTI2MjRkMTYyY2Q5NzhiZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY3YzQ2MDgxYmE5MmI5NWVmM2UxZGUxMDg2MTdhYjA3MDJkOTc2Yjc4NmIzMTVkODllZjBiYjcwYzY3NTkzZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyZDQxNjZmMmFiZDQyMzU3MDI5NWM0OTNmYWIyYzhkYjBlNzFhZjg0NTIxNGNlN2MyYmVkMjNhYTQxZDFjZWQifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L79-L102",
+          "version": "repo-lines-v1:sha256:0d54ec3dc06cabed1d7be6854ffbcad7891a2a80abc601b16c6160db3c66eb4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwNTU1NmMyYWNlNDM0YTVmOTRiZWEyMjczZmZiY2ZiMzM4NmQ4OTYyOTViOGIzMzhhMGVkNmZiZDBhOWUwY2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNDhmYzgzZDg4NGU4ZDI5YmU4NjA4MGY5MjY2M2RjNWYxMmI2OWMyMTdiNjMyNDY0Y2ExOTRjNDJkMjkxZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjM2YyYmNmMzVkNDk5Y2MyOTU1YTQzY2U5NGJiMDJiZDU2NjNiZDU2Yzc1ZGI1YjFlZGJhZDhhZTczZTVjNTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_835a71c3ad354778819dce3a4ba38e53",
+      "statement": "Sebastian enforces one process per repository: Git derives its working root from IHostEnvironment.ContentRootPath and throws at startup when that path is not the git top level, then parses `origin` into the instance's RepositoryIdentity; a job whose payload owner/repository does not match that identity throws in PrepareWorkspaceAsync (after admission) rather than being redirected, so a foreign-repository delivery appears only as a failed job log line.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L68-L77",
+          "version": "repo-lines-v1:sha256:5fb756755be2c0b0e6670fb7b36e308080192ba7318f32d0e251513a2b1e5250:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhZWEyYmZmZGEzMmEwZDFjMWNhYzA2MWQyYjg2OTBiYWNiMzhhMzJkNTczNWU1ZDRiYjBjZmFjMTllNzA5MDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0MWFhNWQ5Zjc3ZjU2OTU2OTk5MTI4NGJhZWU2NDE1NjI1OWEzZGZmYTlkOWIwYWM4NjZiNmZmODMyMGJhNzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhYjBiZjczMmJiNzM0NmJlNmRhN2NiNzI0MmYwYTdlYzQ3Mjc1YTc1MDM3NzAyNDM0OGQwY2ZjZGEwYzhjMTMifQ"
+        },
+        {
+          "resource": "repo://src/Libs/Git.cs#L17-L54",
+          "version": "repo-lines-v1:sha256:98224054173d13e2017283191c7b96700e51df09129511f2940efd22ed13c444:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyYTM5NmI2ZjlkNDU0Y2I4OTI1YmVlYWYwZTgxYjcyOTYyMmI1MTYyMzVhNTJjZGY0MjMwODQ0ZjVmMGU4ODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM0ZDE2ZjUwYThjYTU4YzQ0YjhkMGU5YmFkZmExNDU0MDk1MDdkMmRkMjY4MTM0NGQ4ZDA4YjA0OWZjMmEwY2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTUxYzM5ODE5NjMyMjA2YWZhMDNjMTljZmJjZjAxNGQ3M2MxZjRiNjFlNTk5OWJjMGM5MTI2ODRhN2FlNTgifQ"
+        },
+        {
+          "resource": "repo://src/Webhooks/GitHubWebhookProcessor.cs#L51-L101",
+          "version": "repo-lines-v1:sha256:da97d26aa0c5e62f233940aa359f4c349aec12a597678f6a41bbd490b37dbcf3:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYWNlYzJiOGRjNzIwZWE1ZmRlY2M4MDkzYjQxNDJjMDFlOThiMjU3Y2ZmNmVmNGVjNTI4ODdmYjY1MGRkOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMzhmZDI4MWYxMDY0NzIxODQzZDM0ZjA3OGNjYzJjNGNjNjk4M2U1YzgyYmQ4MmJlZjk5MjYxZWQwNmNmMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5N2Q5Mjc3OWM4MTMwY2EwMDA5YzlkYTQwYWVhM2RjYzY3YzUzMWQ0MDBiZWZhYTQwMDI5YmQ1NDExMTdlMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ccd0c4673a2a402abf6003d8c1d0d223",
+      "statement": "Two build commands verify a change because there is no solution file: `dotnet build Sebastian.csproj` is the strict gate (warnings as errors, latest-all analyzers, AOT and configuration-binding generator settings applied there), while `dotnet test tests/Sebastian.Tests/Sebastian.Tests.csproj` compiles the suite under a looser rule set because the web project excludes tests/** and the test csproj sets none of those settings.",
+      "evidence": [
+        {
+          "resource": "repo://Sebastian.csproj#L1-L27",
+          "version": "repo-lines-v1:sha256:62c02dab80965f2d80751b7065c2fc56ab342e2e082d5f4a280fc01aa1a21eaa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1YjdjMDUwNWE4MWJkOTYwNWU5NjhmYTQ4Yjk5ODNmNWY5MDAwOGRiMTQ0MGVhY2ZiNDA4ZjhmMDg4NDM4MWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkZGMxNTliYjU5NzQ5OGY1MjJlNzkzNWM4MTIxN2JlZTI3OTcyODZlMDNkNmRlYWQ2YWUxZDUyNjI1ZTdlNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljYWVkMTZhZDM5ZjAxMDM2YTFmOTUyNjU2YjhiZjJlMjQ3YTIyNjZmNTVjNjhlZjUwMjkwNTk0YmU1NzgxMzkifQ"
+        },
+        {
+          "resource": "repo://Sebastian.csproj#L15-L15",
+          "version": "repo-lines-v1:sha256:d3b39b46eddf4064368526de567687c9659d8e881304e0804c645fe04797a171:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDNiMzliNDZlZGRmNDA2NDM2ODUyNmRlNTY3Njg3Yzk2NTlkOGU4ODEzMDRlMDgwNGM2NDVmZTA0Nzk3YTE3MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ0YjYwMGZmNjFhMDRjNzg3ZmFmMjg3M2JkZWRiZDUzMTQwZjE4MmU3ZTMzODUyYzU3ZTE0NzE1ODBjNjUxZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWM2M2E3NWZlMDNkOTdhNzg1N2ZmMDUxYTExZjc1ZTYyMTc2MWZlN2NhMjVlZjMyNTNmZTNiMmE1NDU4Yjc3MiJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Sebastian.Tests.csproj",
+          "version": "repo-file-v1:sha256:8483cc7cee1529a26d46fe644cc0ea2f46dd73f52cfc7ea920977b071bab9d5b"
+        }
+      ]
+    },
+    {
+      "id": "claim_558536d2696f4a318060936b884c0378",
+      "statement": "The repository contains no build or test CI workflow; the only workflow is the scheduled OpenWiki documentation refresh (.github/workflows/openwiki-update.yml), which regenerates wiki pages and opens a docs pull request instead of compiling or testing the service.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/openwiki-update.yml#L1-L72",
+          "version": "repo-lines-v1:sha256:60644ec36174c775d4226d4749c3f4f3adb4769fb9979bb237b68e4aab275a7d:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5YTdiOTgxMzVjYWFmNWEyMThhNjAyNmNkZWZlY2I4MzJkNDliOWM4MzE0NGQxMWM5MDU4ODZlZGNhYmQ2MjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhMWMxNDE3MjUzOTkxMTdiZDEwYTliYTBkNzMwYWMxMTY5MDNiOTk5ZmUzNjYwOGI2MjA2YjZlYzZjMWZiY2MifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-11-01T14:54:06.427Z"
   }
 }

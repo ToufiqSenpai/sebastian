@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:997d7753305ed1ec0f23e96386e4f4e7515621056d2a40df99f1e3dbaa667dad",
+  "pageVersion": "sha256:88d40575ae8f643384b0a3e963fffff568c1767710a8a3380567b4411f49206c",
   "claims": [
     {
       "id": "claim_fac6312db7714ffa95066b47502cb645",
@@ -223,10 +223,28 @@
           "version": "repo-lines-v1:sha256:0aa5a9d0b74d2c48b2c1ae3d9e0ecb4a431aa2e99eb62a93e4d1c4fdc3a1ac04:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4OTNkZTIxNGY2OGE0ODZjOGIyMmUxM2Y0NWZhMTFlZDU3MDAzNzFlNGZiMzczZGQ4MGY5MWJkOGRmMzI1MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2ODc3NTIyYWViMWE5NGUxMmUxODZiM2JmNzIyYjhmNDg3OGQwNTkzZmI0YTA4YmI3ZmZkNjZhNjM5MWMzYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliYTJiYTRkMWRhNDdkMjcwYjE4YzhkMWEyMGRjMWM3MjIwOWNmZmMzM2FkYTdkNzFjNDlmZDE4YzIyYTU5ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyYmRkZjRmYjFiMGUzZjRhOGE0MjM5ZTM4ODNkYTg0MDExZWU4YTkwZjA5NWY0MGYxZmQwZDFiYWM4NTU1ZTMifQ"
         }
       ]
+    },
+    {
+      "id": "claim_b48e3c9fc62b47bc8c777ffb92c600fc",
+      "statement": "Neither the preparation hop, the queue hop, nor the full trace is exercised end to end: ImplementSpecTests covers only PrepareWorkspaceAsync (reuse with uncommitted work preserved, recreation after manual removal, dirty-mirror rejection, foreign-repository rejection) and JobQueueTests covers only admission and failure isolation (the ten-slot cap, continuation after a throwing job, and key lifetime), so GitHubWebhookProcessor, the prompt, and LogCompleted are unpinned.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L1-L66",
+          "version": "repo-lines-v1:sha256:a91cf13dac2a3dfc16a82edb70f329e7bc0f3bfefccdf6d9cd549da03ffb99fa:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzYmM2MDA5NDAyNzljZGJlYjZmNTI5MGJmYTM3MWIyMjliZDQ0MDYzMzE0YjFiYzUyNDYxYzNjMDk2OTc0ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs#L1-L112",
+          "version": "repo-lines-v1:sha256:20d87d23b781017b6119b78cc85ed6e0972bb98abc0892467e6ec76a510e7990:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiM2VmMTRiNDAwZDcwMmJmYWRlNThlMzQyN2I1NmRjMDkxMDg4MWVmMTI3M2YwYzNlNDQ2ZTkxYTY4ZDE3N2Y3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L22-L41",
+          "version": "repo-lines-v1:sha256:0aa5a9d0b74d2c48b2c1ae3d9e0ecb4a431aa2e99eb62a93e4d1c4fdc3a1ac04:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4OTNkZTIxNGY2OGE0ODZjOGIyMmUxM2Y0NWZhMTFlZDU3MDAzNzFlNGZiMzczZGQ4MGY5MWJkOGRmMzI1MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2ODc3NTIyYWViMWE5NGUxMmUxODZiM2JmNzIyYjhmNDg3OGQwNTkzZmI0YTA4YmI3ZmZkNjZhNjM5MWMzYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliYTJiYTRkMWRhNDdkMjcwYjE4YzhkMWEyMGRjMWM3MjIwOWNmZmMzM2FkYTdkNzFjNDlmZDE4YzIyYTU5ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyYmRkZjRmYjFiMGUzZjRhOGE0MjM5ZTM4ODNkYTg0MDExZWU4YTkwZjA5NWY0MGYxZmQwZDFiYWM4NTU1ZTMifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-11-01T14:54:06.427Z"
   }
 }

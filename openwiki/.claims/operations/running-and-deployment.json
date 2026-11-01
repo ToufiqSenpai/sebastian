@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:400be540d825ed67873ee17aef7c572776eb172b757d6e42a7c42aaf4a977fe1",
+  "pageVersion": "sha256:b272e3b1c3dc42ab4a87e2314f6a2a2faadf462c5bfc0b60df7dae94c79b02e9",
   "claims": [
     {
       "id": "claim_8c17d5da1795460bb71892075a8b7aeb",
       "statement": "Startup runs as an ordered set of gates — options validation, eager resolution of GitHubService and ProviderResolver, Git repository identity checks, then a bounded mirror sync — and the process only reaches app.RunAsync (which opens the listener) after all of them pass, so every misconfiguration in that chain is a failed start with no /health and no webhook endpoint.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L11-L49",
-          "version": "repo-lines-v1:sha256:55c780b60958294912167d4df7ef03f84d978eb4acaf0f5d177a37bcbb41a099:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+          "resource": "repo://Program.cs#L11-L52",
+          "version": "repo-lines-v1:sha256:94cf220a8fd8099f1bdd03c3d8f530f7faaf70776dfcf985b10632936d9fcfea:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://src/Libs/Git.cs#L27-L54",
@@ -21,7 +21,7 @@
       "statement": "/health is a constant liveness probe: it returns \"ok\" without inspecting mirror freshness, queue depth, in-flight jobs, or whether either credential chain works, so it cannot be used as a readiness check for agent work.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L46-L46",
+          "resource": "repo://Program.cs#L49-L49",
           "version": "repo-lines-v1:sha256:379756f83d225db44f89f0cf42a2a343575eadfb81b955ed74e61d3c3e132d13:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTgyYTE5ZmM4Mzk2NGI3MmQ4N2RhODFhNmQyZTcwMTI5Mzg2ZDgzZGNjODkwY2YxNGM5YTgwODcyZGU5YzhkNCJ9"
         }
       ]
@@ -80,11 +80,15 @@
     },
     {
       "id": "claim_67be24a8e38945d385624e5cc08b6c78",
-      "statement": "Configuration is a single bound SebastianConfig tree whose property names are the configuration keys, supplied through the default ASP.NET Core builder stack (environment variables with '__' as the section separator, user secrets, or command line) because no appsettings.json, environment-specific settings file, or launchSettings.json is committed.",
+      "statement": "Configuration is a single bound SebastianConfig tree whose property names are the configuration keys, and it is supplied by a committed appsettings.json template in which every secret is a whole-value {env:NAME} placeholder (the five variable names come from the placeholder text, not from the key tree) while non-secret tuning is a literal.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L13-L17",
-          "version": "repo-lines-v1:sha256:9e5f8f1d827151e65b50737011dd7e6d186f09579173640ef6dcd7514eb20030:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjJmOTRlMzNkY2NhNzA5NGY2NjMyZDljMzQ3YzE0ZTBmMjI3MjE0YjcwMzU5ZDZhNjQ3NzJiYTkxNzllNzVlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzJjOWEyNDA2OGUzY2JiMzU4NzJiYTYxZGI3ZGJhNDk1ZjVhYjk5MzMyZDdlYzhmNWQzMzk0M2U2NzQxNTFhYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmYzMGQxZGVhOGE4ZjBiMzc3OTM0NTMwNDM1ZDY2NzYwYzMzOWJiY2JiMjk1ZGI5MGQzN2RkMTFlODljNmM1NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJiNGUyYzM5MjE4NjQzYjE4MzNlZWVlZGU2MWY4ZjNjODZjZmJmMzVlZDIyN2NjNmM1MWZmZWZlZmE1Y2I4ZCJ9"
+          "resource": "repo://Program.cs#L11-L20",
+          "version": "repo-lines-v1:sha256:87e32bf62b8f7b47880b012838f7c96125718a5e8ae9c17d103839e7b4143610:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyYzlhMjQwNjhlM2NiYjM1ODcyYmE2MWRiN2RiYTQ5NWY1YWI5OTMzMmQ3ZWM4ZjVkMzM5NDNlNjc0MTUxYWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViYjRlMmMzOTIxODY0M2IxODMzZWVlZWRlNjFmOGYzYzg2Y2ZiZjM1ZWQyMjdjYzZjNTFmZmVmZWZhNWNiOGQifQ"
+        },
+        {
+          "resource": "repo://appsettings.json#L1-L22",
+          "version": "repo-lines-v1:sha256:8a00262e5b636ea33f13d920c5b5647bb138d40dd87ba8cde78b4b5534978493:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://src/Configuration/SebastianConfig.cs#L9-L67",
@@ -121,7 +125,7 @@
       "statement": "GitHubService validates the GitHub credentials by construction — it reads the file at GitHub:PrivateKeyPath with File.ReadAllText, imports it with RSA.ImportFromPem, and builds the installation token provider — and Program.cs resolves it eagerly after Build() so a missing or malformed PEM fails the start rather than the first job.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L42-L44",
+          "resource": "repo://Program.cs#L45-L47",
           "version": "repo-lines-v1:sha256:c929e30b2209c342f3a1782e8af22f55dd8f0bbbdd57b6997d044e750f1f5eee:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmE0NjAxMTMzZmMzN2RiOTQ1MGZmZjU1YjZmODJkYzQ0MzcxZDkwZjY4MzdkYWZjYTc1ODVlZDkwNDBkNWMyOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI0NTBiZWI5NGVmODIyYmFmZjYyYjUzNWJlYTkxNjQ3Njc0ZDIzYzQwYWJkNzgwMDZhYTg4ZDczNjEyOTZkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOGQ0NGViZTFkYzE3Y2I5ZDgyMTgzZTU5ZWRiZTI1MGFhNWE4MmFkNDdkM2NiOTRhZmJmYTMyYmIxMDZhNjJhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWEzZDZlMzM2NjNiMzExOTRiMjIwNTU3MzAyYmM1NDc3NjE5N2M2M2Q0ZjhlZDE1YmE1ZWY5OThmNWQzODQwNCJ9"
         },
         {
@@ -166,11 +170,15 @@
     },
     {
       "id": "claim_e27ff236d96e4f4886b2ed93f5fa8d5a",
-      "statement": "The webhook endpoint is anonymous and trusted solely via the HMAC secret passed to MapGitHubWebhooks, and because the secret is read once at composition time from IOptions<SebastianConfig>.Value, changing GitHub:WebhookSecret requires a restart.",
+      "statement": "The webhook endpoint is anonymous and trusted solely via the HMAC secret passed to MapGitHubWebhooks; the secret reaches configuration through the {env:GITHUB_WEBHOOK_SECRET} placeholder (so an unset variable is a startup failure, not a silent default) and is read once at composition time from IOptions<SebastianConfig>.Value, so changing it requires a restart.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L40-L47",
-          "version": "repo-lines-v1:sha256:ae703da5b213c015d96da29c802eb50f80474ecdef1652da6c79aec732759a36:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI2YmU0M2EwZWEyMWEyODA3YWZhMzI2MDM4MDQ0MGM1YzM0MTU5NTY5ZWMzMGRlYmZkYzlkM2QwOGIyZGE1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzQ5N2RjZGI5ZmQxYjgxY2ZmMWE1YTcxMjM1MDg0YzAwMmY4YzE2ZmVmNTFmNWZmNzIxMzEzZWZlMTFiOGFjMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
+          "resource": "repo://Program.cs#L41-L50",
+          "version": "repo-lines-v1:sha256:56272cba58f93a88ec92241eb1cc31fe478253b9c832a512e18d02280704bad8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxOTI5YTE3OTZjMWJhYWM4MWU3NGRlMmRiNjgyNTNjNWFiNjJhYjQyZjFhZTUwOGRkZGNlMmE4Y2U5MjFmODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwMGZhYTcxMDQxZWZjZjdlMzMwNmNjMzYzY2ZjMjQ1NTdmYjM5ODQyOGNhYjczMmNhOTZhMTk5MWJiNWQwMDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlNmRkN2M1ZTBlZmVkNjQ2OGM0ZDM4MjZjNDlkYTNiYTJlMTRiMDU2NjY4MzBjMDMzNDNkMTY0ZDI4ZmJiMDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0YWYwZmJkMTUwMjlkYTJlMDA5YzA1OTEzY2VkMzQ1MjMxNWVlNzNhY2E3YTQ1MjFmNzUwMzllMmI1MGM0NTkifQ"
+        },
+        {
+          "resource": "repo://appsettings.json#L2-L7",
+          "version": "repo-lines-v1:sha256:b13ad86f21451ba3dbaf3a6fbb05859b73dd44322b52b93e83ce8483fa0ccb93:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWEyZjIzNWQ1MzFjYjM4YjUzNjgyNjY5MzdjODgzMzk4MjcxYzI4YmI3ODViYzk5YThiMDAxYzZmYmVjMzdlYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjEsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZGM1MmE3YzliYzk5MWY4NjFkMDVkZTBhMzI1NWExMTliMzY1MjVkNDNhOGVkNzJlZjU1NWNlY2Q5ZGQ2M2VhNiJ9"
         },
         {
           "resource": "repo://src/Configuration/SebastianConfig.cs#L20-L33",
@@ -183,7 +191,7 @@
       "statement": "The webhook route path is not defined in this repository — MapGitHubWebhooks is called with only the secret, so the path is the Octokit library default — and no listening address is configured anywhere (no UseUrls, Kestrel endpoint, launch profile, or ASPNETCORE_URLS reference), so the port comes from standard ASP.NET Core hosting configuration.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L46-L47",
+          "resource": "repo://Program.cs#L49-L50",
           "version": "repo-lines-v1:sha256:249f502f71258975f361ec1b9f2cf31d4bf21a5457c3cbcc4fab521eafecd282:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzc5NzU2ZjgzZDIyNWRiNDRmODlmMGNmNDJhMmEzNDM1NzVlYWRmYjgxYjk1NWVkNzRlNjFkM2MzZTEzMmQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjAwZmFhNzEwNDFlZmNmN2UzMzA2Y2MzNjNjZmMyNDU1N2ZiMzk4NDI4Y2FiNzMyY2E5NmExOTkxYmI1ZDAwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjNjNmVlZWI4NzRjMjkxNmYzYzYxMjM3MGJjOWQyMjRkNjRkMDkxNTlmNjViZGU0MTBkZmU1YTYxMDMyZjUwZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRhZjBmYmQxNTAyOWRhMmUwMDljMDU5MTNjZWQzNDUyMzE1ZWU3M2FjYTdhNDUyMWY3NTAzOWUyYjUwYzQ1OSJ9"
         }
       ]
@@ -289,10 +297,42 @@
           "version": "repo-lines-v1:sha256:3d3f56518402dd6204e649deb34b378876c9b2bb804024c29da6d3eac36debb5:eyJzZWxlY3RlZExpbmVDb3VudCI6ODksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MDI3ODdhZjZkY2MwODM0ZGUxMjFjYmIxY2I5NWY5NDU5YjcyMWVhYjAzNDlmMTA1MDFiOTk2YzFjNzdmZmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NzE4ZjA2N2I1ZTVjMWYwOTkxYTZlNzQ3MjZmZTJhMjNkMjY0MzQ1ZTA4ZTRlYWQwNGZhZjczYzI3ZWQ0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_e8fedaf4881d489eb8461058898a2c5c",
+      "statement": "ExpandEnvironmentPlaceholders runs on the merged configuration before options registration and throws InvalidOperationException naming both the auto-derived variable and the configuration key when a whole-value {env:NAME} placeholder's variable is unset, empty, or whitespace-only, so a machine missing any of the five template variables fails before validation ever runs.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L11-L20",
+          "version": "repo-lines-v1:sha256:87e32bf62b8f7b47880b012838f7c96125718a5e8ae9c17d103839e7b4143610:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyYzlhMjQwNjhlM2NiYjM1ODcyYmE2MWRiN2RiYTQ5NWY1YWI5OTMzMmQ3ZWM4ZjVkMzM5NDNlNjc0MTUxYWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViYjRlMmMzOTIxODY0M2IxODMzZWVlZWRlNjFmOGYzYzg2Y2ZiZjM1ZWQyMjdjYzZjNTFmZmVmZWZhNWNiOGQifQ"
+        },
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L5-L35",
+          "version": "repo-lines-v1:sha256:c2370bf7e67a2c34e445ed1345b096d14d20e4a2fb4ec51f72675a134751d53e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmOTY4YmRlN2Y0NGQ5ZGUxMjgyOGIyZDRjNzZjMTFhYTExZGMyM2NlNzQwNmM2M2Q3MDM5YTYxYjMwZmU1ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjMmU4YmQwZGE5MmY1Y2QwYTYzOTIzYTZmNjg2NjU4NzVjY2FiZjU4YTc3YzY5YzI5ODA3MzJiY2M1NzRiZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L34-L51",
+          "version": "repo-lines-v1:sha256:101b8935f165a5c5233a252ce2cf8d17db7aaf60ec4e94ca12072aa6eae60d8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OWJkZWZlZWFjYTYzNDBlMDI5MGRjODZlODg5Yzg5ZDVlMTg5YWE1YmE0NGI1ODViM2I3MDczNGY0YTYyZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d6057205c81d4af7802a67f7cdd9ad33",
+      "statement": "Because the resolved placeholder values are appended as the last in-memory configuration layer, they win provider precedence: a direct GitHub__WebhookSecret environment override, user secret, or command-line value is shadowed whenever the placeholder resolves, and does not prevent the throw when the placeholder's variable is unset.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L10-L34",
+          "version": "repo-lines-v1:sha256:b75544ac43dfec3c6d39bf019e809b2c58cc8f95b5a1a82f1d0c3dfa1f2c4ca8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MDNlMzg0MGVjYTY5MDRlNDJhMDdhMWY2ODc4Mjg4ZmQ0YmYwODU2MTU3N2Y0YjEyMjhhNGYzZjc0OWY3YzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2ZDM0OTZiNjA2NDQxNjNmMzNjOGM3YTAzNTQxMzFiNjI4MzhkOGRkMzE5NzA5NmEyYWMxYzAwN2I5MTAzODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmM2QwNzlmYjUxNWMwZWIxMmQ0MjY0NjEwOWYyYjY3MDJmZGI2NWZmYWE4MjFkOGE0MWY4Y2RiODIyY2QxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3OTRkMDJhODEyMTk0NGQxNzZkMjY1ZTliYjljYzU5ZjZhYjg5MGJjYWRmOGFlZmRlYmRiYmI0ZjJlYTg0NDQifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L8-L32",
+          "version": "repo-lines-v1:sha256:4deb5dccbdd926bc75aae67ea1aa359fbc4a4335aac95832fa073a30685188f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzMjZhZDEyNDhmNjA3NDY0NTAzMTJhMDQxYTFjNjBjNTNiODY2M2UxMDBhZGUzNGM4OTk0NTZmZGE3ZTI3NWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiOWRiOTI2NDY0ZWM3YzMwNGE5OWRkNGExMGVjYTM5ZjU4OTczNDNlOTZiMzA5ZDI4OGUxNjFkYzU0ZDM5YWYifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-11-01T14:54:06.427Z"
   }
 }

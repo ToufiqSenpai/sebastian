@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:663c23c5749052989a7e98937b6c1887609eddbc832cc9f822b801b185b6853f",
+  "pageVersion": "sha256:a11ea4f15ebfb3690d54d7348ee3a8b24eeee444af27d352013794564d43d1a2",
   "claims": [
     {
       "id": "claim_eb3eb0b48f3c481fb7ca4a228057b09a",
@@ -243,7 +243,7 @@
       "statement": "Nothing in the suite exercises intake or GitHub writes: no test references `GitHubWebhookProcessor`, `GitHubService`, `PostCommentAsync`, or `CloseIssueAsync`, and there is no `WebApplicationFactory`, so the action list, label checks, spec-before-approval ordering, comment text, `not_planned` close, enqueue path, PEM import, and token adapter all rest on review alone. Making the processor testable requires first introducing a seam, because it takes concrete `GitHubService`, `Git` and `JobQueue` instances and constructs `ImplementSpec` inline.",
       "evidence": [
         {
-          "resource": "repo://Program.cs#L19-L36",
+          "resource": "repo://Program.cs#L22-L39",
           "version": "repo-lines-v1:sha256:e38a35e1f2c411aee52d2c741b8a04cbcb2fe042a6c2626d21c9b48cb81222db:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5Y2M5NmNhZTM4ZjdmMjJiNmVlYThhZDFhZGRlZWQyYmExM2Q2YWE4Mjg3NDRjNmE1Y2QzODFlNmFjNjBiMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1N2MxZWViZTFjNjczYzVkOWFlNGJlNjE4ZDBmNTMzNWY2Y2VkOWZmMTc0YzkwNzc1ZmQwODEyYWVhMmJjNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZDA3OGI3MDlmZjhhNTc0ODUyYzYxYjQwYTI2MWEwYWFhMjA5YTIyMGMyMzVhMTI5YTY4ZWFhNTMwMDBlMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0OTdkY2RiOWZkMWI4MWNmZjFhNWE3MTIzNTA4NGMwMDJmOGMxNmZlZjUxZjVmZjcyMTMxM2VmZTExYjhhYzIifQ"
         },
         {
@@ -323,10 +323,80 @@
           "version": "repo-lines-v1:sha256:8a16c25992e382f80a5b31b3d85e8d23224696724c52368fb8e668084ee2430c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3OWM4ODBmNjJkNDIyNTM4YmNhODRjYjU1ZWNlOGZlMTBlOTY1OGIwNjExMTVjM2ZhYmNkYzdiM2JlY2Y0NDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2NzE4ZjA2N2I1ZTVjMWYwOTkxYTZlNzQ3MjZmZTJhMjNkMjY0MzQ1ZTA4ZTRlYWQwNGZhZjczYzI3ZWQ0NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxOTEzNzMyNTgyYzNlNjAzNTkwNzg2Yzg2ODM2OTUxZmYzNWU5YjJkMGY4ZDMxMDY3ZDRmNGM4NzQzZGIyYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_480ea776706243ff8f9c4ca4eb886e68",
+      "statement": "EnvironmentPlaceholdersTests pins the whole-value `{env:NAME}` placeholder pass through a ConfigurationManager fed by AddInMemoryCollection: a placeholder is replaced from the environment, a literal value is untouched, and an unset variable throws an InvalidOperationException whose message names both the variable and the config key.",
+      "evidence": [
+        {
+          "resource": "repo://src/Configuration/EnvironmentPlaceholders.cs#L10-L35",
+          "version": "repo-lines-v1:sha256:c641598b20c8cccfd3e7444a079315fe9248d528b5cc54f41dcaf4c3f35b6b06:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0MDNlMzg0MGVjYTY5MDRlNDJhMDdhMWY2ODc4Mjg4ZmQ0YmYwODU2MTU3N2Y0YjEyMjhhNGYzZjc0OWY3YzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmM2QwNzlmYjUxNWMwZWIxMmQ0MjY0NjEwOWYyYjY3MDJmZGI2NWZmYWE4MjFkOGE0MWY4Y2RiODIyY2QxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L6-L51",
+          "version": "repo-lines-v1:sha256:ae802d668add3388706116dca55d9a040ec52c29a56c76d6b11619c7421e7482:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0YTU0MmE2YTVjNzQ1MmJmNTgxYWY1Y2U0OTRmYTQ0YzU4MWM3ZTI4Nzc0NWYyNTZlNDk2NWY1ZWZkMTY5YTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYmEwMzE3OWQ5YjFmZTk4M2U4ZmViOTVhMjU1ZTM0MGIyNjAxMDFlYTgxMTc4N2ZjNjdlYTQzM2U5NjQyODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_89fd89397edd4eb0b633ed437598a9e6",
+      "statement": "The suite has seven test files; Configuration/EnvironmentPlaceholdersTests.cs is the only test that mutates process state, setting and restoring a uniquely named environment variable in a finally block.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Configuration/EnvironmentPlaceholdersTests.cs#L8-L32",
+          "version": "repo-lines-v1:sha256:4deb5dccbdd926bc75aae67ea1aa359fbc4a4335aac95832fa073a30685188f2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzMjZhZDEyNDhmNjA3NDY0NTAzMTJhMDQxYTFjNjBjNTNiODY2M2UxMDBhZGUzNGM4OTk0NTZmZGE3ZTI3NWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiOWRiOTI2NDY0ZWM3YzMwNGE5OWRkNGExMGVjYTM5ZjU4OTczNDNlOTZiMzA5ZDI4OGUxNjFkYzU0ZDM5YWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_672f4a2c18954f68a29cbb3b30815e1b",
+      "statement": "Requiring git on PATH applies to TestRepository's RunGit, which launches the git binary and throws \"Could not start git.\" when it cannot start, and an InvalidOperationException carrying git's stderr when git exits non-zero.",
+      "evidence": [
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L10-L12",
+          "version": "repo-lines-v1:sha256:27a015fdc7387023f7ba6185812b774b2b60ffb423ada8b5a313355ff0522ca0:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjI5OGE4M2VmYWMwNGY2Y2IwYzQwZGJjY2M1NDA5OTkwZDcwZTlhYjdhNmZkYWEwNWY4OGY1ZTJkODVmYWY3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZjYjVlNWMzMTAwZGY0NTIwZTYyMTdjOTUxNTRlY2QzYzhiZWM5YjEzMDA0M2M4ZGYwMzE1NTQzOWVkNGY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWU1NzE5MzU1ZTdkYTYyN2YwNWE3YTYwN2Y4ZGQ3ZGFjNjZjMDgyZjlkMDlkZGU2M2YwOTBiNjMxYzU2MThkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMWRkZTBhOTdmMzA0NzhkYzkwMzE4NDY1YTVjMjIzYTEzYTkzYjAzOTEzZjUzNmViNDg2NWM5ZjcyYjYzYTAxZiJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/TestRepository.cs#L66-L95",
+          "version": "repo-lines-v1:sha256:3bcd23694a3c26f0af7eb4d0e85c03a0e0bd53179343f5295849a5cc6bc62285:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjOTVkODUzOTI5ZGU5NDIwNzZkMmVjNDJlZDJlMGMwMjBmNDVkMzM4MWU5NTFkOGI0ZWExYjU2OWNhY2VhMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZkYTZkZTk3NmYyOWI4NWE2Y2JmNTI2MTNhYmI2MTAxZmU1NmQwNmE3NjI2MDBkYzRhOTI1ZDUzMDBhZTI3NjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmOTdiNzdiMjc3YTJmZDkxOTY3YzgyOGVmOGEzNzk1NTZiNGUwNDcwZjg4ODAyNGI3NWU5MWRkZWNhYWRiNTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_465dcc6b47354f948d51d478913cc0f4",
+      "statement": "AgentRoleTests asserts exactly one tool on the ImplementationAgent option graph (Assert.Single on ChatOptions.Tools), so adding a second tool to the role breaks the test.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L28-L32",
+          "version": "repo-lines-v1:sha256:12baab36f28f28346ab0103f65b97f6ff2f30eafe9464783b7a2d8373b414427:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzllMmJhYzgzNmM3ZWM4ZTY4ODA2NWQyZGM1NzFjMDE4NzJiMjEzZDlmNGNhMjY2YjVkZjMyODI5OGFiMjMyZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzVjZGVmODA4NWFlNzRhYjYzNmQ2NDU5ZjVjNmQ1ZmJmYjBkYjI2NGYxYjBkNzViYWM1MTljOWIzZjY3MTdhYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjk3Y2RmNTRiMjg5MDJlNTdlNGE2MGQ5NThiZWFjZTY4ODRiOGQ1OGEzM2Y4OGM1MDBlZWZkOTlmODFlZmUxOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDI2ZDJhM2EwNzBkMTBkZDRhY2I0NTIxNGQ1ZmRjNmExOTkxNTQ5ZDhhYTZiNzkwNjJiNWRmODAyY2NkZTI0OCJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L24-L35",
+          "version": "repo-lines-v1:sha256:659279c94e56f3fd8a97b1ac3c0fb16629ab8e0fee1e935de4ee5e4842be379b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkMTg5ZTk4ZTYyMWY4MjY4ZWRiOGM4NDc3ZTU5YTM5MmQ0MTI1MjA1ZjlmMThjODdjYTRlNDJiOGZlYTc4MDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyYzFiMjZlYWRjMzA5ZGYxODQ3OTAwODlhMTNjMmNiZTI1MmIzOTdmNGRhYmI2NjU2NzZiMGE0MjJmNjVjOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiZGE2ZmMxMmNjOTFkYjRiZWEzMWJkMTI1OTI3Mzg2NWQzZWUyODA5OGQ0MDk2Yzc3N2Q4NDZjM2M3MmMyZGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4163674cda394778aa8aa954f90d33ae",
+      "statement": "No test constructs HarnessAgent: AgentRoleTests only inspects CreateOptions, and Program.cs startup composition (eager GitHubService/ProviderResolver resolution, hosted-service factories, the webhook processor factory, ExpandEnvironmentPlaceholders) has no test or WebApplicationFactory.",
+      "evidence": [
+        {
+          "resource": "repo://Program.cs#L11-L52",
+          "version": "repo-lines-v1:sha256:94cf220a8fd8099f1bdd03c3d8f530f7faaf70776dfcf985b10632936d9fcfea:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MmYwZDNjZTMyNTJiYWRlODc3ZGNlNTllZWYzNWE2MjZjNjk1MWE4ODVkNmFhODc3YWQ0YmJiMjFiZmQ3MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMjFkYTI1ZWE2NGNhMDgzMzkyYzNjNTZjY2U3MGE1YWVkZWZjZWU2YmEyNTgwNmVkYWJmMzBhMDdkMzg2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwMmJmOGM4NmM5NWNiNTczYTE3YzgzYzQ2MWI5ZGYxNWE5ZmNhMTFhOTNmMmY0N2EwN2ZiNGJiMDdjNTY0YTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/AgentRole.cs#L11-L19",
+          "version": "repo-lines-v1:sha256:e6574acc0776419610c99d1734be83f87b011e6c44e13ea655d477130bbf2e95:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWRiMjJlMzg0MDNmNTQ4MWM2NjQwZDk3ZmU2ZDc3NWMyY2ZhNzQ0OGJjOTZjYmU4NGQ1NmFkZDJlNmEzNjQyYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDFlYTI0YzE4ZGI2ODk1NGZiNjA5NDc3MjEzMDViNTc4N2FmMTAwZTdhNTg4Y2IwY2YxZTAzMjI0ZmFmM2VmZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjQ5NmJmNTNlM2UzMTU2NmE0ZDQ4NWVlZDg3Y2M3OTY3NDU1YzJlYjBkMTBmOTRhNTAwYzJjNGJiNTcxNTY2MyJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L12-L35",
+          "version": "repo-lines-v1:sha256:d5d86f44cfc1526f74f6719421e706b836af0053ab59cb88c2c19258c785e677:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YzBhMGIyY2Y1NmM2ZmFlYzI0NjgxMzRjMzk2MGI4NDQ1YTkwMjk1NDExYTJjNmYwZWRiMGU3NGE5YzllYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZlZGZhNTZiNzE3ZTYzNmJhMDc2MTgyZTQ0ZDYzZDczZDNhZGI0N2E3YTg2ZDQyZGRkNDIwMGU3OTBmZTE5YjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiZGE2ZmMxMmNjOTFkYjRiZWEzMWJkMTI1OTI3Mzg2NWQzZWUyODA5OGQ0MDk2Yzc3N2Q4NDZjM2M3MmMyZGQifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-11-01T14:54:06.427Z"
   }
 }

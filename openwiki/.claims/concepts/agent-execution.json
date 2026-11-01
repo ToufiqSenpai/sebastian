@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:a0e91053e7c9f3e6854e11b6d4a7f97cce57b79996d4a39998c4da4baf3adbbe",
+  "pageVersion": "sha256:f9210af61e763d02eb12162ff45ce499faf8781658ac596a7e2b32d7f78002fd",
   "claims": [
     {
       "id": "claim_ff0c0f9bef144353a5e09fe4114b59bc",
@@ -158,7 +158,7 @@
     },
     {
       "id": "claim_dd0ebb4205564b028e9d0408d7d3316d",
-      "statement": "The experimental harness API surface is deliberately contained by MAAI001/MEAI001 pragmas in only three production files — AgentRole, ImplementationAgent, and ImplementSpec — with ProviderResolver carrying MEAI001 alone for the IChatClient adapter, which keeps the blast radius of a breaking harness upgrade to those files and makes new harness usage outside them a visible, reviewable addition.",
+      "statement": "The experimental harness API surface is deliberately contained by MAAI001/MEAI001 pragmas in only three production files — AgentRole, ImplementationAgent, and ImplementSpec — with AgentRoleTests carrying both pragmas and ProviderResolver carrying MEAI001 (plus OPENAI001) alone for the IChatClient adapter; this keeps the blast radius of a breaking harness upgrade to those files and makes new harness usage outside them a visible, reviewable addition.",
       "evidence": [
         {
           "resource": "repo://Sebastian.csproj#L6-L9",
@@ -169,8 +169,8 @@
           "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmRlZDkyZGZkYzE4N2RhNzNlMzdlOGU4NzQ3NTVkM2ZjNzIxNzgyZmQ4MGY0ZWU5MTYwOTg0MmU4OTNkNmU3YSJ9"
         },
         {
-          "resource": "repo://src/Agent/ProviderResolver.cs#L4-L4",
-          "version": "repo-lines-v1:sha256:338ae40e9313bc8530f168ca04563ab5c8c1d8f088b8b7d04c9aabe363ed9b8d:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmI2YTVhMjAzMzNkMWNjNjcwNTQzNTE0NGRmZGRiODEyYTFjZmZkMWJhZjk2YmVhNDI1NTdhYTIyNTEwOTBiZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzg4YjM4NzA3ZGRhMzdkNzg2NWZiNWU2MTgzOWM0MTUyNjlkYTJlNDYyMDJjOGNjNmZlMDJmNzRhNTQ4ZDcxYyJ9"
+          "resource": "repo://src/Agent/ProviderResolver.cs#L1-L4",
+          "version": "repo-lines-v1:sha256:b40f8fd05cad5051f1ff682d725f7294f38aae519cf4ce170fe854bad3e3b13e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWNmODZlOWNhM2Q5NzM5YjU2Yjk5NDQ1NWNmZmI5MDBlN2RhOTgzY2JjMWIxOWE1MGFlYmE4MmM4ZWRiOWY4MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzg4YjM4NzA3ZGRhMzdkNzg2NWZiNWU2MTgzOWM0MTUyNjlkYTJlNDYyMDJjOGNjNmZlMDJmNzRhNTQ4ZDcxYyJ9"
         },
         {
           "resource": "repo://src/Agent/Roles/AgentRole.cs#L1-L2",
@@ -179,6 +179,10 @@
         {
           "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L1-L2",
           "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWEwMzE1NDBkNDk4NzEwOGM4NjIxOWEwNmYwM2QzNTc3NmUwZmNhYjE4ZGRmYzE0MWRhMmU2YzM4NjcxNzM2YiJ9"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/Roles/AgentRoleTests.cs#L1-L2",
+          "version": "repo-lines-v1:sha256:6aa9ce3bed4c6234208cfb1171bacafecf956a9f15bff02dc80f02926812d487:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2ZGRmMDQ0ZWZiZjZkMmIyYTA0NjA1ODIxZjg0ODcyYjg0MmU3N2I0YWFkMzFlYWYxOTFjYTA2Yjk4ZTUxNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM4YWU0MGU5MzEzYmM4NTMwZjE2OGNhMDQ1NjNhYjVjOGMxZDhmMDg4YjhiN2QwNGM5YWFiZTM2M2VkOWI4ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzdkMGY2OTAxZDA3NzAyZDM4MGViY2VjNzRlOWJjNjFmNGY0ODc2MzQyOGViZDBkMmZmM2RiZWVkNDNmMWQ3YyJ9"
         }
       ]
     },
@@ -205,10 +209,46 @@
           "version": "repo-lines-v1:sha256:a043b2835fb4c6577783201ce9f9ce41ed43fde0df0e1f1d5e800038b1cfe950:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhNmRkZjA0NGVmYmY2ZDJiMmEwNDYwNTgyMWY4NDg3MmI4NDJlNzdiNGFhZDMxZWFmMTkxY2EwNmI5OGU1MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_0236ec59cdcb4d04988e908c80415e94",
+      "statement": "ImplementationAgent takes its harness display name from the configured Agent:Name value (\"Sebastian\" in appsettings.json, validated as a required string on AgentConfig), making it the only consumer of that setting while the backing model comes from ProviderResolver.",
+      "evidence": [
+        {
+          "resource": "repo://appsettings.json#L8-L13",
+          "version": "repo-lines-v1:sha256:666c7c6ff8bf33df844503a23f9920e306f04c08a3d8a0c2b6df529165344b24:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiM2ZmYjZhODc3OWZlMDZkOWNiZTI1NzdjNzlhOWIxZDk0YTY0NTU4NTJhODRmZGE3ODVhMDEzNzRlMzkwZTU2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwY2RiOTcyYTdiZmI3ZWQyNDZmOWZmNjcyMzg1ZTU1ZjQ5NjhmYzExMDQzZGM1YjY4NGQ1MWRmYTMxZGJjYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWZjNzJhODUzNzUwN2Y2MTU3OTI3YjhhOTg2Y2E2NzAzYjBiYzQ5NTVhOWFlYmJmYzE5ZTk2NzA2Y2MyYTc1YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzQ0MDlkNGEwNTMyMDQxYjU2MTBiMWU2MTk0NWE5NTk3YTYwZWNjMjI4ZWJjNmVhMTY5MTA4NjMyYjA4YTNhNiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L36-L36",
+          "version": "repo-lines-v1:sha256:27f3ee2795ed5eeb50910ddeb8adfd677dcbe4021f01813bd94b4fa287a967b3:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdmM2VlMjc5NWVkNWVlYjUwOTEwZGRlYjhhZGZkNjc3ZGNiZTQwMjFmMDE4MTNiZDk0YjRmYTI4N2E5NjdiMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdmM2VlMjc5NWVkNWVlYjUwOTEwZGRlYjhhZGZkNjc3ZGNiZTQwMjFmMDE4MTNiZDk0YjRmYTI4N2E5NjdiMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOThmZmE1MDFjNmNjMWExNjlmMzAyYjk0OGZmNzQ5MWM5ZmZmMjkyZGMzMGI2MjkwZGNmZTdiYjQwMDY2YWI2OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzNkZTZhOTg2NTdlMjE2ZmU3NDZhMDEwZGYzYzEzNjZhYThlYWU1NDc3YzMzMjIxYzM2N2M4MDMxMzgyZTdlMiJ9"
+        },
+        {
+          "resource": "repo://src/Agent/Roles/ImplementationAgent.cs#L25-L27",
+          "version": "repo-lines-v1:sha256:f97cdf54b28902e57e4a60d958beace6884b8d58a33f88c500eefd99f81efe19:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDZiNWYwYzU2N2Q5YjkwZTYyNzhiYzU5NjEwMWNkNDEwOWE2ZmY3OTAwZjk5NDkyYjNkYzE3YjZmOTgwMTE5MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTBjMjEyODdkNjlhYzM2NzE2MThiNzgwZWNhN2ZiZDc4NDkzNTE4YjZhMDUxODQzYTEzMTE1NjYyM2YwZGUzMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTAwMDRhMWZiZjMyODcyZTNlMTQyNmI4YTY2YzVjNTg5ODBiZDM4OGQ3MGQzNmQyNDczNDkyMjI0NjMyYjJlNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODA1MDVkNTNiMDE1MGI2MzdjM2QwYWQxYzVhZTBkNzBmZTNkMjIyM2UxNmJlNzI0Y2RmODk0MmU5ODZkYTIxNyJ9"
+        },
+        {
+          "resource": "repo://src/Configuration/SebastianConfig.cs#L35-L38",
+          "version": "repo-lines-v1:sha256:5e5e061242cad228a24a55397771711d9c7ed5929527cd7d2324e5535a107c25:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2E2ZDhmMGVkZDNjNGY4MDZiMjFmY2U0OTYzOTJkM2MwYjlmMmZiMTFlY2QxZGFmNGJlMzRlNDE5M2I1ODY3NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWI3MjJjZGVmNjdmNTQ3MTI4YjlhMjQ5MGRiMzZiMjAyN2E3OTBiODU0ZjhmMWE0NTVlNTc3ZmY1MDA3YjE0YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWI4YjQ2YzIzYTc1ZTg0YTRkN2EwYTk4MmYxMDIyMDJiYTFjMTlkYjg5YWRjMTZlNTgyZDFkMDEyNTY2NjIyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGViOTM2OWJlYTI2M2MzNjRmODNiZmNmM2I3MGU4YzA4NTBjNmU1NWQ1YzQ0Njg3OTFmM2JhNDU4ZWQyOWE4YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e49d627b24da49b48e34d759d36a6f42",
+      "statement": "ImplementSpecTests covers only workspace preparation — worktree reuse that preserves uncommitted files, recreation when the directory was removed, dirty-mirror rejection, and foreign-repository rejection — while RunAsync, prompt building, and the agent run have no test coverage, so the role-to-job wiring is an untested seam.",
+      "evidence": [
+        {
+          "resource": "repo://src/Agent/ImplementSpec.cs#L28-L61",
+          "version": "repo-lines-v1:sha256:53f9fb148752070c9dbfbaa10f3d40be30a9d3a8cd1fe886893e5b3efe5a177c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4NzkyMzc4NDU2ZTAyODc4YWEwMjNiZjM0MjUzYzkyMzMyZDdkZTJjYmUzNmU1YmNiMDY1MThhNzcwNTVjNjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNjc0ZGU4ZGFmZTNhMDk2ZTQ5NWZkNTcwNTA3ZmFkNDg0ZTRjZWExY2NlM2I1M2I2YjE1NDc5ZjgzN2U0Y2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4ZjZjM2I5MzFkNDIxZWRiNjE4MzBhMzBjYjc2Mzk1ZDg1OWVmNTc1NDZmYzA4OGZhZDFhMTlkZDdiZDMzNDAifQ"
+        },
+        {
+          "resource": "repo://tests/Sebastian.Tests/Agent/ImplementSpecTests.cs#L5-L65",
+          "version": "repo-lines-v1:sha256:3137f538387ae27a590301ab845db5ee4a23ae6a93fe75ab05c4a67c2ddf113c:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjNzNhYjY5ZmY3OGQzMjk0ZTMxNWI5NjQ5NTUyZjA5OWE3NmZmZDU2ODc3ZjNiNTk1YmU4N2Q3ODAyNmU3MzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyNTM1YThjOTRjMDIxNWM0ZjkzNTFlYWNmMThjOGZlZTFlNWM4ZDdiY2JkNjQyYTkwYmYzZTA2NzljMGRhY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.7.2",
-    "at": "2026-10-30T13:26:24.015Z"
+    "at": "2026-11-01T14:54:06.427Z"
   }
 }

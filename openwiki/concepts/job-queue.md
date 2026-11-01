@@ -3,9 +3,6 @@ type: job-queue-semantics
 title: Job Queue and Execution Semantics
 description: How JobQueue serves as both the admission API and the background consumer — the unbounded channel, the OrdinalIgnoreCase in-flight key that is the dedupe token, MaxConcurrentJobs = 10, one async DI scope per job, per-job error isolation so one failure cannot stop the loop, and what StopAsync actually does to queued versus running jobs.
 tags: [job-queue, background-service, concurrency, deduplication, cancellation, error-isolation, dependency-injection, backpressure]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-d14cb4231320f903c4c26a78
     resource: repo://Program.cs
@@ -21,7 +18,10 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-7f9ac1665b935b4f858f87e0
     resource: repo://tests/Sebastian.Tests/Jobs/JobQueueTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Job Queue and Execution Semantics
@@ -38,6 +38,30 @@ internal interface IJob
 ```
 
 Two members, and both are semantics rather than plumbing: `Key` is the **admission token** (not an identifier that gets logged or persisted), and `RunAsync` receives a **service provider** (a per-job scope, not the root container) plus the **shutdown token**. `ImplementSpec` is the only production implementation, with `Key => $"{owner}/{repository}#{issueNumber}"`. The queue itself names no job type anywhere, which is what makes "new job kind" a matter of implementing `IJob` and calling `TryAdd`.
+
+## The identity requirement: one instance
+
+Because admission and consumption are the same object, the registration is the load-bearing part of the design, not boilerplate:
+
+```csharp
+builder.Services.AddSingleton<JobQueue>();
+builder.Services.AddHostedService(services => services.GetRequiredService<JobQueue>());
+...
+builder.Services.AddSingleton<WebhookEventProcessor>(
+    services => new GitHubWebhookProcessor(
+        ...,
+        services.GetRequiredService<JobQueue>(),
+        services.GetRequiredService<Git>()));
+```
+
+`Program.cs` registers one `JobQueue` singleton, exposes *that same instance* as the hosted service through a factory lambda, and hands *that same instance* to the webhook processor factory. There is no second constructor call anywhere in production code.
+
+This is a hard requirement, not a convention, because `TryAdd` and the consumer loop share `_channel` and `_inFlight` as **instance** fields:
+
+- `AddHostedService<JobQueue>()` (the generic form) or an `AddSingleton<JobQueue>()` registration repeated under `IHostedService` would let the container build a hosted-service object whose `ExecuteAsync` drains a channel that the processor's instance never writes to.
+- The failure is silent by construction: every `TryAdd` would return `true` and log `Started implementation for …`, and no job would ever run. Nothing throws, no error is logged, and the only symptom is that the issue never progresses.
+
+The same reasoning applies to any consumer added later: resolve `JobQueue` from the container, never construct it. [Startup, Composition, and Configuration Binding](../architecture/startup-and-composition.md) covers the identical two-descriptor pattern for `Git`.
 
 ## Admission: the key is held from `TryAdd` until the job finishes
 
@@ -90,6 +114,14 @@ else
 
 `LogImplementationStarted` is `Information`; `LogImplementationAlreadyRunning` is `Debug` with the message `Implementation already running for {Repository}#{Number}`. So a duplicate delivery produces a debug line and a normal webhook response — **callers must not treat `TryAdd == false` as a failure**, must not throw, and must not close or comment on the issue. The queue's only log statement at all is `Job {Key} failed`; the reject path is silent by design, which is the correct choice because the reject path is the common case for edited issues.
 
+## The delivery guarantee, stated plainly
+
+Everything the queue knows is in two in-memory collections. There is no persistence layer, no outbox, no journal, and no replay:
+
+- **A restart loses all buffered jobs.** The process comes back with an empty channel and an empty in-flight set; recovery depends entirely on GitHub redelivering or a human re-triggering a qualifying `issues` event (re-label, edit, reopen).
+- **The in-flight key suppresses duplicates only while a job is queued or running.** It is not a "this issue was already processed" record. Once the `finally` removes the key, the next qualifying event starts a fresh run — even if the previous run failed, and even if the previous run succeeded and a PR already exists. Dedupe is a concurrency guard, not an idempotency key.
+- **At-most-once, not at-least-once.** A job object that is dequeued is never put back, so a crash or shutdown loses the work rather than repeating it. Retries, redelivery, and dead-letter handling do not exist; see [Failure Handling](../operations/failure-handling.md) for the operator view of that gap, and [GitHub Webhooks](../integrations/github-webhooks.md) for what triggers a delivery in the first place.
+
 ## The execution lifecycle
 
 ```mermaid
@@ -134,7 +166,7 @@ The channel is `Channel.CreateUnbounded<IJob>()` with default options, and the c
 
 - **No backpressure at all.** `TryAdd` never blocks and never returns `false` for capacity. A burst of qualifying issue events — or a redelivery storm, or a label applied in bulk — enqueues one job object each, and the only bound is process memory. The HTTP intake path pays nothing for queuing.
 - **Queue depth is invisible.** There is no count, no log of depth, and no metric. The observable signal that work is waiting is the absence of a "started" log line for that issue, and the practical symptom of a backlog is jobs sitting in memory until slots free.
-- **Queued work is volatile.** The channel and the in-flight set are the only memory-resident state in the process, so a restart loses everything buffered; recovery is a redelivered or re-triggered event. That is stated as a design consequence in [System Overview and Runtime Topology](../architecture/overview.md) and [Failure Handling](../operations/failure-handling.md) covers the operator view.
+- **Queued work is volatile.** The channel and the in-flight set are the only memory-resident state in the process, so a restart loses everything buffered; recovery is a redelivered or re-triggered event, as described above and in [System Overview and Runtime Topology](../architecture/overview.md).
 - **Multi-writer safe.** `CreateUnbounded` does not set `SingleWriter`, so concurrent webhook requests calling `TryAdd` are supported by the channel itself; correctness of the dedupe still rests on the concurrent dictionary.
 - **FIFO, not priority.** `ReadAllAsync` drains the channel in write order. There is no prioritization by issue age, label, or repository — and with one repository there is nothing to prioritize across.
 
@@ -203,12 +235,12 @@ sequenceDiagram
 What `StopAsync` does to each class of work, in order. The writer completion prevents admission; the base-class cancellation prevents execution.
 
 - **New admissions** are refused from the instant `TryComplete` runs: a fresh key is added to `_inFlight`, the write fails, the key is rolled back, and `TryAdd` returns `false`. Post-shutdown `TryAdd` therefore never leaks keys and never throws.
-- **Buffered, not-yet-started jobs are abandoned.** `ReadAllAsync(stoppingToken)` would happily keep yielding buffered items after the writer completes, but `base.StopAsync` immediately cancels `stoppingToken`, and that token is both the reader's token and the `ParallelOptions.CancellationToken` linked into every handler's `cancellationToken`. So the loop ends rather than draining, and abandoned jobs never start — and therefore keep their in-flight keys, which is harmless because the writer is already completed and nothing can be admitted again. (It only becomes observable if the same `JobQueue` object outlives `StopAsync`, as the tests do.)
+- **Buffered, not-yet-started jobs are abandoned.** `ReadAllAsync(stoppingToken)` would happily keep yielding buffered items after the writer completes, but `base.StopAsync` immediately cancels `stoppingToken`, and that token is both the reader's token and the `ParallelOptions.CancellationToken` linked into every handler's `cancellationToken`. So the loop ends rather than draining, and abandoned jobs never start — and therefore keep their in-flight keys. Nothing observable follows from that in production, because the writer is already completed and no caller can be admitted again; it only becomes visible if the same `JobQueue` object is used after `StopAsync`, as the tests do by disposing it without starting it again.
 - **Running jobs observe cancellation.** The token handed to `RunAsync` fires, and `ImplementSpec` propagates it into `PrepareWorkspaceAsync`, the git commands (which kill the child process tree before rethrowing), and the agent run. A job that cooperates exits; a job that ignores the token keeps running for as long as the host's shutdown timeout allows, because `base.StopAsync` waits for `ExecuteAsync` bounded by the caller's cancellation token (the framework's default `HostOptions.ShutdownTimeout` applies — nothing in `Program.cs` overrides it).
 - **Cancellation is never logged as a failure**, because of the `when (stoppingToken.IsCancellationRequested)` filters on both catches.
 - **`ExecuteAsync` returns normally** once the loop ends, so a shutdown mid-job is an orderly stop from the host's point of view, not a faulted hosted service.
 
-The practical reading: there is **no graceful drain**. Nothing in the design waits for the ten running agents to finish, and nothing saves the buffered ones. If losing in-flight agent work at shutdown is unacceptable, that is a change to `StopAsync` and to the shutdown timeout, and it must be made with the knowledge that agent runs are long — minutes, not milliseconds — while `ImplementSpec` holds `PrepareLock` for its preparation phase.
+The practical reading: there is **no graceful drain**. Nothing in the design waits for the ten running agents to finish, and nothing saves the buffered ones. If losing in-flight agent work at shutdown is unacceptable, that is a change to `StopAsync` and to the shutdown timeout, and it must be made with the knowledge that agent runs are long — minutes, not milliseconds — while `ImplementSpec` holds `PrepareLock` for its preparation phase. The key mechanics also mean a drain would have to keep the writer's completion but move the cancellation, since cancelling `stoppingToken` is what ends the loop whether or not items remain buffered.
 
 ## What a reader or operator should take away
 
@@ -236,13 +268,15 @@ The decision that is *not* available without editing this file is changing the c
 
 ## Tests
 
-`tests/Sebastian.Tests/Jobs/JobQueueTests.cs` constructs `JobQueue` directly — `new JobQueue(new ServiceCollection().BuildServiceProvider(), NullLogger<JobQueue>.Instance)`, then `StartAsync` / `StopAsync` — with a local `TestJob` that exposes a completion `TaskCompletionSource`. The DI composition itself is never exercised; the three tests pin the queue's externally visible contract:
+`tests/Sebastian.Tests/Jobs/JobQueueTests.cs` constructs `JobQueue` directly — `new JobQueue(new ServiceCollection().BuildServiceProvider(), NullLogger<JobQueue>.Instance)` — wraps it in `using`, calls `StartAsync`, and calls `StopAsync` at the end of each test, with a local `TestJob` that exposes a completion `TaskCompletionSource` signalled from its own `finally`. The DI composition itself is never exercised; the three tests pin the queue's externally visible contract:
 
 | Test | Pinned behavior |
 | --- | --- |
 | `RunsAtMostTenJobsConcurrently` | Twelve submitted jobs with a gated body: exactly **ten** are observed to have started before the gate is released, then twelve, then all twelve complete. This is the only evidence that `MaxDegreeOfParallelism = 10` is the effective cap rather than, say, an upper bound the runtime ignores. |
 | `ContinuesAfterJobFailure` | A job whose body throws `InvalidOperationException` and a following job that completes — both completion sources are awaited, so the test fails if the exception escapes the handler or if the loop stops after the fault. |
 | `RejectsDuplicateKeyWhileJobRuns` | `TryAdd` succeeds for a running key, returns `false` for the same key while it runs, and (via `SpinWait.SpinUntil`) succeeds again once the first job's completion has been signalled — pinning the `finally` timing, not just the dedupe. |
+
+The tests are also the only place a `JobQueue` is *disposed* rather than merely stopped (`using var queue = ...`), so they double as the container-disposal path coverage that production never reaches; note that disposal can race a still-running `ExecuteAsync`, another reason the shutdown path deserves explicit assertions rather than incidental coverage.
 
 What is **not** covered, and therefore what to verify by hand when you touch `StopAsync` or the cancellation handling: no test asserts that `TryAdd` returns `false` after `StopAsync`; none asserts that a buffered job is abandoned rather than run at shutdown; none exercises the `OperationCanceledException` filter on either catch; and none asserts that a cancelled job is *not* logged as a failure. The shutdown path is the least-tested part of this file — the admission and failure-isolation paths are the well-covered ones.
 

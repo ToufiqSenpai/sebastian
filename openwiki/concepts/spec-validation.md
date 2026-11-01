@@ -1,11 +1,8 @@
 ---
 type: issue-intake-contract
 title: Issue Spec Contract and Validation Gate
-description: The feature-issue intake contract — the seven required markdown sections SpecTemplateValidator enforces, the exact heading and empty-content algorithm, the close-as-not_planned terminal outcome for invalid specs, and the maintenance link to the to-spec skill template.
+description: How SpecTemplateValidator and GitHubWebhookProcessor turn the feature-issue markdown contract into a terminal gate — seven required level-2 sections, the filler-detection rules (HTML comments, _No response_, blank lines), case-insensitive matching, and the comment-then-close outcome for an incomplete spec.
 tags: [issue-intake, spec-validation, markdown-parsing, github-webhooks, feature-gate, labels, maintenance]
-verified:
-  - by: openwiki/0.7.2
-    at: 2026-10-30T13:26:24.015Z
 sources:
   - id: openwiki-source-6f35f7ccf1495063b8fc71d0
     resource: repo://docs/PRD.md
@@ -21,7 +18,10 @@ sources:
     resource: repo://src/Webhooks/GitHubWebhookProcessor.cs
   - id: openwiki-source-8a717290a8315456a0f1fc7e
     resource: repo://tests/Sebastian.Tests/GitHub/Issues/SpecTemplateValidatorTests.cs
-generated: { by: "openwiki/0.7.2", at: "2026-10-30T13:26:24.015Z" }
+generated: { by: "openwiki/0.7.2", at: "2026-11-01T14:54:06.427Z" }
+verified:
+  - by: openwiki/0.7.2
+    at: 2026-11-01T14:54:06.427Z
 ---
 
 # Issue Spec Contract and Validation Gate
@@ -34,6 +34,10 @@ The gate is small and split across two files with different jobs:
 - `GitHubWebhookProcessor.ProcessIssuesWebhookAsync` is the **policy**: which deliveries reach the validator, what happens when sections are missing, and what happens when they are not.
 
 Read the split as "where a change goes". Changing the list of required sections is a one-array edit in the validator; changing *when* an issue is checked, or what an invalid issue costs, is webhook-processor work. For where these fit in the wider process, see [System Overview and Runtime Topology](../architecture/overview.md); for the surrounding event routing, see [Webhook Intake and Event Routing](../integrations/github-webhooks.md).
+
+## A Note on `skills/to-spec/SKILL.md`
+
+[`skills/to-spec/SKILL.md`](../../skills/to-spec/SKILL.md) is the spec-authoring skill, and it is the other half of this contract: its `<spec-template>` fence (lines 19–73) is the markdown that produces a valid spec body. It is **not part of the .NET build** — no project references it, no analyzer reads it — so it is documented here as a coupled artifact rather than as code. Everything on this page about the template is derived from its heading lines and the validator's own comment; read the file directly before changing either side.
 
 ## Scope: open `feature` issues only
 
@@ -52,21 +56,23 @@ Three consequences follow from the guards, and they are the ones that surprise p
 - **A closed issue can never be re-validated.** After the close path below runs, later `edited` deliveries carry `state = closed` and return at the state guard. Recovery therefore requires a `reopened` (or a re-label) event, not an edit.
 - **Validation runs again on every matching delivery.** Labeling, editing, and reopening all re-enter the gate, so a spec that loses a section after approval is closed on the next event, even though it was implementable a minute earlier.
 
-## The contract: seven sections
+## The contract: seven level-2 sections
 
-`RequiredSections` is a static array, and its **declaration order is observable** — it is the order of the missing list, which is the order of the names in the closure comment.
+`RequiredSections` is a static array of seven names, and its **declaration order is observable** — it is the order of the missing list, which is the order of the names in the closure comment.
 
-| # | Section heading (as required) | Filled by the `to-spec` template? |
+| # | Section heading (as required) | Heading level in the template |
 | --- | --- | --- |
-| 1 | `Problem Statement` | yes |
-| 2 | `Solution` | yes |
-| 3 | `User Stories` | yes |
-| 4 | `Tech Stack` | yes |
-| 5 | `Implementation Decisions` | yes |
-| 6 | `Testing Decisions` | yes |
-| 7 | `Out of Scope` | yes |
+| 1 | `Problem Statement` | `##` (line 21) |
+| 2 | `Solution` | `##` |
+| 3 | `User Stories` | `##` |
+| 4 | `Tech Stack` | `##` |
+| 5 | `Implementation Decisions` | `##` |
+| 6 | `Testing Decisions` | `##` |
+| 7 | `Out of Scope` | `##` (line 65) |
 
-The template also ends with `Further Notes`, which is deliberately **not** required and is proved optional by a test. Extra sections are ignored entirely: they are tracked like any other heading but never queried, so a spec may add whatever headings it likes.
+The template fence ends at line 73 and its last heading is `## Further Notes` (line 69), which is deliberately **not** required and is proved optional by a test. Extra sections are ignored entirely: they are tracked like any other heading but never queried, so a spec may add whatever headings it likes.
+
+**Only `## ` opens a section.** The validator's heading test is the literal prefix `"## "`, so a required name written as `# Problem Statement` or `### Problem Statement` does not satisfy it, and neither does a `Problem Statement` heading with the hashes stripped by an editor or a form renderer. Since the template authors every heading at level 2, the practical rule for anyone editing the template is: keep the two hashes, or intake breaks silently.
 
 ## The validation algorithm, as implemented
 
@@ -106,7 +112,7 @@ private static bool IsEmptyContent(string line) =>
 Step by step, the semantics a reader must internalize:
 
 1. **Split on `\n` and `Trim` every line.** The trim is what makes CRLF bodies work (the trailing `\r` disappears), and it also means leading indentation does not hide a heading.
-2. **A heading is a line whose trimmed form starts with `"## "` — exactly two hashes and a space.** The section name is the remainder, trimmed. This is ordinal: `## ` matches, `### ` does not, `# ` does not.
+2. **A heading is a line whose trimmed form starts with `"## "` — exactly two hashes and a space.** The section name is the remainder, trimmed. This test is ordinal: `## ` matches, `### ` does not, `# ` does not.
 3. **`filled` is a set of section *names*, not positions.** Membership is `OrdinalIgnoreCase`, so `## tech stack` satisfies `Tech Stack`, and a required section appearing twice counts as filled if *either* occurrence has content.
 4. **A section is filled by any single non-empty line under it.** There is no minimum length, no structure check, and no inspection of what the line says. One character of text is enough.
 5. **Content before the first `## ` heading is discarded** (`currentSection is null`), so a preamble or a template header line cannot fill anything.
@@ -123,7 +129,7 @@ Step by step, the semantics a reader must internalize:
 | equals `_No response_` (any casing) | empty |
 | anything else, including a single word | **content — the section is filled** |
 
-These are the exact rules the tests pin, and each corresponds to a real template artifact: GitHub issue forms emit `_No response_` for skipped optional fields, and template authors leave `<!-- ... -->` guidance comments that must not be mistaken for answers.
+These are the exact rules the tests pin, and each corresponds to a real template artifact: a rendered issue form emits `_No response_` for skipped optional fields, and template authors leave `<!-- ... -->` guidance comments inside spec bodies that must not be mistaken for answers. Note the asymmetry with headings — the comment test is `StartsWith` (so `<!-- x -->` on one line is fine), while the placeholder test is full equality.
 
 ### Sharp edges worth knowing before you touch this
 
@@ -200,16 +206,16 @@ Admission is informational only: `true` logs `Information` (`Started implementat
 
 Note the shape of the contract as a whole: **validation decides whether the issue may be implemented, and the label decides whether it will be, right now.** Both are read from one payload snapshot, so a delivery that carries a complete spec and `ready-for-agent` starts work immediately; the gate never re-reads the issue.
 
-## Maintenance: the section list is duplicated in three places
+## Maintenance: one comment holds a two-file contract together
 
-The one-line comment above the array is a real constraint, not decoration:
+The one-line comment is the most important line in the class:
 
 ```csharp
 // Keep in sync with skills/to-spec/SKILL.md.
 private static readonly string[] RequiredSections = [ ... ];
 ```
 
-[`skills/to-spec/SKILL.md`](../../skills/to-spec/SKILL.md) is the spec-authoring skill. Its `<spec-template>` block lists the seven headings — `Problem Statement`, `Solution`, `User Stories`, `Tech Stack`, `Implementation Decisions`, `Testing Decisions`, `Out of Scope` — plus `Further Notes`, and its process step applies the `feature` label when it publishes the issue with `gh`. The hash characters in front of each heading are part of that template, which is exactly what the `"## "` heading test matches.
+It is a real constraint, not decoration, and it is addressed to anyone editing the array: the authoritative list of headings lives in the markdown template inside `skills/to-spec/SKILL.md`'s `<spec-template>` fence (lines 19–73), which authors `## Problem Statement` through `## Out of Scope`, ends with `## Further Notes`, and is the thing the validator is meant to mirror. The hash characters in front of each heading are part of that template, which is exactly what the `"## "` heading test matches.
 
 So the contract is authored in markdown and enforced in C#, and nothing couples them:
 
