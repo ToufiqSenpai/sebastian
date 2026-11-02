@@ -195,7 +195,7 @@ public sealed class CatalogServiceTests : IDisposable
             (_, _) =>
             {
                 var content = new ByteArrayContent([1]);
-                content.Headers.ContentLength = (16L * 1024 * 1024) + 1;
+                content.Headers.ContentLength = (64L * 1024 * 1024) + 1;
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = content,
@@ -203,8 +203,10 @@ public sealed class CatalogServiceTests : IDisposable
             });
         using var service = CreateService(serviceHandler, time);
 
-        _ = await Assert.ThrowsAsync<CatalogException>(
+        var error = await Assert.ThrowsAsync<CatalogException>(
             () => service.GetAsync(CancellationToken.None));
+
+        Assert.Contains("larger than 64 MB", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]

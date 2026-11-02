@@ -12,6 +12,9 @@ public sealed class CatalogService : IDisposable
     private const long MaxBytes = 64L * 1024 * 1024;
     private const int MaxErrorBody = 4096;
 
+    private static readonly string TooLargeMessage =
+        $"models.dev returned a document larger than {MaxBytes / (1024 * 1024)} MB.";
+
     private static readonly TimeSpan NoEtagRefreshInterval = TimeSpan.FromHours(24);
 
     private readonly HttpClient _httpClient;
@@ -161,13 +164,13 @@ public sealed class CatalogService : IDisposable
 
             if (response.Content.Headers.ContentLength > MaxBytes)
             {
-                return (null, "models.dev returned a document larger than 16 MB.");
+                return (null, TooLargeMessage);
             }
 
             var bytes = await ReadCappedAsync(response.Content, cancellationToken).ConfigureAwait(false);
             if (bytes is null)
             {
-                return (null, "models.dev returned a document larger than 16 MB.");
+                return (null, TooLargeMessage);
             }
 
             var providers = ParseProviders(bytes);
