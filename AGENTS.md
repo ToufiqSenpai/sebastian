@@ -29,3 +29,10 @@ The scheduled OpenWiki GitHub Actions workflow refreshes the repository wiki. Do
 - Do not add Moq or FakeItEasy; do not hand-roll new `Fake*`/`Stub*` classes for interfaces that NSubstitute can produce.
 - Existing hand-written doubles (`InMemorySettings`, `StubHttpMessageHandler`, fake services) stay as they are; do not rewrite them just to switch libraries.
 - Still use real platform objects where they are cheap and more faithful: a fake `HttpMessageHandler` for HTTP, and temp files/folders, temp git repos, or SQLite files instead of mocking the filesystem or git.
+
+## Analyzers
+
+- `TreatWarningsAsErrors` and `AnalysisLevel=latest-all` are on. Fix the diagnostic; do not silence it.
+- A suppression must be member-scoped and carry the category, the rule id, and a `Justification` that explains why the analyzer is wrong *here*. Never an empty or copy-pasted justification.
+- Before adding a `SuppressMessage`, check whether the same rule with the same wording already exists elsewhere. The third identical justification means the design is wrong — usually an ownership or API shape the analyzer cannot see (CA2000 on a handler passed to a constructor is the current example). Fix the cause with a helper, an owning wrapper, or a narrower signature instead.
+- No blanket disables. `NoWarn` only per rule, with an inline comment saying why.
