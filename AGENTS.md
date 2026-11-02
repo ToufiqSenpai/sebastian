@@ -22,3 +22,10 @@ The scheduled OpenWiki GitHub Actions workflow refreshes the repository wiki. Do
   - `ISettings` -> `LocalSettings` (Windows adapter), `InMemorySettings` (test fake)
   - `IGitHubPersonalService` -> `GitHubPersonalService`
 - `I` is reserved for interfaces; never prefix a class with it.
+
+## Testing
+
+- For new tests, use NSubstitute when a test double is needed: `Substitute.For<IWhatever>()`. Add the `NSubstitute` package to `Directory.Packages.props` when the first test needs it.
+- Do not add Moq or FakeItEasy; do not hand-roll new `Fake*`/`Stub*` classes for interfaces that NSubstitute can produce.
+- Existing hand-written doubles (`InMemorySettings`, `StubHttpMessageHandler`, fake services) stay as they are; do not rewrite them just to switch libraries.
+- Still use real platform objects where they are cheap and more faithful: a fake `HttpMessageHandler` for HTTP, and temp files/folders, temp git repos, or SQLite files instead of mocking the filesystem or git.

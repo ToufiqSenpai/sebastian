@@ -9,10 +9,12 @@ using Microsoft.UI.Reactor.Layout;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
+using Sebastian.Libs.GitHub.App;
 using Sebastian.Windows.Setup;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using AppContexts = Sebastian.Windows.Bootstrap.AppContexts;
 using static Microsoft.UI.Reactor.Controls.Validation.FormFieldDsl;
 using static Microsoft.UI.Reactor.Factories;
 
@@ -24,14 +26,16 @@ internal sealed record GitHubAppDraft(
     string PrivateKey = "",
     string PrivateKeyFileName = "",
     string WebhookSecret = "",
-    string WebhookUrl = "");
+    string WebhookUrl = "",
+    bool HasStoredPrivateKey = false,
+    bool HasStoredWebhookSecret = false);
 
 internal sealed record GitHubAppStepProps(
     GitHubAppDraft Draft,
     Action<GitHubAppDraft> SetDraft,
     PatValidation? Pat,
     Action Back,
-    Action Next);
+    Action<GitHubAppValidation> Next);
 
 internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
 {
@@ -43,6 +47,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
 
     public override Element Render()
     {
+        var setup = UseContext(AppContexts.Setup);
         var validation = this.UseValidationContext();
         var window = UseWindow();
         var wide = UseBreakpoint(720);
@@ -53,11 +58,20 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
 
         (var copied, var setCopied) = UseState(false);
         (var keyError, var setKeyError) = UseState<string?>(null);
-        var keyValid = UseMemo(() => IsValidPrivateKey(draft.PrivateKey), draft.PrivateKey);
+        var keyValid = UseMemo(
+            () => draft.HasStoredPrivateKey || IsValidPrivateKey(draft.PrivateKey),
+            draft.HasStoredPrivateKey,
+            draft.PrivateKey);
+        var secretValid = string.IsNullOrWhiteSpace(draft.WebhookSecret)
+            ? draft.HasStoredWebhookSecret
+            : IsWebhookSecretValid(draft.WebhookSecret);
+        var test = UseMutation<GitHubAppCredentials, GitHubAppValidation>(
+            setup.TestAndSaveGitHubAppAsync);
 
         void Update(Func<GitHubAppDraft, GitHubAppDraft> change)
         {
             Props.SetDraft(change(draft));
+            test.Reset();
         }
 
         void GenerateSecret()
@@ -155,7 +169,13 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             description: "The installation that grants access to your repositories.",
             fieldName: InstallationIdField);
 
-        var keyStatus = draft.PrivateKeyFileName.Length == 0
+        var keyStatusText = draft switch
+        {
+            { PrivateKeyFileName.Length: > 0 } => $"Loaded {draft.PrivateKeyFileName}",
+            { HasStoredPrivateKey: true } => "Configured — choose a file to replace",
+            _ => string.Empty,
+        };
+        var keyStatus = keyStatusText.Length == 0
             ? Empty()
             : HStack(
                 6,
@@ -163,21 +183,22 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                     .FontFamily("Segoe Fluent Icons")
                     .FontSize(12)
                     .Foreground(Theme.SystemSuccess),
-                Caption($"Loaded {draft.PrivateKeyFileName}").Foreground(Theme.SecondaryText));
+                Caption(keyStatusText).Foreground(Theme.SecondaryText));
+        var hasKey = draft.PrivateKeyFileName.Length > 0 || draft.HasStoredPrivateKey;
 
         var keyField = FormField(
             VStack(
                 8,
                 FlexRow(
                         Button(
-                                draft.PrivateKeyFileName.Length == 0
-                                    ? "Choose .pem file…"
-                                    : "Replace .pem file…",
+                                hasKey
+                                    ? "Replace .pem file…"
+                                    : "Choose .pem file…",
                                 () => _ = PickKeyAsync())
                             .AutomationName(
-                                draft.PrivateKeyFileName.Length == 0
-                                    ? "Choose GitHub App private key file"
-                                    : "Replace GitHub App private key file"),
+                                hasKey
+                                    ? "Replace GitHub App private key file"
+                                    : "Choose GitHub App private key file"),
                         keyStatus)
                     with
                 {
@@ -206,11 +227,15 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                             validation.MarkTouched(WebhookSecretField);
                             setCopied(false);
                         },
-                        placeholderText: $"At least {MinWebhookSecretLength} characters")
+                        placeholderText: draft.HasStoredWebhookSecret
+                            ? "Configured — leave blank to keep"
+                            : $"At least {MinWebhookSecretLength} characters")
                     .PasswordRevealMode(PasswordRevealMode.Hidden)
                     .Validate(WebhookSecretField, draft.WebhookSecret,
                         Validate.Must<string>(
-                            IsWebhookSecretValid,
+                            value => string.IsNullOrWhiteSpace(value)
+                                ? draft.HasStoredWebhookSecret
+                                : IsWebhookSecretValid(value),
                             $"Use at least {MinWebhookSecretLength} characters."))
                     .AutomationName("GitHub App webhook secret"),
                 HStack(
@@ -272,12 +297,43 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
         var canNext =
             IsPositiveInteger(draft.AppId) &&
             IsPositiveInteger(draft.InstallationId) &&
-            IsWebhookSecretValid(draft.WebhookSecret) &&
+            secretValid &&
             IsValidWebhookUrl(draft.WebhookUrl) &&
-            keyValid;
+            keyValid &&
+            !test.IsPending;
 
-        // shortcut: local validation only; the GitHub App test and key storage land before this step can finish.
-        var next = Button("Next", Props.Next)
+        [SuppressMessage(
+            "Design",
+            "CA1031",
+            Justification = "Failures are surfaced through test.Error; staying on the step is intentional.")]
+        async Task SubmitAsync()
+        {
+            if (!canNext || test.IsPending)
+            {
+                return;
+            }
+
+            var credentials = new GitHubAppCredentials(
+                draft.AppId.Trim(),
+                draft.InstallationId.Trim(),
+                draft.PrivateKey,
+                draft.WebhookSecret,
+                draft.WebhookUrl.Trim());
+
+            GitHubAppValidation result;
+            try
+            {
+                result = await test.RunAsync(credentials).ConfigureAwait(true);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            Props.Next(result);
+        }
+
+        var next = Button("Next", () => _ = SubmitAsync())
             .AccentButton()
             .IsEnabled(canNext)
             .AutomationName("Continue to the provider step");
@@ -324,6 +380,20 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             RowGap = 4,
         };
 
+        var status = test switch
+        {
+            { IsPending: true } => HStack(
+                8,
+                ProgressRing().Width(16).Height(16),
+                Body("Testing GitHub App…").Foreground(Theme.SecondaryText)),
+            { Error: { } failure } => InfoBar(
+                    "Could not verify the GitHub App",
+                    failure.Message)
+                .Error()
+                .IsClosable(false),
+            _ => Empty(),
+        };
+
         var form = VStack(
             0,
             Title("Connect your GitHub App")
@@ -340,7 +410,8 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             SubHeading("Webhook")
                 .HeadingLevel(AutomationHeadingLevel.Level2)
                 .Margin(0, 24, 0, 0),
-            webhookFields.Margin(0, 12, 0, 0));
+            webhookFields.Margin(0, 12, 0, 0),
+            status.Margin(0, 16, 0, 0));
 
         // preview.16 requires an explicit provide; newer Reactor versions auto-provide.
         return Grid(

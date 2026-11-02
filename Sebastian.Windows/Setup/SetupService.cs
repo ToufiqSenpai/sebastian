@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using Sebastian.Libs.GitHub.App;
 using Sebastian.Libs.GitHub.Personal;
 using Sebastian.Libs.Settings;
 
@@ -9,17 +11,55 @@ internal sealed class SetupService
 {
     private readonly KeyValueStore _store;
     private readonly IGitHubPersonalService _github;
+    private readonly GitHubAppSetupService _githubApp;
 
-    public SetupService(KeyValueStore store, IGitHubPersonalService github)
+    public SetupService(
+        KeyValueStore store,
+        IGitHubPersonalService github,
+        GitHubAppSetupService githubApp)
     {
         ArgumentNullException.ThrowIfNull(store);
         ArgumentNullException.ThrowIfNull(github);
+        ArgumentNullException.ThrowIfNull(githubApp);
 
         _store = store;
         _github = github;
+        _githubApp = githubApp;
     }
 
     public bool IsPatConfigured => _store.Has("github:pat");
+
+    public bool IsGitHubAppConfigured => _githubApp.IsConfigured;
+
+    public int? CompletedStep
+    {
+        get
+        {
+            var value = _store["setup:step"];
+            return int.TryParse(
+                    value,
+                    NumberStyles.None,
+                    CultureInfo.InvariantCulture,
+                    out var step) &&
+                step >= 0
+                ? step
+                : null;
+        }
+    }
+
+    public GitHubAppStoredState LoadGitHubAppState()
+    {
+        return _githubApp.LoadState();
+    }
+
+    public void MarkStepCompleted(int step)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(step);
+        _store.Set(
+            "setup:step",
+            step.ToString(CultureInfo.InvariantCulture),
+            isSecret: false);
+    }
 
     public async Task<PatValidation> TestPatAsync(
         string? candidateToken,
@@ -77,5 +117,35 @@ internal sealed class SetupService
             validation.Login ?? "unknown",
             validation.RepositoryCount,
             validation.Scopes);
+    }
+
+    public async Task<GitHubAppValidation> TestAndSaveGitHubAppAsync(
+        GitHubAppCredentials candidate,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(candidate);
+
+        GitHubAppValidation validation;
+        try
+        {
+            validation = await _githubApp
+                .TestAndSaveAsync(candidate, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            throw new SetupException(
+                $"Could not verify the GitHub App: {exception.Message}",
+                exception);
+        }
+
+        return !validation.Success
+            ? throw new SetupException(
+                validation.Error ?? "GitHub rejected the app credentials.")
+            : validation;
     }
 }

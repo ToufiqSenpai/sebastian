@@ -2,6 +2,8 @@ using Microsoft.UI.Reactor;
 using Microsoft.UI.Reactor.Core;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
+using Sebastian.Libs.GitHub.App;
+using Sebastian.Libs.Providers;
 using Sebastian.Windows.Components.Setup;
 using Sebastian.Windows.Setup;
 using AppContexts = Sebastian.Windows.Bootstrap.AppContexts;
@@ -14,9 +16,22 @@ internal sealed class SetupPage : Component
     public override Element Render()
     {
         var setup = UseContext(AppContexts.Setup);
-        (var step, var setStep) = UseState(setup.IsPatConfigured ? 1 : -1);
+        (var step, var setStep) = UseState(GetInitialStep(setup));
         (var verifiedPat, var setVerifiedPat) = UseState<PatValidation?>(null);
-        var initialDraft = UseMemo(static () => new GitHubAppDraft(), []);
+        (var verifiedApp, var setVerifiedApp) = UseState<GitHubAppValidation?>(null);
+        (var providerTest, var setProviderTest) = UseState<ProviderTestResult?>(null);
+        var initialDraft = UseMemo(
+            () =>
+            {
+                var state = setup.LoadGitHubAppState();
+                return new GitHubAppDraft(
+                    AppId: state.AppId,
+                    InstallationId: state.InstallationId,
+                    WebhookUrl: state.WebhookUrl,
+                    HasStoredPrivateKey: state.HasPrivateKey,
+                    HasStoredWebhookSecret: state.HasWebhookSecret);
+            },
+            []);
         (var githubAppDraft, var setGithubAppDraft) = UseState(initialDraft);
         var wide = UseBreakpoint(720);
         (var windowWidth, var _) = UseWindowSize();
@@ -44,6 +59,7 @@ internal sealed class SetupPage : Component
                                 setVerifiedPat(validation);
                             }
 
+                            setup.MarkStepCompleted(0);
                             setStep(1);
                         })),
                 1 => Component<GitHubAppStep, GitHubAppStepProps>(
@@ -52,11 +68,27 @@ internal sealed class SetupPage : Component
                         setGithubAppDraft,
                         verifiedPat,
                         () => setStep(0),
-                        () => setStep(2))),
+                        validation =>
+                        {
+                            setVerifiedApp(validation);
+                            setup.MarkStepCompleted(1);
+                            setStep(2);
+                        })),
+                2 => Component<ProviderStep, ProviderStepProps>(
+                    new(
+                        () => setStep(1),
+                        result =>
+                        {
+                            setProviderTest(result);
+                            setup.MarkStepCompleted(2);
+                            setStep(3);
+                        },
+                        contentWidth,
+                        verifiedApp)),
                 _ => NextStepPlaceholder(
-                    "Provider and API key",
-                    "Choose a provider and verify its API key. This step comes next.",
-                    () => setStep(1)),
+                    "Agent model",
+                    ProviderSummary(providerTest),
+                    () => setStep(2)),
             };
 
             content = Column(
@@ -69,6 +101,33 @@ internal sealed class SetupPage : Component
 
         return VStack(0, content)
             .Padding(padding, 24);
+    }
+
+    private static int GetInitialStep(SetupService setup)
+    {
+        if (!setup.IsPatConfigured)
+        {
+            return setup.CompletedStep is null ? -1 : 0;
+        }
+
+        if (!setup.IsGitHubAppConfigured)
+        {
+            return 1;
+        }
+
+        var completed = Math.Max(setup.CompletedStep ?? 1, 1);
+        return Math.Min(completed + 1, 5);
+    }
+
+    private static string ProviderSummary(ProviderTestResult? result)
+    {
+        return result switch
+        {
+            null => "Choose an agent model next.",
+            { UsedFallback: true } =>
+                "Provider connected — the key was verified with a chat completion. Choose an agent model next.",
+            _ => $"Provider connected — {result.ModelCount} models available. Choose an agent model next.",
+        };
     }
 
     private static GridElement Column(double width, Element content)

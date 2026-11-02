@@ -60,8 +60,9 @@ Out of scope here: the chat turn contract (`03`), build and review behaviour (`0
 | `agent:provider` | plain | — | models.dev provider id, for example `openrouter`. |
 | `agent:<provider>:model` | plain | — | Selected agent model id. |
 | `agent:<provider>:model:context` | plain | — | `limit.context` from the catalog at selection time, used by the harness. |
-| `agent:<provider>:api` | plain | — | `openai` or `anthropic`; overrides the adapter inferred from `npm`. |
+| `agent:<provider>:api` | plain | — | `openai`, `anthropic`, or `azure`; overrides the adapter inferred from `npm`. |
 | `agent:<provider>:base-url` | plain | — | Set only when the endpoint is overridden. |
+| `agent:<provider>:env:<ENV_NAME>` | plain/secret | — | Extra credential fields from the catalog `env` list, such as `AZURE_RESOURCE_NAME`. Secret classification follows the env name. |
 | `agent:<provider>:api-key` | secret | — | One per provider. |
 | `agent:decision:provider` | plain | — | Provider id for the decision endpoint. Usually the chat provider. |
 | `agent:decision:api` | plain | — | `openai` or `systemone`. |
@@ -98,6 +99,7 @@ The decision key uses the same `agent:<provider>:api-key` entry as chat. A diffe
 - `github:webhook-secret`
 - `agent:provider`
 - `agent:<provider>:api-key`
+- `agent:<provider>:env:<ENV_NAME>` for every field the selected adapter requires. Azure API-key mode requires `AZURE_RESOURCE_NAME` or `AZURE_COGNITIVE_SERVICES_RESOURCE_NAME`.
 - `agent:<provider>:model`
 - `agent:decision:provider`
 - `agent:decision:api`
@@ -130,7 +132,7 @@ Rules:
 | 0 | Welcome | What will be collected; links to create a GitHub App and get a provider key | — | — |
 | 1 | GitHub PAT | Token, write-only | `GET /user` and `GET /user/repos?per_page=1`; `repo` scope | Yes |
 | 2 | GitHub App | App ID, installation ID, private key, webhook secret, webhook URL | JWT + `GET /app` + installation token + `GET /installation/repositories` | Yes |
-| 3 | Provider and key | Provider, base URL, API key | `GET {base}/models` through the adapter | Yes |
+| 3 | Provider and key | Provider, env-derived credential fields, base URL, API key | Model-list request through the adapter; Azure uses `/models` with `api-key` | Yes |
 | 4 | Agent model | One model from the catalog with `tool_call: true` | One short chat completion | Yes |
 | 5 | Decision model | Provider, API shape, model | One predicate decision request | Yes |
 | 6 | Review | Masked summary, project count | Re-runs tests 1–5 in order | — |
@@ -160,14 +162,27 @@ Rules:
 ### 5.5 Provider and API key
 
 - The provider list comes from the catalog. Search matches name and id.
-- Each row shows name, id, `npm`, documentation link, and the resolved base URL.
-- The base URL is editable. Changing it overrides `agent:<provider>:base-url`.
-- **Custom endpoint** chooses a catalog provider as the metadata source, then overrides the API type (`OpenAI-compatible` or `Anthropic`), base URL, and key. The provider id and the model list stay those of the catalog provider; only the endpoint and adapter change. The override is stored as `agent:<provider>:api` and `agent:<provider>:base-url`.
+- Each row shows name, id, `npm`, documentation link, and the resolved endpoint.
+- The credential fields come from the provider's catalog `env` list, in catalog order:
+  - An env name containing `KEY`, `TOKEN`, `SECRET`, `PAT`, `PASSWORD`, `CREDENTIAL`, or `CONNECTION_STRING` is a secret and renders as a password field.
+  - The first secret-like env is the primary key and is stored as `agent:<provider>:api-key`.
+  - When every env on a provider is secret-like, they are aliases of one key; the step renders one field and lists the aliases. Google is the canonical example.
+  - Every other env renders its own field and is stored as `agent:<provider>:env:<ENV_NAME>`. Plain values are stored plain; secret values are stored secret.
+  - Field labels are derived from the env name, and the raw env name is shown as the description.
+- Azure is API-key mode:
+  - `AZURE_RESOURCE_NAME` (or `AZURE_COGNITIVE_SERVICES_RESOURCE_NAME`) derives the endpoint `https://{resource}.openai.azure.com/openai/v1`.
+  - `AZURE_API_KEY` is the primary key.
+  - The derived endpoint is read-only. **Custom endpoint** reveals the base URL override.
+  - The test calls `GET {base}/models` with the `api-key` header.
+  - A 404 does not fall back to chat completion; it means the resource name or `/openai/v1` endpoint is wrong.
+- The base URL is editable for other providers. Changing it overrides `agent:<provider>:base-url`.
+- **Custom endpoint** chooses a catalog provider as the metadata source, then overrides the API type (`OpenAI-compatible`, `Anthropic`, or `Azure`), base URL, and key. The provider id and the catalog models stay those of the catalog provider; only the endpoint and adapter change. The override is stored as `agent:<provider>:api` and `agent:<provider>:base-url`.
 - A provider absent from the catalog cannot be used for the agent role, because it has no model metadata.
-- The API key is write-only and stored only after a passing test.
-- The test calls the adapter's model-list endpoint and shows the model count. A 401, 404, or timeout stays on the step with the provider's error.
-- When the model-list endpoint is `404`, the test falls back to a one-token chat completion with the first catalog model that has `tool_call: true`; the step labels the result as a fallback.
-- Before the test sends the key, the step shows the destination host and asks for confirmation when the host differs from the provider's documentation domain.
+- The API key is write-only and stored only after a passing test. A stored key may be reused when the field is left blank.
+- The test calls the adapter's model-list endpoint and shows the model count. A 401, timeout, or malformed response stays on the step with the provider's error.
+- For OpenAI-compatible and Anthropic providers, a `404` on the model-list endpoint falls back to a one-token chat completion with the first catalog model that has `tool_call: true`; the step labels the result as a fallback.
+- Before the test sends the key, the step shows the destination host and requires confirmation when the host differs from the documented host. The documented host is the catalog `api` host, the default endpoint host, the derived Azure endpoint host, or the `doc` host, in that order.
+- On pass, the step stores `agent:provider`, the primary key, every non-empty env field, and the `api`/`base-url` overrides when applicable. A failed test writes nothing.
 
 ### 5.6 Agent model
 
@@ -242,14 +257,16 @@ The `npm` property selects the chat adapter:
 |---|---|
 | `@ai-sdk/openai-compatible`, `@ai-sdk/openai`, `@openrouter/ai-sdk-provider`, `@ai-sdk/deepinfra`, `@aihubmix/ai-sdk-provider`, `@saladtechnologies-oss/ai-sdk-provider`, `@jerome-benoit/sap-ai-provider-v2`, `@ai-sdk/groq`, `@ai-sdk/mistral`, `@ai-sdk/xai`, `@ai-sdk/perplexity` | OpenAI-compatible |
 | `@ai-sdk/anthropic` | Anthropic |
-| `@ai-sdk/azure`, `@ai-sdk/google`, `@ai-sdk/google-vertex`, `@ai-sdk/amazon-bedrock`, `@ai-sdk/cohere`, `@qvac/ai-sdk-provider`, `gitlab-ai-provider` | No adapter |
+| `@ai-sdk/azure` | Azure |
+| `@ai-sdk/google`, `@ai-sdk/google-vertex`, `@ai-sdk/amazon-bedrock`, `@ai-sdk/cohere`, `@qvac/ai-sdk-provider`, `gitlab-ai-provider` | No adapter |
 | Missing or anything else | No adapter |
 
 Rules:
 
 - `agent:<provider>:api` overrides the adapter inferred from `npm`. The catalog provider is still the metadata source.
 - A provider with no adapter is selectable only after the step shows: "No adapter is mapped for `<npm>`. Sebastian will treat this endpoint as OpenAI-compatible. Confirm the base URL before testing." The test must pass.
-- The fallback warning is explicit, never silent. Azure, Google, Vertex, and Bedrock are named in the warning because their auth or URL shape usually differs.
+- The fallback warning is explicit, never silent. Google, Vertex, and Bedrock are named in the warning because their auth or URL shape usually differs.
+- Azure has no default catalog endpoint. Its endpoint is derived from the provider's resource-name env field, or supplied through **Custom endpoint**.
 - If the provider has no `api` field, the base URL defaults from this table when the provider id matches: `openai` → `https://api.openai.com/v1`, `anthropic` → `https://api.anthropic.com`, `groq` → `https://api.groq.com/openai/v1`, `mistral` → `https://api.mistral.ai/v1`, `xai` → `https://api.x.ai/v1`, `google` → `https://generativelanguage.googleapis.com/v1beta/openai/`. Otherwise the base URL is required.
 - A base URL that is not `https` is rejected unless the host is loopback.
 - A base URL containing a `${...}` placeholder requires the user to fill it; the test fails until it is replaced.
@@ -261,7 +278,8 @@ Rules:
 
 - OpenAI-compatible: `OpenAIClient` with `ApiKeyCredential` and an optional endpoint, exposed as `IChatClient`.
 - Anthropic: the official `Anthropic` package (12.x), `AnthropicClient.AsIChatClient(model)`. The AOT spike must construct the client and serialize one request; the package is not assumed to be AOT-safe.
-- Provider test paths: OpenAI-compatible `GET {base}/models`; Anthropic `GET {base}/v1/models` with `x-api-key` and `anthropic-version`.
+- Azure: the v1 endpoint `https://{resource}.openai.azure.com/openai/v1`, API-key authentication with the `api-key` header, and the OpenAI-compatible wire shape. Tenant and Entra ID credentials are not part of v1 setup.
+- Provider test paths: OpenAI-compatible `GET {base}/models`; Anthropic `GET {base}/v1/models` with `x-api-key` and `anthropic-version`; Azure `GET {base}/models` with `api-key`. Azure has no chat fallback.
 - The adapter is chosen per provider and shared by every project.
 - `ProviderResolver` and the `appsettings.json` provider block are replaced by a factory that reads `agent:provider`, `agent:<provider>:api`, the base URL, and the key, and returns an `IChatClient`.
 
@@ -410,7 +428,7 @@ Three choices, all in the Projects navigation flow defined by `05`:
 
 `05-board` owns the layout. This spec fixes the fields and the rules:
 
-- Global: server URL, App ID, installation ID, private key status, webhook secret status, webhook URL, PAT status, provider, base URL, agent model, decision provider, decision API, decision model, catalog refresh.
+- Global: server URL, App ID, installation ID, private key status, webhook secret status, webhook URL, PAT status, provider, env-derived credential fields, base URL, agent model, decision provider, decision API, decision model, catalog refresh.
 - Per project: path, name, repository, installation override, database path, webhook hook id, last delivery, last reconcile.
 - **Run setup again** opens the wizard prefilled.
 - **Refresh catalog** performs the conditional request and shows the ETag result.
@@ -422,7 +440,9 @@ Three choices, all in the Projects navigation flow defined by `05`:
 - The PAT is a classic `repo` token. It is used only for repository listing, repository creation, and webhook management. It never enters a git command or a log.
 - The App private key is imported once, held in memory, and never logged, shown, or passed on a command line. Installation tokens live in memory.
 - Every secret is DPAPI-encrypted for the current Windows user through `KeyValueStore`.
-- Provider API keys are sent only to the base URL shown on the step, after explicit confirmation when the host is not the provider's documented domain.
+- Provider API keys are sent only to the base URL shown on the step, after explicit confirmation when the host is not the documented host.
+- Catalog `env` names decide which provider fields are secret. The classification is conservative: an env name containing `KEY`, `TOKEN`, `SECRET`, `PAT`, `PASSWORD`, `CREDENTIAL`, or `CONNECTION_STRING` is stored through DPAPI. Values are never rendered back.
+- Azure API keys use the `api-key` header. Azure resource names and other non-secret env values are stored plain; the key is stored secret.
 - A non-loopback base URL must be `https`. Loopback may be `http` for local models.
 - The catalog and every live model list are untrusted input. They are size-capped, parsed without reflection, displayed as data, and never used to build a command.
 - The wizard has no network surface. The only inbound routes remain `/health` and the webhook route.
@@ -441,6 +461,8 @@ Three choices, all in the Projects navigation flow defined by `05`:
 | App key cannot be parsed | Stay on the step; name the expected PEM forms. |
 | Installation does not cover the repository | Show the install link and Recheck; do not add the project. |
 | Provider 401/404/timeout | Stay on the step; show the endpoint and the provider error. |
+| Azure resource name missing or invalid | Stay on the step; derive no endpoint and show the resource-name error. |
+| Azure model list 404 | Stay on the step; point at the `/openai/v1` endpoint; do not use the chat fallback. |
 | Provider has no tool-capable model | Model step blocks; back to Provider. |
 | Model test returns no text | Stay on the step; show the raw response. |
 | Decision endpoint unsupported | Stay on the step; suggest another provider or API shape. |
@@ -460,12 +482,13 @@ Three choices, all in the Projects navigation flow defined by `05`:
 | `SetupState` | Required keys, optional keys, removal reopens, decision key required | Temp `KeyValueStore` |
 | `SetupService` | Step order, resume, stored values show `Configured`, edit resets the test, finish writes keys | Temp settings, fake tests |
 | `CatalogService` | 200/304/500/timeout/corrupt/oversize/no ETag, atomic write, stale cache, one refresh at a time | Fake HTTP handler |
-| Provider mapping | Every `npm` row, missing `npm`, unknown `npm` warning, default endpoints | Catalog fixtures |
+| Provider mapping | Every `npm` row, missing `npm`, unknown `npm` warning, default endpoints, Azure resource derivation | Catalog fixtures |
+| Env fields | Primary key, alias grouping, secret classification, Azure resource, labels | Catalog fixtures |
 | `ProjectRegistry` | Add/remove/activate, duplicate path, normalization, missing path, corrupt order | Temp settings, temp folders |
 | `ProjectRuntimeRegistry` | Runtime per project, unavailable project, DB migration failure, isolation between two temp databases | Temp repos, temp SQLite |
 | Add-project flow | Local checks, clone, create, branch `main` fix, install coverage, webhook create/ping | Fake PAT/App services, temp git repo, fake HTTP handler |
 | Webhook routing | Known repo, unknown repo, installation mismatch, case-insensitive match, unavailable project | Octokit fixtures, fake runtimes |
-| Provider test | OpenAI and Anthropic model lists, 401/404/timeout, 404 chat fallback | Fake HTTP handler |
+| Provider test | OpenAI, Anthropic, and Azure model lists, 401/404/timeout, 404 chat fallback, Azure no fallback, Azure resource endpoint | Fake HTTP handler |
 | Agent model filter | Only `tool_call: true` is listed; empty list blocks; context limit stored | Catalog fixtures |
 | `DecisionClient` | OpenAI and System One request shapes, predicate/choice/score parsing, refusal, 400/404, timeout | Fake HTTP handler |
 | Decision listing | OpenAI fixed model, OpenRouter catalog, System One catalog, manual id | Fake HTTP handler |
@@ -485,7 +508,7 @@ Acceptance criteria:
 2. Killing the app mid-wizard resumes at the last completed step, shows stored values as `Configured`, and never renders a secret.
 3. An invalid PAT stays on the step and does not replace the stored token; a valid token shows the login and repository count.
 4. An invalid App key or installation stays on the step; a valid one shows the app name, installation account, and repository count.
-5. A provider with a mapped `npm` gets the matching adapter; an unknown `npm` shows the OpenAI fallback warning and cannot continue without a passing test; a custom endpoint can override the adapter and base URL but still lists only catalog models with `tool_call: true`.
+5. A provider with a mapped `npm` gets the matching adapter; an unknown `npm` shows the OpenAI fallback warning and cannot continue without a passing test; a custom endpoint can override the adapter and base URL but still uses only catalog metadata. Azure derives its endpoint from the resource env field and uses the `api-key` header without a chat fallback.
 6. The agent model list contains only `tool_call: true` models; a provider without one blocks the step; no chat tool probe is used.
 7. The decision step lists models from the provider, not models.dev; a rejected probe stays on the step; a passing probe stores the keys.
 8. Removing `github:pat` or `agent:decision:model` reopens the wizard on the next start.
@@ -502,7 +525,7 @@ Acceptance criteria:
 - Cross-project tasks, dependencies, chat, or runs.
 - Custom agent models that are absent from models.dev; they have no tool metadata and are not selectable.
 - Providers that are absent from models.dev; a custom endpoint must name a catalog provider for model metadata.
-- Native Azure, Vertex, Bedrock, Google, or Cohere SDK adapters; they use the OpenAI-compatible fallback only.
+- Native Vertex, Bedrock, Google, or Cohere SDK adapters; they use the OpenAI-compatible fallback only. Azure is supported in API-key mode.
 - The GitHub App manifest creation flow; the wizard links to GitHub and asks for the values.
 - An automatic tunnel; the user supplies the public webhook URL.
 - Decision-model consumers, thresholds, retries, or guardrails.
@@ -519,6 +542,8 @@ Acceptance criteria:
 - **models.dev availability** is now on the critical path for setup and Settings. The cache covers restarts, not a first run with no network.
 - **The Anthropic adapter** is unverified for AOT and for tool-calling parity; the spike decides it before implementation continues.
 - **The catalog is third-party** and can change shape. A parse failure is recoverable through the cache, but a schema change needs a code update.
+- **Azure model metadata** still comes from models.dev, while Azure inference uses deployment names. The agent-model step must map a deployment to catalog metadata before an Azure model can be selected.
+- **Env-driven fields** are only as good as the catalog `env` list. A provider with several distinct secrets or a host derived from an env field other than Azure's resource name still needs an explicit adapter rule.
 - **Tool support is metadata-only.** A catalog entry that says `tool_call: true` can still be wrong; the first real run is the first proof.
 - **Decision model has no consumer** in v1. It is required by product decision, so a broken decision endpoint blocks setup even though no task uses it.
 - **Anthropic has no decisions endpoint.** A chat provider without a decision surface needs the explicit decision-provider exception in 5.7, or setup cannot complete.
