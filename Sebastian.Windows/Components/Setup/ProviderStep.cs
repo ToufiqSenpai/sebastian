@@ -29,7 +29,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
         var providerSetup = UseContext(AppContexts.Providers);
         var wide = UseBreakpoint(720);
         (var _, var windowHeight) = UseWindowSize();
-        var pageHeight = Math.Max(320, windowHeight - 160);
+        var pageHeight = SetupLayout.PageHeight(windowHeight);
 
         (var attempt, var setAttempt) = UseState(0);
         var catalog = UseResource(
@@ -64,6 +64,9 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             ? error.Exception
             : null;
         var provider = catalogData?.FindProvider(providerId);
+        var inferredAdapter = provider is null
+            ? ProviderAdapter.OpenAiCompatible
+            : ProviderAdapters.Infer(provider.Npm) ?? ProviderAdapter.OpenAiCompatible;
 
         UseEffect(
             () =>
@@ -74,9 +77,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
                 }
 
                 var stored = providerSetup.GetStoredState(provider);
-                var inferred = ProviderAdapters.Infer(provider.Npm) ??
-                    ProviderAdapter.OpenAiCompatible;
-                var adapter = ProviderAdapters.ParseApi(stored.Api) ?? inferred;
+                var adapter = ProviderAdapters.ParseApi(stored.Api) ?? inferredAdapter;
 
                 setBaseUrl(
                     stored.BaseUrl is null ? string.Empty : ProviderAdapters.ToText(stored.BaseUrl));
@@ -116,16 +117,13 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
         ProviderField[] fields = provider is null
             ? []
             : [.. ProviderFields.Build(provider)];
-        var primary = fields.FirstOrDefault(field => field.IsPrimaryKey);
+        var primary = provider is null ? null : ProviderFields.PrimaryKey(provider);
         var apiKey = primary is not null &&
             envValues.TryGetValue(primary.Name, out var candidateKey)
             ? candidateKey
             : null;
         var stored = provider is null ? null : providerSetup.GetStoredState(provider);
 
-        var inferredAdapter = provider is null
-            ? ProviderAdapter.OpenAiCompatible
-            : ProviderAdapters.Infer(provider.Npm) ?? ProviderAdapter.OpenAiCompatible;
         var effectiveAdapter = customEndpoint
             ? ProviderAdapters.FromIndex(adapterIndex)
             : inferredAdapter;
@@ -212,9 +210,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             setCustomEndpoint(value);
             if (value && provider is not null)
             {
-                var inferred = ProviderAdapters.Infer(provider.Npm) ??
-                    ProviderAdapter.OpenAiCompatible;
-                setAdapterIndex(ProviderAdapters.ToIndex(inferred));
+                setAdapterIndex(ProviderAdapters.ToIndex(inferredAdapter));
             }
 
             setConfirmedHost(null);
@@ -240,11 +236,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
                 effectiveAdapter,
                 baseValidation.Url!,
                 customEndpoint,
-                new ProviderCredentials(
-                    apiKey,
-                    new Dictionary<string, string>(
-                        envValues,
-                        StringComparer.OrdinalIgnoreCase)));
+                envValues);
 
             ProviderTestResult result;
             try
@@ -281,7 +273,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
 
                 return FormField(
                         box,
-                        label: field.IsPrimaryKey ? "API key" : field.Label,
+                        label: field.Label,
                         required: field.IsPrimaryKey,
                         description: field.Aliases.Count > 1
                             ? $"Use any of: {string.Join(", ", field.Aliases)}."
@@ -637,19 +629,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             .SubtleButton()
             .AutomationName("Back to the GitHub App step");
 
-        Element actions = wide
-            ? Grid(
-                [GridSize.Auto, GridSize.Star(), GridSize.Auto],
-                [GridSize.Auto],
-                [
-                    backButton.Grid(row: 0, column: 0),
-                    Empty().Grid(row: 0, column: 1),
-                    nextButton.Grid(row: 0, column: 2),
-                ])
-            : VStack(
-                8,
-                nextButton.HAlign(HorizontalAlignment.Right),
-                backButton.HAlign(HorizontalAlignment.Left));
+        var actions = SetupLayout.Actions(wide, backButton, nextButton);
 
         return Grid(
             [GridSize.Star()],

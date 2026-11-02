@@ -108,20 +108,9 @@ internal sealed class PatStep : Component<PatStepProps>
         var nextButton = Button("Next", () => _ = SubmitAsync())
             .AccentButton()
             .IsEnabled(canNext);
+        var backButton = Button("Back", Props.Back).SubtleButton();
 
-        Element actions = wide
-            ? Grid(
-                [GridSize.Auto, GridSize.Star(), GridSize.Auto],
-                [GridSize.Auto],
-                [
-                    Button("Back", Props.Back).SubtleButton().Grid(row: 0, column: 0),
-                    Empty().Grid(row: 0, column: 1),
-                    nextButton.Grid(row: 0, column: 2),
-                ])
-            : VStack(
-                8,
-                nextButton.HAlign(HorizontalAlignment.Right),
-                Button("Back", Props.Back).SubtleButton().HAlign(HorizontalAlignment.Left));
+        var actions = SetupLayout.Actions(wide, backButton, nextButton);
 
         return VStack(
                 0,

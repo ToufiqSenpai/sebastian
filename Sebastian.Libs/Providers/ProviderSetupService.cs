@@ -8,7 +8,7 @@ public sealed record ProviderSelection(
     ProviderAdapter Adapter,
     Uri BaseUrl,
     bool IsCustomEndpoint,
-    ProviderCredentials Credentials);
+    IReadOnlyDictionary<string, string> Env);
 
 public sealed record ProviderStoredState(
     string? ProviderId,
@@ -74,7 +74,7 @@ public sealed class ProviderSetupService
             return ProviderTestResult.Failed("This provider has no credential field.");
         }
 
-        var candidateKey = selection.Credentials.ApiKey?.Trim();
+        var candidateKey = Value(selection.Env, primary.Name);
         var storedKey = _store[ApiKeySetting(provider.Id)];
         var apiKey = string.IsNullOrWhiteSpace(candidateKey) ? storedKey : candidateKey;
 
@@ -83,12 +83,11 @@ public sealed class ProviderSetupService
             return ProviderTestResult.Failed("Enter an API key.");
         }
 
-        var credentials = selection.Credentials with { ApiKey = apiKey };
         var result = await _tester
             .TestAsync(
                 selection.Adapter,
                 selection.BaseUrl,
-                credentials,
+                apiKey,
                 provider.Models,
                 cancellationToken)
             .ConfigureAwait(false);
@@ -110,7 +109,7 @@ public sealed class ProviderSetupService
                 continue;
             }
 
-            var value = credentials.GetValue(field.Name);
+            var value = Value(selection.Env, field.Name);
             var key = EnvSetting(provider.Id, field.Name);
 
             if (field.IsSecret)
@@ -142,7 +141,7 @@ public sealed class ProviderSetupService
             _store.Remove(ApiSetting(provider.Id));
         }
 
-        var defaultBase = ProviderAdapters.ResolveBaseUrl(provider, credentials.Values);
+        var defaultBase = ProviderAdapters.ResolveBaseUrl(provider, selection.Env);
 
         if (selection.IsCustomEndpoint ||
             !Uri.Equals(selection.BaseUrl, defaultBase))
@@ -159,6 +158,13 @@ public sealed class ProviderSetupService
 
         _store.Set("agent:provider", provider.Id, isSecret: false);
         return result;
+    }
+
+    private static string? Value(IReadOnlyDictionary<string, string> env, string name)
+    {
+        return env.TryGetValue(name, out var value) && !string.IsNullOrWhiteSpace(value)
+            ? value.Trim()
+            : null;
     }
 
     private static string ApiKeySetting(string providerId)

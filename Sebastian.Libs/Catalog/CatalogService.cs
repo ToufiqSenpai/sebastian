@@ -2,20 +2,19 @@ using System.Globalization;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Sebastian.Libs.Http;
 
 namespace Sebastian.Libs.Catalog;
 
 public sealed class CatalogService : IDisposable
 {
     private const string SourceUrl = "https://models.dev/api.json";
-    private const string UserAgent = "Sebastian/0.1";
     private const long MaxBytes = 64L * 1024 * 1024;
     private const int MaxErrorBody = 4096;
 
     private static readonly TimeSpan NoEtagRefreshInterval = TimeSpan.FromHours(24);
 
     private readonly HttpClient _httpClient;
-    private readonly HttpMessageHandler? _ownedHandler;
     private readonly string _cacheDirectory;
     private readonly string _modelsPath;
     private readonly string _metaPath;
@@ -31,12 +30,11 @@ public sealed class CatalogService : IDisposable
         TimeSpan? timeout = null,
         TimeProvider? timeProvider = null)
     {
-        _ownedHandler = finalHandler is null ? new HttpClientHandler() : null;
-        _httpClient = new HttpClient(finalHandler ?? _ownedHandler!)
-        {
-            Timeout = Timeout.InfiniteTimeSpan,
-        };
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
+        _httpClient = finalHandler is null
+            ? new HttpClient()
+            : new HttpClient(finalHandler, disposeHandler: false);
+        _httpClient.Timeout = Timeout.InfiniteTimeSpan;
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(AppHttp.UserAgent);
 
         _cacheDirectory = Path.GetFullPath(
             cacheDirectory ??
@@ -53,7 +51,6 @@ public sealed class CatalogService : IDisposable
     public void Dispose()
     {
         _httpClient.Dispose();
-        _ownedHandler?.Dispose();
         _gate.Dispose();
     }
 
@@ -98,8 +95,8 @@ public sealed class CatalogService : IDisposable
             return new ModelCatalog(cached, meta.CheckedAt, Warning: null);
         }
 
-        var refresh = await RefreshAsync(cached, meta, cancellationToken).ConfigureAwait(false);
-        return refresh.Catalog ?? CachedOrThrow(cached, meta, refresh.Error);
+        var (refreshed, error) = await RefreshAsync(cached, meta, cancellationToken).ConfigureAwait(false);
+        return refreshed ?? CachedOrThrow(cached, meta, error);
     }
 
     private static ModelCatalog CachedOrThrow(
@@ -115,7 +112,7 @@ public sealed class CatalogService : IDisposable
             : throw new CatalogException($"The provider catalog could not be loaded: {error}");
     }
 
-    private async Task<RefreshResult> RefreshAsync(
+    private async Task<(ModelCatalog? Catalog, string? Error)> RefreshAsync(
         List<CatalogProvider>? cached,
         CatalogMeta? meta,
         CancellationToken cancellationToken)
@@ -139,8 +136,7 @@ public sealed class CatalogService : IDisposable
             {
                 if (cached is null)
                 {
-                    return RefreshResult.Failed(
-                        "models.dev returned 304 Not Modified but there is no cached catalog.");
+                    return (null, "models.dev returned 304 Not Modified but there is no cached catalog.");
                 }
 
                 var now = _timeProvider.GetUtcNow();
@@ -150,7 +146,7 @@ public sealed class CatalogService : IDisposable
                     now,
                     meta?.Bytes ?? 0);
                 TryWriteMeta(updated);
-                return RefreshResult.Succeeded(new ModelCatalog(cached, now, Warning: null));
+                return (new ModelCatalog(cached, now, Warning: null), null);
             }
 
             if (!response.IsSuccessStatusCode)
@@ -158,44 +154,43 @@ public sealed class CatalogService : IDisposable
                 var body = await ReadErrorBodyAsync(response.Content, cancellationToken)
                     .ConfigureAwait(false);
                 var status = ((int)response.StatusCode).ToString(CultureInfo.InvariantCulture);
-                return RefreshResult.Failed(
-                    string.IsNullOrWhiteSpace(body)
-                        ? $"models.dev returned HTTP {status}."
-                        : $"models.dev returned HTTP {status}: {body}");
+                return (null, string.IsNullOrWhiteSpace(body)
+                    ? $"models.dev returned HTTP {status}."
+                    : $"models.dev returned HTTP {status}: {body}");
             }
 
             if (response.Content.Headers.ContentLength > MaxBytes)
             {
-                return RefreshResult.Failed("models.dev returned a document larger than 16 MB.");
+                return (null, "models.dev returned a document larger than 16 MB.");
             }
 
             var bytes = await ReadCappedAsync(response.Content, cancellationToken).ConfigureAwait(false);
             if (bytes is null)
             {
-                return RefreshResult.Failed("models.dev returned a document larger than 16 MB.");
+                return (null, "models.dev returned a document larger than 16 MB.");
             }
 
             var providers = ParseProviders(bytes);
             var fetchedAt = _timeProvider.GetUtcNow();
             WriteCache(bytes, response.Headers.ETag?.ToString(), fetchedAt);
-            return RefreshResult.Succeeded(new ModelCatalog(providers, fetchedAt, Warning: null));
+            return (new ModelCatalog(providers, fetchedAt, Warning: null), null);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             var seconds = _timeout.TotalSeconds.ToString("0", CultureInfo.InvariantCulture);
-            return RefreshResult.Failed($"models.dev did not respond within {seconds} seconds.");
+            return (null, $"models.dev did not respond within {seconds} seconds.");
         }
         catch (HttpRequestException exception)
         {
-            return RefreshResult.Failed($"Could not reach models.dev: {exception.Message}");
+            return (null, $"Could not reach models.dev: {exception.Message}");
         }
         catch (IOException exception)
         {
-            return RefreshResult.Failed($"Could not read models.dev: {exception.Message}");
+            return (null, $"Could not read models.dev: {exception.Message}");
         }
         catch (JsonException)
         {
-            return RefreshResult.Failed("models.dev returned a response that could not be read.");
+            return (null, "models.dev returned a response that could not be read.");
         }
     }
 
@@ -203,34 +198,16 @@ public sealed class CatalogService : IDisposable
         HttpContent content,
         CancellationToken cancellationToken)
     {
-        var stream = await content
-            .ReadAsStreamAsync(cancellationToken)
-            .ConfigureAwait(false);
-        await using (stream.ConfigureAwait(false))
+        try
         {
-            var buffer = new MemoryStream();
-            await using (buffer.ConfigureAwait(false))
-            {
-                var chunk = new byte[81920];
-
-                int read;
-                while ((read = await stream
-                           .ReadAsync(chunk.AsMemory(0, chunk.Length), cancellationToken)
-                           .ConfigureAwait(false)) > 0)
-                {
-                    if (buffer.Length + read > MaxBytes)
-                    {
-                        return null;
-                    }
-
-                    await buffer
-                        .WriteAsync(chunk.AsMemory(0, read), cancellationToken)
-                        .ConfigureAwait(false);
-                }
-
-                return buffer.ToArray();
-            }
+            await content.LoadIntoBufferAsync(MaxBytes, cancellationToken).ConfigureAwait(false);
         }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+
+        return await content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static async Task<string> ReadErrorBodyAsync(
@@ -545,19 +522,6 @@ public sealed class CatalogService : IDisposable
         catch (UnauthorizedAccessException)
         {
             // Best-effort cleanup of a temporary file.
-        }
-    }
-
-    private sealed record RefreshResult(ModelCatalog? Catalog, string? Error)
-    {
-        public static RefreshResult Succeeded(ModelCatalog catalog)
-        {
-            return new RefreshResult(catalog, null);
-        }
-
-        public static RefreshResult Failed(string error)
-        {
-            return new RefreshResult(null, error);
         }
     }
 }

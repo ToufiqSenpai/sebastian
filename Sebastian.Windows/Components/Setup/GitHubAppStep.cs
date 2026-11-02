@@ -1,6 +1,6 @@
+using System.Buffers.Text;
 using System.Globalization;
 using System.Security.Cryptography;
-using Microsoft.UI;
 using Microsoft.UI.Reactor;
 using Microsoft.UI.Reactor.Controls.Validation;
 using Microsoft.UI.Reactor.Core;
@@ -9,10 +9,11 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Sebastian.Libs.GitHub.App;
+using Sebastian.Libs.Providers;
+using Sebastian.Windows.Helpers;
 using Sebastian.Windows.Setup;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 using AppContexts = Sebastian.Windows.Bootstrap.AppContexts;
 using static Microsoft.UI.Reactor.Controls.Validation.FormFieldDsl;
 using static Microsoft.UI.Reactor.Factories;
@@ -52,13 +53,13 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
         var wide = UseBreakpoint(720);
         (var _, var windowHeight) = UseWindowSize();
         // Room for the title bar, setup padding, step caption, and the actions row.
-        var pageHeight = Math.Max(320, windowHeight - 160);
+        var pageHeight = SetupLayout.PageHeight(windowHeight);
         var draft = Props.Draft;
 
         (var copied, var setCopied) = UseState(false);
         (var keyError, var setKeyError) = UseState<string?>(null);
         var keyValid = UseMemo(
-            () => draft.HasStoredPrivateKey || IsValidPrivateKey(draft.PrivateKey),
+            () => draft.HasStoredPrivateKey || GitHubPrivateKey.IsValid(draft.PrivateKey),
             draft.HasStoredPrivateKey,
             draft.PrivateKey);
         var secretValid = string.IsNullOrWhiteSpace(draft.WebhookSecret)
@@ -99,16 +100,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                 return;
             }
 
-            var picker = new FileOpenPicker
-            {
-                ViewMode = PickerViewMode.List,
-                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-            };
-            picker.FileTypeFilter.Add(".pem");
-            var hwnd = Win32Interop.GetWindowFromWindowId(window.NativeWindow.AppWindow.Id);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            var file = await picker.PickSingleFileAsync();
+            var file = await FilePicker.PickFileAsync(window, ".pem").ConfigureAwait(true);
             if (file is null)
             {
                 return;
@@ -117,7 +109,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             try
             {
                 var text = await FileIO.ReadTextAsync(file);
-                if (!IsValidPrivateKey(text))
+                if (!GitHubPrivateKey.IsValid(text))
                 {
                     setKeyError("That file does not contain a valid PEM private key.");
                     return;
@@ -337,19 +329,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             .SubtleButton()
             .AutomationName("Back to the GitHub token step");
 
-        Element actions = wide
-            ? Grid(
-                [GridSize.Auto, GridSize.Star(), GridSize.Auto],
-                [GridSize.Auto],
-                [
-                    back.Grid(row: 0, column: 0),
-                    Empty().Grid(row: 0, column: 1),
-                    next.Grid(row: 0, column: 2),
-                ])
-            : VStack(
-                8,
-                next.HAlign(HorizontalAlignment.Right),
-                back.HAlign(HorizontalAlignment.Left));
+        var actions = SetupLayout.Actions(wide, back, next);
 
         var patInfo = Props.Pat is null
             ? Empty()
@@ -423,10 +403,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
 
     private static string NewWebhookSecret()
     {
-        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
-            .TrimEnd('=')
-            .Replace('+', '-')
-            .Replace('/', '_');
+        return Base64Url.EncodeToString(RandomNumberGenerator.GetBytes(32));
     }
 
     private static bool IsPositiveInteger(string value)
@@ -443,31 +420,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
     private static bool IsValidWebhookUrl(string value)
     {
         return string.IsNullOrWhiteSpace(value) ||
-            (Uri.TryCreate(value.Trim(), UriKind.Absolute, out var uri) &&
-                (uri.Scheme == Uri.UriSchemeHttps ||
-                    (uri.Scheme == Uri.UriSchemeHttp && uri.IsLoopback)));
-    }
-
-    private static bool IsValidPrivateKey(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        try
-        {
-            using var rsa = RSA.Create();
-            rsa.ImportFromPem(value);
-            return true;
-        }
-        catch (ArgumentException)
-        {
-            return false;
-        }
-        catch (CryptographicException)
-        {
-            return false;
-        }
+            ProviderAdapters.ValidateBaseUrl(value).IsValid;
     }
 }

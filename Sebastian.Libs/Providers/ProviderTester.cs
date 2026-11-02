@@ -5,22 +5,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Sebastian.Libs.Catalog;
+using Sebastian.Libs.Http;
 
 namespace Sebastian.Libs.Providers;
-
-public sealed record ProviderCredentials(
-    string? ApiKey,
-    IReadOnlyDictionary<string, string> Values)
-{
-    public string? GetValue(string name)
-    {
-        return Values is not null &&
-            Values.TryGetValue(name, out var value) &&
-            !string.IsNullOrWhiteSpace(value)
-            ? value.Trim()
-            : null;
-    }
-}
 
 public sealed record ProviderTestResult(
     bool Success,
@@ -41,46 +28,42 @@ public sealed record ProviderTestResult(
 
 public sealed class ProviderTester : IDisposable
 {
-    private const string UserAgent = "Sebastian/0.1";
     private const string AnthropicVersion = "2023-06-01";
     private const int MaxErrorBody = 4096;
 
     private readonly HttpClient _httpClient;
-    private readonly HttpMessageHandler? _ownedHandler;
     private readonly TimeSpan _timeout;
 
     public ProviderTester(
         HttpMessageHandler? finalHandler = null,
         TimeSpan? timeout = null)
     {
-        _ownedHandler = finalHandler is null ? new HttpClientHandler() : null;
-        _httpClient = new HttpClient(finalHandler ?? _ownedHandler!)
-        {
-            Timeout = Timeout.InfiniteTimeSpan,
-        };
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
+        _httpClient = finalHandler is null
+            ? new HttpClient()
+            : new HttpClient(finalHandler, disposeHandler: false);
+        _httpClient.Timeout = Timeout.InfiniteTimeSpan;
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(AppHttp.UserAgent);
         _timeout = timeout ?? TimeSpan.FromSeconds(30);
     }
 
     public void Dispose()
     {
         _httpClient.Dispose();
-        _ownedHandler?.Dispose();
     }
 
     public async Task<ProviderTestResult> TestAsync(
         ProviderAdapter adapter,
         Uri baseUrl,
-        ProviderCredentials credentials,
+        string apiKey,
         IReadOnlyList<CatalogModel> catalogModels,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(credentials);
+        ArgumentNullException.ThrowIfNull(apiKey);
         ArgumentNullException.ThrowIfNull(catalogModels);
         ArgumentNullException.ThrowIfNull(baseUrl);
 
-        var apiKey = credentials.ApiKey?.Trim();
-        if (string.IsNullOrWhiteSpace(apiKey))
+        apiKey = apiKey.Trim();
+        if (apiKey.Length == 0)
         {
             return ProviderTestResult.Failed("Enter an API key.");
         }
@@ -213,30 +196,32 @@ public sealed class ProviderTester : IDisposable
 
     private static Uri ModelsUri(ProviderAdapter adapter, Uri baseUrl)
     {
-        var trimmed = ProviderAdapters.ToText(baseUrl);
-        var path = adapter == ProviderAdapter.Anthropic &&
-            !trimmed.EndsWith("/v1", StringComparison.OrdinalIgnoreCase)
-            ? "/v1/models"
-            : "/models";
-
-        return new Uri(trimmed + path, UriKind.Absolute);
+        return Append(baseUrl, adapter, "/models");
     }
 
     private static Uri ChatUri(ProviderAdapter adapter, Uri baseUrl)
     {
-        var trimmed = ProviderAdapters.ToText(baseUrl);
         var path = adapter switch
         {
             ProviderAdapter.OpenAiCompatible => "/chat/completions",
-            ProviderAdapter.Anthropic when trimmed.EndsWith(
-                "/v1",
-                StringComparison.OrdinalIgnoreCase) => "/messages",
-            ProviderAdapter.Anthropic => "/v1/messages",
+            ProviderAdapter.Anthropic => "/messages",
             ProviderAdapter.Azure => "/chat/completions",
             _ => throw new ArgumentOutOfRangeException(nameof(adapter)),
         };
 
-        return new Uri(trimmed + path, UriKind.Absolute);
+        return Append(baseUrl, adapter, path);
+    }
+
+    // Anthropic serves /v1/messages and /v1/models, unless the base already ends in /v1.
+    private static Uri Append(Uri baseUrl, ProviderAdapter adapter, string path)
+    {
+        var trimmed = ProviderAdapters.ToText(baseUrl);
+        var prefix = adapter == ProviderAdapter.Anthropic &&
+            !trimmed.EndsWith("/v1", StringComparison.OrdinalIgnoreCase)
+            ? "/v1"
+            : string.Empty;
+
+        return new Uri(trimmed + prefix + path, UriKind.Absolute);
     }
 
     private static void AddAuthentication(

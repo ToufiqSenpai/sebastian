@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
 
         _ = services.AddSingleton<KeyValueStore>();
-        _ = services.AddSingleton<IGitHubPersonalService, GitHubPersonalService>();
+        _ = services.AddSingleton<GitHubPersonalService>();
         _ = services.AddSingleton<IGitHubAppService, GitHubAppService>();
         _ = services.AddSingleton<GitHubAppSetupService>();
         _ = services.AddSingleton<CatalogService>();

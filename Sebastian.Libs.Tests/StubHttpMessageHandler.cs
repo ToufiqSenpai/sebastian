@@ -1,4 +1,4 @@
-namespace Sebastian.Libs.Tests.GitHub.Personal;
+namespace Sebastian.Libs.Tests;
 
 internal sealed record CapturedRequest(
     string Uri,

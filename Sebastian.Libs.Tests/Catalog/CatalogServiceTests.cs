@@ -1,8 +1,6 @@
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Text.Json;
 using Sebastian.Libs.Catalog;
-using Sebastian.Libs.Tests.GitHub.Personal;
 
 namespace Sebastian.Libs.Tests.Catalog;
 
@@ -58,7 +56,7 @@ public sealed class CatalogServiceTests : IDisposable
     {
         var time = new TestTimeProvider(Now);
         using var serviceHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")));
         using var service = CreateService(serviceHandler, time);
 
         var catalog = await service.GetAsync(CancellationToken.None);
@@ -86,7 +84,7 @@ public sealed class CatalogServiceTests : IDisposable
     {
         var time = new TestTimeProvider(Now);
         using var firstHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")));
         using (var first = CreateService(firstHandler, time))
         {
             _ = await first.GetAsync(CancellationToken.None);
@@ -119,14 +117,14 @@ public sealed class CatalogServiceTests : IDisposable
     {
         var time = new TestTimeProvider(Now);
         using var firstHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "\"abc\"")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.OK, CatalogJson, etag: "\"abc\"")));
         using (var first = CreateService(firstHandler, time))
         {
             _ = await first.GetAsync(CancellationToken.None);
         }
 
         using var secondHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.InternalServerError, "boom")));
         using var second = CreateService(secondHandler, time);
 
         var catalog = await second.GetAsync(CancellationToken.None);
@@ -141,7 +139,7 @@ public sealed class CatalogServiceTests : IDisposable
     {
         var time = new TestTimeProvider(Now);
         using var serviceHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.InternalServerError, "boom")));
         using var service = CreateService(serviceHandler, time);
 
         _ = await Assert.ThrowsAsync<CatalogException>(
@@ -159,7 +157,7 @@ public sealed class CatalogServiceTests : IDisposable
 
         var time = new TestTimeProvider(Now);
         using var serviceHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.InternalServerError, "boom")));
         using var service = CreateService(serviceHandler, time);
 
         _ = await Assert.ThrowsAsync<CatalogException>(
@@ -177,7 +175,7 @@ public sealed class CatalogServiceTests : IDisposable
 
         var time = new TestTimeProvider(Now);
         using var serviceHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson)));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.OK, CatalogJson)));
         using var service = CreateService(serviceHandler, time);
 
         var catalog = await service.GetAsync(CancellationToken.None);
@@ -214,7 +212,7 @@ public sealed class CatalogServiceTests : IDisposable
     {
         var time = new TestTimeProvider(Now);
         using var firstHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson)));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.OK, CatalogJson)));
         using (var first = CreateService(firstHandler, time))
         {
             _ = await first.GetAsync(CancellationToken.None);
@@ -226,7 +224,7 @@ public sealed class CatalogServiceTests : IDisposable
             (_, _) =>
             {
                 dayRequests++;
-                return Task.FromResult(Json(HttpStatusCode.OK, CatalogJson));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, CatalogJson));
             });
         using (var second = CreateService(secondHandler, time))
         {
@@ -242,7 +240,7 @@ public sealed class CatalogServiceTests : IDisposable
             (_, _) =>
             {
                 nextDayRequests++;
-                return Task.FromResult(Json(HttpStatusCode.OK, CatalogJson));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, CatalogJson));
             });
         using var third = CreateService(thirdHandler, time);
         _ = await third.GetAsync(CancellationToken.None);
@@ -260,7 +258,7 @@ public sealed class CatalogServiceTests : IDisposable
             {
                 _ = Interlocked.Increment(ref calls);
                 await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
-                return Json(HttpStatusCode.OK, CatalogJson);
+                return TestHttp.Json(HttpStatusCode.OK, CatalogJson);
             });
         using var service = CreateService(serviceHandler, time);
 
@@ -290,24 +288,6 @@ public sealed class CatalogServiceTests : IDisposable
             _directory,
             TimeSpan.FromSeconds(5),
             time);
-    }
-
-    private static HttpResponseMessage Json(
-        HttpStatusCode status,
-        string body,
-        string? etag = null)
-    {
-        var response = new HttpResponseMessage(status)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
-
-        if (etag is not null)
-        {
-            _ = response.Headers.TryAddWithoutValidation("ETag", etag);
-        }
-
-        return response;
     }
 
     private sealed class TestTimeProvider(DateTimeOffset now) : TimeProvider

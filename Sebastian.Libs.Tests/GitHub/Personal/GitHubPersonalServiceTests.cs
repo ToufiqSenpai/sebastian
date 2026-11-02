@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using Sebastian.Libs.GitHub.Personal;
 
 namespace Sebastian.Libs.Tests.GitHub.Personal;
@@ -16,11 +15,11 @@ public sealed class GitHubPersonalServiceTests
             requests,
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(
+                "/user" => TestHttp.Json(
                     HttpStatusCode.OK,
                     UserBody,
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "repo, read:org")),
-                "/user/repos" => Json(
+                "/user/repos" => TestHttp.Json(
                     HttpStatusCode.OK,
                                          /*lang=json,strict*/
                                          """[{"full_name":"octocat/Hello-World"}]""",
@@ -58,11 +57,11 @@ public sealed class GitHubPersonalServiceTests
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(
+                "/user" => TestHttp.Json(
                     HttpStatusCode.OK,
                     UserBody,
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "repo")),
-                "/user/repos" => Json(
+                "/user/repos" => TestHttp.Json(
                     HttpStatusCode.OK,
                                          /*lang=json,strict*/
                                          """[{"full_name":"octocat/Hello-World"}]""",
@@ -86,11 +85,11 @@ public sealed class GitHubPersonalServiceTests
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(
+                "/user" => TestHttp.Json(
                     HttpStatusCode.OK,
                     UserBody,
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "read:org")),
-                "/user/repos" => Json(HttpStatusCode.OK, "[]"),
+                "/user/repos" => TestHttp.Json(HttpStatusCode.OK, "[]"),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
             }));
         using var service = CreateService(serviceHandler);
@@ -111,8 +110,8 @@ public sealed class GitHubPersonalServiceTests
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(HttpStatusCode.OK, UserBody),
-                "/user/repos" => Json(HttpStatusCode.OK, "[]"),
+                "/user" => TestHttp.Json(HttpStatusCode.OK, UserBody),
+                "/user/repos" => TestHttp.Json(HttpStatusCode.OK, "[]"),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
             }));
         using var service = CreateService(serviceHandler);
@@ -132,7 +131,7 @@ public sealed class GitHubPersonalServiceTests
             requests,
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(HttpStatusCode.Unauthorized, /*lang=json,strict*/ """{"message":"Bad credentials"}"""),
+                "/user" => TestHttp.Json(HttpStatusCode.Unauthorized, /*lang=json,strict*/ """{"message":"Bad credentials"}"""),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
             }));
         using var service = CreateService(serviceHandler);
@@ -151,11 +150,11 @@ public sealed class GitHubPersonalServiceTests
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(
+                "/user" => TestHttp.Json(
                     HttpStatusCode.OK,
                     UserBody,
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "repo")),
-                "/user/repos" => Json(HttpStatusCode.OK, "[]"),
+                "/user/repos" => TestHttp.Json(HttpStatusCode.OK, "[]"),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
             }));
         using var service = CreateService(serviceHandler);
@@ -173,11 +172,11 @@ public sealed class GitHubPersonalServiceTests
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(
+                "/user" => TestHttp.Json(
                     HttpStatusCode.OK,
                     UserBody,
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "repo")),
-                "/user/repos" => Json(
+                "/user/repos" => TestHttp.Json(
                     HttpStatusCode.OK,
                                          /*lang=json,strict*/
                                          """[{"full_name":"octocat/Hello-World"}]"""),
@@ -198,11 +197,11 @@ public sealed class GitHubPersonalServiceTests
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
-                "/user" => Json(
+                "/user" => TestHttp.Json(
                     HttpStatusCode.OK,
                     UserBody,
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "repo")),
-                "/user/repos" => Json(
+                "/user/repos" => TestHttp.Json(
                     HttpStatusCode.Forbidden,
                                          /*lang=json,strict*/
                                          """{"message":"API rate limit exceeded"}"""),
@@ -250,20 +249,6 @@ public sealed class GitHubPersonalServiceTests
             requests.Add(Capture(request));
             return Task.FromResult(responder(request));
         };
-    }
-
-    private static HttpResponseMessage Json(
-        HttpStatusCode status,
-        string body,
-        Action<HttpResponseMessage>? configure = null)
-    {
-        var response = new HttpResponseMessage(status)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
-
-        configure?.Invoke(response);
-        return response;
     }
 
     private static CapturedRequest Capture(HttpRequestMessage request)

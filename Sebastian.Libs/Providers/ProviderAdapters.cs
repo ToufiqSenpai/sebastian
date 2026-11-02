@@ -95,33 +95,24 @@ public static class ProviderAdapters
 
     public static Uri? BuildAzureBaseUrl(string? resourceName)
     {
-        var resource = NormalizeAzureResourceName(resourceName);
-        return resource is null
-            ? null
-            : new Uri($"https://{resource}.openai.azure.com/openai/v1", UriKind.Absolute);
-    }
-
-    public static string? NormalizeAzureResourceName(string? value)
-    {
-        return IsValidAzureResourceName(value) ? value!.Trim() : null;
-    }
-
-    public static bool IsValidAzureResourceName(string? value)
-    {
-        var trimmed = value?.Trim();
-        return !string.IsNullOrWhiteSpace(trimmed) &&
-            trimmed.Length is >= 2 and <= 64 &&
-            char.IsAsciiLetterOrDigit(trimmed[0]) &&
-            char.IsAsciiLetterOrDigit(trimmed[^1]) &&
-            trimmed.All(
-                character => char.IsAsciiLetterOrDigit(character) || character == '-');
+        return ValidateAzureResourceName(resourceName) is null
+            ? new Uri($"https://{resourceName!.Trim()}.openai.azure.com/openai/v1", UriKind.Absolute)
+            : null;
     }
 
     public static string? ValidateAzureResourceName(string? value)
     {
-        return string.IsNullOrWhiteSpace(value)
-            ? "Enter the Azure resource name."
-            : InvalidAzureResourceMessage(value);
+        var trimmed = value?.Trim();
+        return trimmed switch
+        {
+            null or "" => "Enter the Azure resource name.",
+            _ when trimmed.Length is >= 2 and <= 64 &&
+                char.IsAsciiLetterOrDigit(trimmed[0]) &&
+                char.IsAsciiLetterOrDigit(trimmed[^1]) &&
+                trimmed.All(character =>
+                    char.IsAsciiLetterOrDigit(character) || character == '-') => null,
+            _ => "Use only letters, numbers, and hyphens.",
+        };
     }
 
     public static BaseUrlValidation ValidateBaseUrl(string? value)
@@ -236,23 +227,14 @@ public static class ProviderAdapters
 
     public static int ToIndex(ProviderAdapter adapter)
     {
-        return adapter switch
-        {
-            ProviderAdapter.OpenAiCompatible => 0,
-            ProviderAdapter.Anthropic => 1,
-            ProviderAdapter.Azure => 2,
-            _ => throw new ArgumentOutOfRangeException(nameof(adapter)),
-        };
+        return (int)adapter;
     }
 
     public static ProviderAdapter FromIndex(int index)
     {
-        return index switch
-        {
-            1 => ProviderAdapter.Anthropic,
-            2 => ProviderAdapter.Azure,
-            _ => ProviderAdapter.OpenAiCompatible,
-        };
+        return Enum.IsDefined(typeof(ProviderAdapter), index)
+            ? (ProviderAdapter)index
+            : ProviderAdapter.OpenAiCompatible;
     }
 
     private static ProviderAdapter? LookupAdapter(string npm)
@@ -267,13 +249,6 @@ public static class ProviderAdapters
         return Infer(provider.Npm) == ProviderAdapter.Azure
             ? BuildAzureBaseUrl(GetAzureResource(env))
             : DefaultBaseUrl(provider.Id);
-    }
-
-    private static string? InvalidAzureResourceMessage(string value)
-    {
-        return IsValidAzureResourceName(value)
-            ? null
-            : "Use only letters, numbers, and hyphens.";
     }
 
     private static BaseUrlValidation ValidateScheme(Uri uri)

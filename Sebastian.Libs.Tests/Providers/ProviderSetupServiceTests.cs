@@ -1,9 +1,7 @@
 using System.Net;
-using System.Text;
 using Sebastian.Libs.Catalog;
 using Sebastian.Libs.Providers;
 using Sebastian.Libs.Settings;
-using Sebastian.Libs.Tests.GitHub.Personal;
 using Sebastian.Libs.Tests.Settings;
 
 namespace Sebastian.Libs.Tests.Providers;
@@ -32,7 +30,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 ProviderAdapter.OpenAiCompatible,
                 new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
-                new ProviderCredentials("sk-test", EmptyEnv())),
+                Env(("OPENAI_API_KEY", "sk-test"))),
             CancellationToken.None);
 
         Assert.True(result.Success);
@@ -49,7 +47,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
         store.Set("agent:openai:api-key", "old-key", isSecret: true);
         using var testerHandler = new StubHttpMessageHandler(
             (_, _) => Task.FromResult(
-                Json(HttpStatusCode.Unauthorized, """{"error":"bad key"}""")));
+                TestHttp.Json(HttpStatusCode.Unauthorized, """{"error":"bad key"}""")));
         using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
 
@@ -59,7 +57,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 ProviderAdapter.OpenAiCompatible,
                 new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
-                new ProviderCredentials("new-key", EmptyEnv())),
+                Env(("OPENAI_API_KEY", "new-key"))),
             CancellationToken.None);
 
         Assert.False(result.Success);
@@ -77,7 +75,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
             {
                 Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
                 Assert.Equal("stored-key", request.Headers.Authorization?.Parameter);
-                return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[]}"""));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """{"data":[]}"""));
             });
         using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
@@ -88,7 +86,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 ProviderAdapter.OpenAiCompatible,
                 new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
-                new ProviderCredentials(null, EmptyEnv())),
+                Env()),
             CancellationToken.None);
 
         Assert.True(result.Success);
@@ -107,7 +105,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                     request.RequestUri!.AbsoluteUri);
                 Assert.True(request.Headers.TryGetValues("api-key", out var keys));
                 Assert.Equal("azure-key", keys.Single());
-                return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[{"id":"deployment"}]}"""));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """{"data":[{"id":"deployment"}]}"""));
             });
         using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
@@ -115,10 +113,6 @@ public sealed class ProviderSetupServiceTests : IDisposable
             "azure",
             npm: "@ai-sdk/azure",
             env: ["AZURE_RESOURCE_NAME", "AZURE_API_KEY"]);
-        var env = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["AZURE_RESOURCE_NAME"] = "my-resource",
-        };
 
         var result = await setup.TestAndSaveAsync(
             new ProviderSelection(
@@ -126,7 +120,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 ProviderAdapter.Azure,
                 new Uri("https://my-resource.openai.azure.com/openai/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
-                new ProviderCredentials("azure-key", env)),
+                Env(("AZURE_RESOURCE_NAME", "my-resource"), ("AZURE_API_KEY", "azure-key"))),
             CancellationToken.None);
 
         Assert.True(result.Success);
@@ -155,7 +149,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 ProviderAdapter.Anthropic,
                 new Uri("https://proxy.example/v1", UriKind.Absolute),
                 IsCustomEndpoint: true,
-                new ProviderCredentials("sk-test", EmptyEnv())),
+                Env(("OPENAI_API_KEY", "sk-test"))),
             CancellationToken.None);
 
         Assert.True(custom.Success);
@@ -168,7 +162,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 ProviderAdapter.OpenAiCompatible,
                 new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
-                new ProviderCredentials("sk-test", EmptyEnv())),
+                Env(("OPENAI_API_KEY", "sk-test"))),
             CancellationToken.None);
 
         Assert.True(normal.Success);
@@ -191,7 +185,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 ProviderAdapter.OpenAiCompatible,
                 new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
-                new ProviderCredentials("sk-test", EmptyEnv())),
+                Env(("OPENAI_API_KEY", "sk-test"))),
             CancellationToken.None);
 
         Assert.Equal("other-key", store["agent:anthropic:api-key"]);
@@ -213,9 +207,15 @@ public sealed class ProviderSetupServiceTests : IDisposable
             env: ["OPENAI_API_KEY"]);
     }
 
-    private static Dictionary<string, string> EmptyEnv()
+    private static Dictionary<string, string> Env(params (string Name, string Value)[] values)
     {
-        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var env = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (name, value) in values)
+        {
+            env[name] = value;
+        }
+
+        return env;
     }
 
     private KeyValueStore CreateStore()
@@ -234,14 +234,6 @@ public sealed class ProviderSetupServiceTests : IDisposable
     {
         _ = request;
         _ = cancellationToken;
-        return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[{"id":"gpt-test"}]}"""));
-    }
-
-    private static HttpResponseMessage Json(HttpStatusCode status, string body)
-    {
-        return new HttpResponseMessage(status)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
+        return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """{"data":[{"id":"gpt-test"}]}"""));
     }
 }

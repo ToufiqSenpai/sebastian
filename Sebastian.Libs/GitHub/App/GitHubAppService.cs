@@ -1,38 +1,22 @@
 using System.Globalization;
-using System.Security.Cryptography;
 using GitHub;
 using GitHub.Octokit.Client;
 using GitHub.Octokit.Client.Authentication;
 using Microsoft.Kiota.Abstractions;
-using Microsoft.Kiota.Http.HttpClientLibrary;
 using GitHubAccessTokensBody =
     global::GitHub.App.Installations.Item.Access_tokens.Access_tokensPostRequestBody;
 
 namespace Sebastian.Libs.GitHub.App;
 
-public sealed class GitHubAppService : IGitHubAppService, IDisposable
+public sealed class GitHubAppService(
+    HttpMessageHandler? finalHandler = null,
+    TimeSpan? timeout = null,
+    TimeProvider? timeProvider = null) : IGitHubAppService, IDisposable
 {
-    private const string BaseUrl = "https://api.github.com";
-    private const string ApiVersion = "2022-11-28";
-    private const string UserAgent = "Sebastian/0.1";
-
-    private readonly HttpClient _httpClient;
-    private readonly TimeSpan _timeout;
-    private readonly TimeProvider _timeProvider;
-
-    public GitHubAppService(
-        HttpMessageHandler? finalHandler = null,
-        TimeSpan? timeout = null,
-        TimeProvider? timeProvider = null)
-    {
-        _httpClient = KiotaClientFactory.Create(finalHandler);
-        _httpClient.BaseAddress = new Uri(BaseUrl, UriKind.Absolute);
-        _httpClient.Timeout = timeout ?? TimeSpan.FromSeconds(30);
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
-        _httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", ApiVersion);
-        _timeout = timeout ?? TimeSpan.FromSeconds(30);
-        _timeProvider = timeProvider ?? TimeProvider.System;
-    }
+    private readonly HttpClient _httpClient = GitHubApi.CreateClient(
+        finalHandler,
+        timeout ?? TimeSpan.FromSeconds(30));
+    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
     public void Dispose()
     {
@@ -66,120 +50,105 @@ public sealed class GitHubAppService : IGitHubAppService, IDisposable
             return GitHubAppValidation.Failed("Enter a numeric installation ID.");
         }
 
-        RSA? privateKey = null;
+        using var privateKey = GitHubPrivateKey.TryCreate(credentials.PrivateKey);
+        if (privateKey is null)
+        {
+            return GitHubAppValidation.Failed(
+                "That does not look like a PEM private key. Use PKCS#8 or PKCS#1.");
+        }
+
         try
         {
-            privateKey = RSA.Create();
-            privateKey.ImportFromPem(credentials.PrivateKey);
+            var tokenProvider = new GitHubAppTokenProvider();
+            var descriptor = tokenProvider.CreateTokenDescriptor(
+                privateKey,
+                appId,
+                _timeProvider.GetUtcNow().UtcDateTime.AddMinutes(-1));
+            var jwt = tokenProvider.CreateJsonWebToken(descriptor);
+
+            using var appAdapter = RequestAdapter.Create(
+                new TokenAuthProvider(new TokenProvider(jwt)),
+                _httpClient);
+            var appClient = new GitHubClient(appAdapter);
+
+            var app = await appClient.App
+                .GetAsync(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            if (app is null || string.IsNullOrWhiteSpace(app.Name))
+            {
+                return GitHubAppValidation.Failed(
+                    "GitHub did not return the app details.");
+            }
+
+            var slug = app.Slug ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                return GitHubAppValidation.Failed(
+                    "GitHub returned an app without a slug.");
+            }
+
+            var installations = await appClient.App.Installations
+                .GetAsync(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            var installation = installations?
+                .FirstOrDefault(candidate => candidate.Id == installationId);
+            if (installation is null)
+            {
+                var known = installations is null || installations.Count == 0
+                    ? "none"
+                    : string.Join(
+                        ", ",
+                        installations
+                            .Select(candidate => candidate.Account?.SimpleUser?.Login)
+                            .Where(login => !string.IsNullOrWhiteSpace(login)));
+                return GitHubAppValidation.Failed(
+                    $"Installation ID {installationId.ToString(CultureInfo.InvariantCulture)} is not listed for this app. Known installations: {known}.");
+            }
+
+            var installationToken = await appClient.App.Installations[installationId]
+                .Access_tokens.PostAsync(
+                    new GitHubAccessTokensBody(),
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+            if (installationToken?.Token is not { Length: > 0 } token)
+            {
+                return GitHubAppValidation.Failed(
+                    "GitHub did not return an installation token.");
+            }
+
+            using var installationAdapter = RequestAdapter.Create(
+                new TokenAuthProvider(new TokenProvider(token)),
+                _httpClient);
+            var installationClient = new GitHubClient(installationAdapter);
+            var repositories = await installationClient.Installation.Repositories
+                .GetAsync(
+                    configuration => configuration.QueryParameters.PerPage = 1,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            var repositoryCount = repositories?.TotalCount ?? 0;
+            var login = installation.Account?.SimpleUser?.Login ??
+                installation.Account?.Enterprise?.Slug ??
+                "unknown";
+
+            return GitHubAppValidation.Passed(
+                app.Name,
+                slug,
+                login,
+                repositoryCount,
+                new Uri($"https://github.com/apps/{slug}/installations/new", UriKind.Absolute));
         }
-        catch (ArgumentException)
+        catch (ApiException exception)
         {
-            privateKey?.Dispose();
-            return GitHubAppValidation.Failed(
-                "That does not look like a PEM private key. Use PKCS#8 or PKCS#1.");
+            return GitHubAppValidation.Failed(exception.Message);
         }
-        catch (CryptographicException)
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            privateKey?.Dispose();
-            return GitHubAppValidation.Failed(
-                "That does not look like a PEM private key. Use PKCS#8 or PKCS#1.");
+            var seconds = _httpClient.Timeout.TotalSeconds.ToString("0", CultureInfo.InvariantCulture);
+            return GitHubAppValidation.Failed($"GitHub did not respond within {seconds} seconds.");
         }
-
-        using (privateKey)
+        catch (HttpRequestException exception)
         {
-            try
-            {
-                var tokenProvider = new GitHubAppTokenProvider();
-                var descriptor = tokenProvider.CreateTokenDescriptor(
-                    privateKey,
-                    appId,
-                    _timeProvider.GetUtcNow().UtcDateTime.AddMinutes(-1));
-                var jwt = tokenProvider.CreateJsonWebToken(descriptor);
-
-                using var appAdapter = RequestAdapter.Create(
-                    new TokenAuthProvider(new TokenProvider(jwt)),
-                    _httpClient);
-                var appClient = new GitHubClient(appAdapter);
-
-                var app = await appClient.App
-                    .GetAsync(cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                if (app is null || string.IsNullOrWhiteSpace(app.Name))
-                {
-                    return GitHubAppValidation.Failed(
-                        "GitHub did not return the app details.");
-                }
-
-                var slug = app.Slug ?? string.Empty;
-                if (string.IsNullOrWhiteSpace(slug))
-                {
-                    return GitHubAppValidation.Failed(
-                        "GitHub returned an app without a slug.");
-                }
-
-                var installations = await appClient.App.Installations
-                    .GetAsync(cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                var installation = installations?
-                    .FirstOrDefault(candidate => candidate.Id == installationId);
-                if (installation is null)
-                {
-                    var known = installations is null || installations.Count == 0
-                        ? "none"
-                        : string.Join(
-                            ", ",
-                            installations
-                                .Select(candidate => candidate.Account?.SimpleUser?.Login)
-                                .Where(login => !string.IsNullOrWhiteSpace(login)));
-                    return GitHubAppValidation.Failed(
-                        $"Installation ID {installationId.ToString(CultureInfo.InvariantCulture)} is not listed for this app. Known installations: {known}.");
-                }
-
-                var installationToken = await appClient.App.Installations[installationId]
-                    .Access_tokens.PostAsync(
-                        new GitHubAccessTokensBody(),
-                        cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-                if (installationToken?.Token is not { Length: > 0 } token)
-                {
-                    return GitHubAppValidation.Failed(
-                        "GitHub did not return an installation token.");
-                }
-
-                using var installationAdapter = RequestAdapter.Create(
-                    new TokenAuthProvider(new TokenProvider(token)),
-                    _httpClient);
-                var installationClient = new GitHubClient(installationAdapter);
-                var repositories = await installationClient.Installation.Repositories
-                    .GetAsync(
-                        configuration => configuration.QueryParameters.PerPage = 1,
-                        cancellationToken)
-                    .ConfigureAwait(false);
-                var repositoryCount = repositories?.TotalCount ?? 0;
-                var login = installation.Account?.SimpleUser?.Login ??
-                    installation.Account?.Enterprise?.Slug ??
-                    "unknown";
-
-                return GitHubAppValidation.Passed(
-                    app.Name,
-                    slug,
-                    login,
-                    repositoryCount,
-                    new Uri($"https://github.com/apps/{slug}/installations/new", UriKind.Absolute));
-            }
-            catch (ApiException exception)
-            {
-                return GitHubAppValidation.Failed(exception.Message);
-            }
-            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-            {
-                var seconds = _timeout.TotalSeconds.ToString("0", CultureInfo.InvariantCulture);
-                return GitHubAppValidation.Failed($"GitHub did not respond within {seconds} seconds.");
-            }
-            catch (HttpRequestException exception)
-            {
-                return GitHubAppValidation.Failed($"Could not reach GitHub: {exception.Message}");
-            }
+            return GitHubAppValidation.Failed($"Could not reach GitHub: {exception.Message}");
         }
     }
 }

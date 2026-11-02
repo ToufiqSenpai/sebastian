@@ -1,10 +1,9 @@
-using Microsoft.UI;
 using Microsoft.UI.Reactor;
 using Microsoft.UI.Reactor.Core;
 using Microsoft.UI.Reactor.Layout;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
-using Windows.Storage.Pickers;
+using Sebastian.Windows.Helpers;
 using static Microsoft.UI.Reactor.Factories;
 
 namespace Sebastian.Windows.Pages;
@@ -39,16 +38,7 @@ internal sealed class HomePage : Component
                 return;
             }
 
-            var picker = new FileOpenPicker
-            {
-                ViewMode = PickerViewMode.List,
-                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
-            };
-            picker.FileTypeFilter.Add("*");
-            var hwnd = Win32Interop.GetWindowFromWindowId(window.NativeWindow.AppWindow.Id);
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-            var files = await picker.PickMultipleFilesAsync();
+            var files = await FilePicker.PickFilesAsync(window, "*").ConfigureAwait(true);
             if (files is null || files.Count == 0)
             {
                 return;

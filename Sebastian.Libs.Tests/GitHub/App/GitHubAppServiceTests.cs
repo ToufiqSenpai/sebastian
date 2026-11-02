@@ -1,9 +1,7 @@
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using Sebastian.Libs.GitHub.App;
-using Sebastian.Libs.Tests.GitHub.Personal;
 
 namespace Sebastian.Libs.Tests.GitHub.App;
 
@@ -24,10 +22,10 @@ public sealed class GitHubAppServiceTests
                 requests.Add(request);
                 return Task.FromResult(request.RequestUri!.AbsolutePath switch
                 {
-                    "/app" => Json(HttpStatusCode.OK, AppBody),
-                    "/app/installations" => Json(HttpStatusCode.OK, InstallationsBody),
-                    "/app/installations/42/access_tokens" => Json(HttpStatusCode.OK, TokenBody),
-                    "/installation/repositories" => Json(HttpStatusCode.OK, RepositoriesBody),
+                    "/app" => TestHttp.Json(HttpStatusCode.OK, AppBody),
+                    "/app/installations" => TestHttp.Json(HttpStatusCode.OK, InstallationsBody),
+                    "/app/installations/42/access_tokens" => TestHttp.Json(HttpStatusCode.OK, TokenBody),
+                    "/installation/repositories" => TestHttp.Json(HttpStatusCode.OK, RepositoriesBody),
                     var path => throw new InvalidOperationException($"Unexpected request: {path}"),
                 });
             });
@@ -78,8 +76,8 @@ public sealed class GitHubAppServiceTests
             (request, _) => Task.FromResult(
                 request.RequestUri!.AbsolutePath switch
                 {
-                    "/app" => Json(HttpStatusCode.OK, AppBody),
-                    "/app/installations" => Json(
+                    "/app" => TestHttp.Json(HttpStatusCode.OK, AppBody),
+                    "/app/installations" => TestHttp.Json(
                         HttpStatusCode.OK,
                         """[{"id":7,"account":{"login":"other"}}]"""),
                     var path => throw new InvalidOperationException($"Unexpected request: {path}"),
@@ -99,7 +97,7 @@ public sealed class GitHubAppServiceTests
     {
         using var serviceHandler = new StubHttpMessageHandler(
             (_, _) => Task.FromResult(
-                Json(HttpStatusCode.Unauthorized, """{"message":"Bad credentials"}""")));
+                TestHttp.Json(HttpStatusCode.Unauthorized, """{"message":"Bad credentials"}""")));
         using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateAsync(
@@ -118,7 +116,7 @@ public sealed class GitHubAppServiceTests
             (_, _) =>
             {
                 calls++;
-                return Task.FromResult(Json(HttpStatusCode.OK, AppBody));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, AppBody));
             });
         using var service = CreateService(serviceHandler);
 
@@ -137,7 +135,7 @@ public sealed class GitHubAppServiceTests
             async (_, cancellationToken) =>
             {
                 await Task.Delay(500, cancellationToken).ConfigureAwait(false);
-                return Json(HttpStatusCode.OK, AppBody);
+                return TestHttp.Json(HttpStatusCode.OK, AppBody);
             });
         using var service = CreateService(serviceHandler, TimeSpan.FromMilliseconds(50));
 
@@ -178,13 +176,5 @@ public sealed class GitHubAppServiceTests
         return new GitHubAppService(
             handler,
             timeout ?? TimeSpan.FromSeconds(5));
-    }
-
-    private static HttpResponseMessage Json(HttpStatusCode status, string body)
-    {
-        return new HttpResponseMessage(status)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
     }
 }

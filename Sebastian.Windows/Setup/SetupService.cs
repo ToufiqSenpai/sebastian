@@ -8,12 +8,12 @@ namespace Sebastian.Windows.Setup;
 internal sealed class SetupService
 {
     private readonly KeyValueStore _store;
-    private readonly IGitHubPersonalService _github;
+    private readonly GitHubPersonalService _github;
     private readonly GitHubAppSetupService _githubApp;
 
     public SetupService(
         KeyValueStore store,
-        IGitHubPersonalService github,
+        GitHubPersonalService github,
         GitHubAppSetupService githubApp)
     {
         ArgumentNullException.ThrowIfNull(store);

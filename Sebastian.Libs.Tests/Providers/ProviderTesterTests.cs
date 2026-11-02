@@ -1,7 +1,5 @@
 using System.Net;
-using System.Text;
 using Sebastian.Libs.Providers;
-using Sebastian.Libs.Tests.GitHub.Personal;
 
 namespace Sebastian.Libs.Tests.Providers;
 
@@ -19,14 +17,14 @@ public sealed class ProviderTesterTests
                     request.RequestUri!.AbsoluteUri);
                 Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
                 Assert.Equal("sk-test", request.Headers.Authorization?.Parameter);
-                return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[{"id":"a"},{"id":"b"}]}"""));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """{"data":[{"id":"a"},{"id":"b"}]}"""));
             });
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.OpenAiCompatible,
             new Uri("https://api.openai.com/v1", UriKind.Absolute),
-            Credentials("sk-test"),
+            "sk-test",
             [TestCatalog.Model("gpt-test")],
             CancellationToken.None);
 
@@ -48,14 +46,14 @@ public sealed class ProviderTesterTests
                 Assert.Equal("sk-ant", keys.Single());
                 Assert.True(request.Headers.TryGetValues("anthropic-version", out var versions));
                 Assert.Equal("2023-06-01", versions.Single());
-                return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[{"id":"claude"}]}"""));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """{"data":[{"id":"claude"}]}"""));
             });
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.Anthropic,
             new Uri("https://api.anthropic.com", UriKind.Absolute),
-            Credentials("sk-ant"),
+            "sk-ant",
             [TestCatalog.Model("claude")],
             CancellationToken.None);
 
@@ -72,14 +70,14 @@ public sealed class ProviderTesterTests
                 Assert.Equal(
                     "https://api.anthropic.com/v1/models",
                     request.RequestUri!.AbsoluteUri);
-                return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[]}"""));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """{"data":[]}"""));
             });
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.Anthropic,
             new Uri("https://api.anthropic.com/v1", UriKind.Absolute),
-            Credentials("sk-ant"),
+            "sk-ant",
             [TestCatalog.Model("claude")],
             CancellationToken.None);
 
@@ -99,14 +97,14 @@ public sealed class ProviderTesterTests
                 Assert.True(request.Headers.TryGetValues("api-key", out var keys));
                 Assert.Equal("azure-key", keys.Single());
                 Assert.Null(request.Headers.Authorization);
-                return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[{"id":"deployment"}]}"""));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """{"data":[{"id":"deployment"}]}"""));
             });
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.Azure,
             new Uri("https://my-resource.openai.azure.com/openai/v1", UriKind.Absolute),
-            Credentials("azure-key"),
+            "azure-key",
             [TestCatalog.Model("deployment")],
             CancellationToken.None);
 
@@ -122,14 +120,14 @@ public sealed class ProviderTesterTests
             (_, _) =>
             {
                 calls++;
-                return Task.FromResult(Json(HttpStatusCode.NotFound, """{"error":"not found"}"""));
+                return Task.FromResult(TestHttp.Json(HttpStatusCode.NotFound, """{"error":"not found"}"""));
             });
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.Azure,
             new Uri("https://my-resource.openai.azure.com/openai/v1", UriKind.Absolute),
-            Credentials("azure-key"),
+            "azure-key",
             [TestCatalog.Model("deployment")],
             CancellationToken.None);
 
@@ -147,7 +145,7 @@ public sealed class ProviderTesterTests
             {
                 if (request.Method == HttpMethod.Get)
                 {
-                    return Json(HttpStatusCode.NotFound, """{"error":"no models endpoint"}""");
+                    return TestHttp.Json(HttpStatusCode.NotFound, """{"error":"no models endpoint"}""");
                 }
 
                 Assert.Equal(
@@ -156,14 +154,14 @@ public sealed class ProviderTesterTests
                 body = await request.Content!
                     .ReadAsStringAsync(cancellationToken)
                     .ConfigureAwait(false);
-                return Json(HttpStatusCode.OK, "{}");
+                return TestHttp.Json(HttpStatusCode.OK, "{}");
             });
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.OpenAiCompatible,
             new Uri("https://api.openai.com/v1", UriKind.Absolute),
-            Credentials("sk-test"),
+            "sk-test",
             [TestCatalog.Model("gpt-test")],
             CancellationToken.None);
 
@@ -178,13 +176,13 @@ public sealed class ProviderTesterTests
     public async Task FallbackWithoutToolModelFails()
     {
         using var testerHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.NotFound, "{}")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.NotFound, "{}")));
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.OpenAiCompatible,
             new Uri("https://api.openai.com/v1", UriKind.Absolute),
-            Credentials("sk-test"),
+            "sk-test",
             [TestCatalog.Model("text-only", toolCall: false)],
             CancellationToken.None);
 
@@ -197,13 +195,13 @@ public sealed class ProviderTesterTests
     {
         using var testerHandler = new StubHttpMessageHandler(
             (_, _) => Task.FromResult(
-                Json(HttpStatusCode.Unauthorized, """{"error":{"message":"bad key"}}""")));
+                TestHttp.Json(HttpStatusCode.Unauthorized, """{"error":{"message":"bad key"}}""")));
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.OpenAiCompatible,
             new Uri("https://api.openai.com/v1", UriKind.Absolute),
-            Credentials("sk-test"),
+            "sk-test",
             [TestCatalog.Model("gpt-test")],
             CancellationToken.None);
 
@@ -219,14 +217,14 @@ public sealed class ProviderTesterTests
             async (_, cancellationToken) =>
             {
                 await Task.Delay(500, cancellationToken).ConfigureAwait(false);
-                return Json(HttpStatusCode.OK, "{}");
+                return TestHttp.Json(HttpStatusCode.OK, "{}");
             });
         using var tester = CreateTester(testerHandler, TimeSpan.FromMilliseconds(50));
 
         var result = await tester.TestAsync(
             ProviderAdapter.OpenAiCompatible,
             new Uri("https://api.openai.com/v1", UriKind.Absolute),
-            Credentials("sk-test"),
+            "sk-test",
             [TestCatalog.Model("gpt-test")],
             CancellationToken.None);
 
@@ -238,13 +236,13 @@ public sealed class ProviderTesterTests
     public async Task MalformedModelListFails()
     {
         using var testerHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, "not json")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.OK, "not json")));
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.OpenAiCompatible,
             new Uri("https://api.openai.com/v1", UriKind.Absolute),
-            Credentials("sk-test"),
+            "sk-test",
             [TestCatalog.Model("gpt-test")],
             CancellationToken.None);
 
@@ -256,13 +254,13 @@ public sealed class ProviderTesterTests
     public async Task RootArrayCountsModels()
     {
         using var testerHandler = new StubHttpMessageHandler(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, """[{"id":"a"}]""")));
+            (_, _) => Task.FromResult(TestHttp.Json(HttpStatusCode.OK, """[{"id":"a"}]""")));
         using var tester = CreateTester(testerHandler);
 
         var result = await tester.TestAsync(
             ProviderAdapter.OpenAiCompatible,
             new Uri("https://api.openai.com/v1", UriKind.Absolute),
-            Credentials("sk-test"),
+            "sk-test",
             [TestCatalog.Model("gpt-test")],
             CancellationToken.None);
 
@@ -270,25 +268,10 @@ public sealed class ProviderTesterTests
         Assert.Equal(1, result.ModelCount);
     }
 
-    private static ProviderCredentials Credentials(string key)
-    {
-        return new ProviderCredentials(
-            key,
-            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-    }
-
     private static ProviderTester CreateTester(
         StubHttpMessageHandler handler,
         TimeSpan? timeout = null)
     {
         return new ProviderTester(handler, timeout);
-    }
-
-    private static HttpResponseMessage Json(HttpStatusCode status, string body)
-    {
-        return new HttpResponseMessage(status)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
     }
 }

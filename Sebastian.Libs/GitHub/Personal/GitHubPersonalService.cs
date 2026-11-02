@@ -11,12 +11,8 @@ using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 
 namespace Sebastian.Libs.GitHub.Personal;
 
-public sealed partial class GitHubPersonalService : IGitHubPersonalService, IDisposable
+public sealed partial class GitHubPersonalService : IDisposable
 {
-    private const string BaseUrl = "https://api.github.com";
-    private const string ApiVersion = "2022-11-28";
-    private const string UserAgent = "Sebastian/0.1";
-
     private readonly MutableTokenProvider _tokenProvider;
     private readonly HttpClient _httpClient;
     private readonly HttpClientRequestAdapter _adapter;
@@ -28,11 +24,7 @@ public sealed partial class GitHubPersonalService : IGitHubPersonalService, IDis
     {
         _tokenProvider = new MutableTokenProvider();
 
-        _httpClient = KiotaClientFactory.Create(finalHandler);
-        _httpClient.BaseAddress = new Uri(BaseUrl, UriKind.Absolute);
-        _httpClient.Timeout = timeout ?? TimeSpan.FromSeconds(30);
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
-        _httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", ApiVersion);
+        _httpClient = GitHubApi.CreateClient(finalHandler, timeout ?? TimeSpan.FromSeconds(30));
 
         _adapter = RequestAdapter.Create(
             new TokenAuthProvider(_tokenProvider),
@@ -90,19 +82,16 @@ public sealed partial class GitHubPersonalService : IGitHubPersonalService, IDis
                 repositoryHeaders,
                 repositories?.Count ?? 0);
 
-            return !scopes.Contains("repo", StringComparer.OrdinalIgnoreCase)
-                ? new GitHubTokenValidation(
-                    Success: false,
-                    Login: login,
-                    RepositoryCount: repositoryCount,
-                    Scopes: scopes,
-                    Error: "The token does not report the repo scope. Use a classic personal access token with the repo scope.")
-                : new GitHubTokenValidation(
-                Success: true,
+            var hasRepoScope = scopes.Contains("repo", StringComparer.OrdinalIgnoreCase);
+
+            return new GitHubTokenValidation(
+                Success: hasRepoScope,
                 Login: login,
                 RepositoryCount: repositoryCount,
                 Scopes: scopes,
-                Error: null);
+                Error: hasRepoScope
+                    ? null
+                    : "The token does not report the repo scope. Use a classic personal access token with the repo scope.");
         }
         catch (ApiException exception)
         {
@@ -110,7 +99,8 @@ public sealed partial class GitHubPersonalService : IGitHubPersonalService, IDis
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
-            return GitHubTokenValidation.Failed("GitHub did not respond within 30 seconds.");
+            var seconds = _httpClient.Timeout.TotalSeconds.ToString("0", CultureInfo.InvariantCulture);
+            return GitHubTokenValidation.Failed($"GitHub did not respond within {seconds} seconds.");
         }
         catch (HttpRequestException exception)
         {

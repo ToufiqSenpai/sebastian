@@ -17,7 +17,7 @@ internal static class AppServices
         _ = services.AddSingleton<ISettings>(_ => new LocalSettings());
         _ = services.AddSingleton(sp => new SetupService(
             sp.GetRequiredService<KeyValueStore>(),
-            sp.GetRequiredService<IGitHubPersonalService>(),
+            sp.GetRequiredService<GitHubPersonalService>(),
             sp.GetRequiredService<GitHubAppSetupService>()));
         _ = services.AddSebastianLibs();
 
