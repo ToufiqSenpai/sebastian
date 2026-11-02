@@ -30,24 +30,9 @@ public sealed class GitHubAppService(
         ArgumentNullException.ThrowIfNull(credentials);
 
         var appId = credentials.AppId.Trim();
-        if (!long.TryParse(
-                appId,
-                NumberStyles.None,
-                CultureInfo.InvariantCulture,
-                out var appIdValue) ||
-            appIdValue <= 0)
+        if (ParseCredentials(credentials, out var appIdValue, out var installationId) is { } invalid)
         {
-            return GitHubAppValidation.Failed("Enter a numeric App ID.");
-        }
-
-        if (!int.TryParse(
-                credentials.InstallationId.Trim(),
-                NumberStyles.None,
-                CultureInfo.InvariantCulture,
-                out var installationId) ||
-            installationId <= 0)
-        {
-            return GitHubAppValidation.Failed("Enter a numeric installation ID.");
+            return invalid;
         }
 
         using var privateKey = GitHubPrivateKey.TryCreate(credentials.PrivateKey);
@@ -94,13 +79,8 @@ public sealed class GitHubAppService(
                 .FirstOrDefault(candidate => candidate.Id == installationId);
             if (installation is null)
             {
-                var known = installations is null || installations.Count == 0
-                    ? "none"
-                    : string.Join(
-                        ", ",
-                        installations
-                            .Select(candidate => candidate.Account?.SimpleUser?.Login)
-                            .Where(login => !string.IsNullOrWhiteSpace(login)));
+                var known = DescribeInstallations(
+                    installations?.Select(candidate => candidate.Account?.SimpleUser?.Login));
                 return GitHubAppValidation.Failed(
                     $"Installation ID {installationId.ToString(CultureInfo.InvariantCulture)} is not listed for this app. Known installations: {known}.");
             }
@@ -126,9 +106,10 @@ public sealed class GitHubAppService(
                     cancellationToken)
                 .ConfigureAwait(false);
             var repositoryCount = repositories?.TotalCount ?? 0;
-            var login = installation.Account?.SimpleUser?.Login ??
-                installation.Account?.Enterprise?.Slug ??
-                "unknown";
+            var login = FirstNonEmpty(
+                installation.Account?.SimpleUser?.Login,
+                installation.Account?.Enterprise?.Slug,
+                "unknown");
 
             return GitHubAppValidation.Passed(
                 app.Name,
@@ -150,5 +131,44 @@ public sealed class GitHubAppService(
         {
             return GitHubAppValidation.Failed($"Could not reach GitHub: {exception.Message}");
         }
+    }
+
+    private static GitHubAppValidation? ParseCredentials(
+        GitHubAppCredentials credentials,
+        out long appId,
+        out int installationId)
+    {
+        if (!long.TryParse(
+                credentials.AppId.Trim(),
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out appId) ||
+            appId <= 0)
+        {
+            installationId = 0;
+            return GitHubAppValidation.Failed("Enter a numeric App ID.");
+        }
+
+        return !int.TryParse(
+                credentials.InstallationId.Trim(),
+                NumberStyles.None,
+                CultureInfo.InvariantCulture,
+                out installationId) ||
+            installationId <= 0
+            ? GitHubAppValidation.Failed("Enter a numeric installation ID.")
+            : null;
+    }
+
+    private static string DescribeInstallations(IEnumerable<string?>? logins)
+    {
+        var known = logins?
+            .Where(login => !string.IsNullOrWhiteSpace(login))
+            .ToArray() ?? [];
+        return known.Length == 0 ? "none" : string.Join(", ", known);
+    }
+
+    private static string FirstNonEmpty(params string?[] values)
+    {
+        return Array.Find(values, value => !string.IsNullOrWhiteSpace(value)) ?? "unknown";
     }
 }

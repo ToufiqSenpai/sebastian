@@ -170,7 +170,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             : HStack(
                 6,
                 TextBlock("\uE73E")
-                    .FontFamily("Segoe Fluent Icons")
+                    .FontFamily(IconFont.Family)
                     .FontSize(12)
                     .Foreground(Theme.SystemSuccess),
                 Caption(keyStatusText).Foreground(Theme.SecondaryText));

@@ -4,6 +4,9 @@ namespace Sebastian.Libs.GitHub.App;
 
 public sealed class GitHubAppSetupService
 {
+    private const string AppKeySetting = "github:app-key";
+    private const string WebhookSecretSetting = "github:webhook-secret";
+
     private readonly KeyValueStore _store;
     private readonly IGitHubAppService _github;
 
@@ -19,8 +22,8 @@ public sealed class GitHubAppSetupService
     public bool IsConfigured =>
         Has("github:app-id") &&
         Has("github:installation-id") &&
-        Has("github:app-key") &&
-        Has("github:webhook-secret");
+        Has(AppKeySetting) &&
+        Has(WebhookSecretSetting);
 
     public GitHubAppStoredState LoadState()
     {
@@ -30,8 +33,8 @@ public sealed class GitHubAppSetupService
             _store["github:app-id"] ?? string.Empty,
             _store["github:installation-id"] ?? string.Empty,
             Uri.TryCreate(webhookUrl, UriKind.Absolute, out var parsed) ? parsed : null,
-            Has("github:app-key"),
-            Has("github:webhook-secret"));
+            Has(AppKeySetting),
+            Has(WebhookSecretSetting));
     }
 
     public async Task<GitHubAppValidation> TestAndSaveAsync(
@@ -44,10 +47,10 @@ public sealed class GitHubAppSetupService
         var installationId = candidate.InstallationId.Trim();
         var webhookUrl = candidate.WebhookUrl;
         var privateKey = string.IsNullOrWhiteSpace(candidate.PrivateKey)
-            ? _store["github:app-key"]
+            ? _store[AppKeySetting]
             : candidate.PrivateKey;
         var webhookSecret = string.IsNullOrWhiteSpace(candidate.WebhookSecret)
-            ? _store["github:webhook-secret"]
+            ? _store[WebhookSecretSetting]
             : candidate.WebhookSecret;
 
         if (string.IsNullOrWhiteSpace(privateKey))
@@ -81,12 +84,12 @@ public sealed class GitHubAppSetupService
 
         if (!string.IsNullOrWhiteSpace(candidate.PrivateKey))
         {
-            _store.Set("github:app-key", candidate.PrivateKey, isSecret: true);
+            _store.Set(AppKeySetting, candidate.PrivateKey, isSecret: true);
         }
 
         if (!string.IsNullOrWhiteSpace(candidate.WebhookSecret))
         {
-            _store.Set("github:webhook-secret", candidate.WebhookSecret, isSecret: true);
+            _store.Set(WebhookSecretSetting, candidate.WebhookSecret, isSecret: true);
         }
 
         if (webhookUrl is null)

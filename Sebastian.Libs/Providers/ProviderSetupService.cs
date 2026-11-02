@@ -75,8 +75,7 @@ public sealed class ProviderSetupService
         }
 
         var candidateKey = Value(selection.Env, primary.Name);
-        var storedKey = _store[ApiKeySetting(provider.Id)];
-        var apiKey = string.IsNullOrWhiteSpace(candidateKey) ? storedKey : candidateKey;
+        var apiKey = candidateKey ?? _store[ApiKeySetting(provider.Id)];
 
         if (string.IsNullOrWhiteSpace(apiKey))
         {
@@ -102,6 +101,15 @@ public sealed class ProviderSetupService
             _store.Set(ApiKeySetting(provider.Id), candidateKey, isSecret: true);
         }
 
+        SaveFields(provider, selection.Env);
+        SaveEndpoint(selection);
+
+        _store.Set("agent:provider", provider.Id, isSecret: false);
+        return result;
+    }
+
+    private void SaveFields(CatalogProvider provider, IReadOnlyDictionary<string, string> env)
+    {
         foreach (var field in ProviderFields.Build(provider))
         {
             if (field.IsPrimaryKey)
@@ -109,7 +117,7 @@ public sealed class ProviderSetupService
                 continue;
             }
 
-            var value = Value(selection.Env, field.Name);
+            var value = Value(env, field.Name);
             var key = EnvSetting(provider.Id, field.Name);
 
             if (field.IsSecret)
@@ -131,33 +139,36 @@ public sealed class ProviderSetupService
                 _store.Set(key, value, isSecret: false);
             }
         }
+    }
 
+    private void SaveEndpoint(ProviderSelection selection)
+    {
         if (selection.IsCustomEndpoint)
         {
-            _store.Set(ApiSetting(provider.Id), ProviderAdapters.ToApi(selection.Adapter), isSecret: false);
+            _store.Set(
+                ApiSetting(selection.Provider.Id),
+                ProviderAdapters.ToApi(selection.Adapter),
+                isSecret: false);
         }
         else
         {
-            _store.Remove(ApiSetting(provider.Id));
+            _store.Remove(ApiSetting(selection.Provider.Id));
         }
 
-        var defaultBase = ProviderAdapters.ResolveBaseUrl(provider, selection.Env);
+        var defaultBase = ProviderAdapters.ResolveBaseUrl(selection.Provider, selection.Env);
 
         if (selection.IsCustomEndpoint ||
             !Uri.Equals(selection.BaseUrl, defaultBase))
         {
             _store.Set(
-                BaseUrlSetting(provider.Id),
+                BaseUrlSetting(selection.Provider.Id),
                 ProviderAdapters.ToText(selection.BaseUrl),
                 isSecret: false);
         }
         else
         {
-            _store.Remove(BaseUrlSetting(provider.Id));
+            _store.Remove(BaseUrlSetting(selection.Provider.Id));
         }
-
-        _store.Set("agent:provider", provider.Id, isSecret: false);
-        return result;
     }
 
     private static string? Value(IReadOnlyDictionary<string, string> env, string name)

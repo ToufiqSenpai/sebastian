@@ -64,7 +64,7 @@ internal sealed class HomePage : Component
                 .Foreground(Theme.SecondaryText)
                 .VAlign(VerticalAlignment.Center));
             parts.Add(TextBlock("\uE70D")
-                .FontFamily("Segoe Fluent Icons")
+                .FontFamily(IconFont.Family)
                 .FontSize(12)
                 .Foreground(Theme.SecondaryText)
                 .VAlign(VerticalAlignment.Center));
@@ -78,13 +78,13 @@ internal sealed class HomePage : Component
         }
 
         var projectChip = MenuChip(
-            TextBlock("\uE8B7").FontFamily("Segoe Fluent Icons").FontSize(14).Foreground(Theme.SecondaryText),
+            TextBlock("\uE8B7").FontFamily(IconFont.Family).FontSize(14).Foreground(Theme.SecondaryText),
             project,
             "Project",
             [.. Projects.Select(p => RadioMenuItem(p, "project", p == project, () => setProject(p)))]);
 
         var modeChip = MenuChip(
-            TextBlock("\uE77B").FontFamily("Segoe Fluent Icons").FontSize(14).Foreground(Theme.SecondaryText),
+            TextBlock("\uE77B").FontFamily(IconFont.Family).FontSize(14).Foreground(Theme.SecondaryText),
             mode,
             "Mode",
             [.. Modes.Select(m => RadioMenuItem(m, "mode", m == mode, () => setMode(m)))]);
@@ -101,7 +101,7 @@ internal sealed class HomePage : Component
             ]);
 
         var plusButton = MenuFlyout(
-            Button(TextBlock("\uE710").FontFamily("Segoe Fluent Icons").FontSize(16))
+            Button(TextBlock("\uE710").FontFamily(IconFont.Family).FontSize(16))
                 .SubtleButton()
                 .Width(32)
                 .Height(32)
@@ -117,7 +117,7 @@ internal sealed class HomePage : Component
 
         var sendButton = Button(
                 TextBlock("\uE74A")
-                    .FontFamily("Segoe Fluent Icons")
+                    .FontFamily(IconFont.Family)
                     .FontSize(14)
                     .Foreground(Theme.Ref("TextOnAccentFillColorPrimaryBrush")))
             .AccentButton()
@@ -149,12 +149,12 @@ internal sealed class HomePage : Component
             FlexRow([.. attachments.Select(a =>
                     Border(HStack(6,
                             TextBlock("\uE8A5")
-                                .FontFamily("Segoe Fluent Icons")
+                                .FontFamily(IconFont.Family)
                                 .FontSize(12)
                                 .Foreground(Theme.SecondaryText),
                             Body(a.Name).Foreground(Theme.SecondaryText),
                             Button(TextBlock("\uE711")
-                                        .FontFamily("Segoe Fluent Icons")
+                                        .FontFamily(IconFont.Family)
                                         .FontSize(10),
                                     () => updateAttachments(list => [.. list.Where(x => x.Path != a.Path)]))
                                 .SubtleButton()
