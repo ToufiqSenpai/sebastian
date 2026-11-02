@@ -97,21 +97,11 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
 
         var actions = SetupLayout.Actions(wide, back, next);
 
-        var linkRow = FlexRow(
-                HyperlinkButton(
-                        "Open GitHub Apps settings",
-                        new Uri("https://github.com/settings/apps"))
-                    .TextLink()
-                    .Padding(0),
-                Caption("Create one there if you do not have an app yet.")
-                    .Foreground(Theme.SecondaryText))
-            with
-        {
-            Wrap = FlexWrap.Wrap,
-            AlignItems = FlexAlign.Center,
-            ColumnGap = 12,
-            RowGap = 4,
-        };
+        var linkRow = HyperlinkButton(
+                "Open GitHub Apps settings",
+                new Uri("https://github.com/settings/apps"))
+            .TextLink()
+            .Padding(0);
 
         var form = VStack(
             0,
@@ -173,7 +163,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                 .AutomationName("GitHub App ID"),
             label: "App ID",
             required: true,
-            description: "Found on the GitHub App settings page.",
             fieldName: AppIdField);
 
         var installationId = FormField(
@@ -192,7 +181,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                 .AutomationName("GitHub App installation ID"),
             label: "Installation ID",
             required: true,
-            description: "The installation that grants access to your repositories.",
             fieldName: InstallationIdField);
 
         var hasKey = draft.PrivateKeyFileName.Length > 0 || draft.HasStoredPrivateKey;
@@ -219,8 +207,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                 },
                 BuildKeyError(keyError)),
             label: "Private key",
-            required: true,
-            description: "Open the .pem file downloaded from GitHub. Its path is not stored.");
+            required: true);
 
         var webhookSecret = FormField(
             VStack(
@@ -259,7 +246,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                         .AutomationName("Copy webhook secret"))),
             label: "Webhook secret",
             required: true,
-            description: "GitHub signs each delivery with this secret.",
             fieldName: WebhookSecretField);
 
         var webhookUrl = FormField(
@@ -275,7 +261,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                     Validate.Must<string>(IsValidWebhookUrl, "Use an HTTPS URL. HTTP is allowed only for localhost."))
                 .AutomationName("GitHub App webhook URL"),
             label: "Webhook URL",
-            description: "Optional. Without it, GitHub cannot deliver events.",
             fieldName: WebhookUrlField);
 
         return new AppFields(appId, installationId, keyField, webhookSecret, webhookUrl);

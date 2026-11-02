@@ -1,6 +1,5 @@
 using Microsoft.UI.Reactor;
 using Microsoft.UI.Reactor.Core;
-using Microsoft.UI.Reactor.Layout;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using AppContexts = Sebastian.Windows.Bootstrap.AppContexts;
@@ -46,24 +45,13 @@ internal sealed class PatStep : Component<PatStepProps>
                 .IsEnabled(!test.IsPending)
                 .AutomationName("GitHub personal access token"),
             label: "Personal access token",
-            required: true,
-            description: "Classic token with the repo scope.");
+            required: true);
 
-        var linkRow = FlexRow(
-                HyperlinkButton(
-                        "Create a classic token",
-                        new Uri("https://github.com/settings/tokens/new?scopes=repo&description=Sebastian"))
-                    .TextLink()
-                    .Padding(0),
-                Caption("Fine-grained tokens are not supported yet.")
-                    .Foreground(Theme.SecondaryText))
-            with
-        {
-            Wrap = FlexWrap.Wrap,
-            AlignItems = FlexAlign.Center,
-            ColumnGap = 12,
-            RowGap = 4,
-        };
+        var linkRow = HyperlinkButton(
+                "Create a classic token",
+                new Uri("https://github.com/settings/tokens/new?scopes=repo&description=Sebastian"))
+            .TextLink()
+            .Padding(0);
 
         var status = test switch
         {
@@ -72,9 +60,6 @@ internal sealed class PatStep : Component<PatStepProps>
                 ProgressRing().Width(16).Height(16),
                 Body("Testing…").Foreground(Theme.SecondaryText)),
             { Error: not null } => InfoBar("Could not verify token", test.Error.Message).Error().IsClosable(false),
-            _ when configured && string.IsNullOrWhiteSpace(token) => Body(
-                    "A token is already configured. Leave blank to keep it, or paste a new one.")
-                .Foreground(Theme.SecondaryText),
             _ => Empty(),
         };
 

@@ -54,7 +54,6 @@ internal sealed class ProviderDetails : Component<ProviderDetailsProps>
             BuildAdapterSelector(state, actions).Margin(0, 12, 0, 0),
             BuildBaseUrlSection(state, actions).Margin(0, 12, 0, 0),
             BuildEnvSection(state, actions),
-            BuildKeyHint(state).Margin(0, 8, 0, 0),
             BuildHostSection(state, actions).Margin(0, 16, 0, 0));
     }
 
@@ -103,37 +102,27 @@ internal sealed class ProviderDetails : Component<ProviderDetailsProps>
         ProviderDetailsState state,
         ProviderDetailsActions actions)
     {
-        if (state.Endpoint.DerivedBaseUrl)
-        {
-            var caption = string.IsNullOrWhiteSpace(state.Endpoint.EffectiveBaseUrl)
-                ? "Enter the Azure resource name to derive the endpoint."
-                : $"Endpoint: {state.Endpoint.EffectiveBaseUrl}";
-
-            return VStack(
+        return state.Endpoint.DerivedBaseUrl
+            ? VStack(
                 4,
-                Caption(caption)
-                    .Foreground(Theme.SecondaryText)
-                    .TextWrapping(TextWrapping.Wrap),
-                BuildValidationError(state.Validation));
-        }
-
-        var description = state.Endpoint.DefaultBaseText is null
-            ? "The provider endpoint."
-            : $"Default: {state.Endpoint.DefaultBaseText}";
-
-        return VStack(
-            0,
-            FormField(
-                TextBox(
-                        state.BaseUrl,
-                        actions.SetBaseUrl,
-                        placeholderText: state.Endpoint.DefaultBaseText ?? "https://…")
-                    .IsEnabled(!state.Busy)
-                    .AutomationName("Provider base URL"),
-                label: "Base URL",
-                required: state.Endpoint.DefaultBaseText is null,
-                description: description),
-            BuildValidationError(state.Validation).Margin(0, 4, 0, 0));
+                string.IsNullOrWhiteSpace(state.Endpoint.EffectiveBaseUrl)
+                    ? Empty()
+                    : Caption($"Endpoint: {state.Endpoint.EffectiveBaseUrl}")
+                        .Foreground(Theme.SecondaryText)
+                        .TextWrapping(TextWrapping.Wrap),
+                BuildValidationError(state.Validation))
+            : VStack(
+                0,
+                FormField(
+                    TextBox(
+                            state.BaseUrl,
+                            actions.SetBaseUrl,
+                            placeholderText: state.Endpoint.DefaultBaseText ?? "https://…")
+                        .IsEnabled(!state.Busy)
+                        .AutomationName("Provider base URL"),
+                    label: "Base URL",
+                    required: state.Endpoint.DefaultBaseText is null),
+                BuildValidationError(state.Validation).Margin(0, 4, 0, 0));
     }
 
     private static Element BuildValidationError(BaseUrlValidation validation)
@@ -177,10 +166,7 @@ internal sealed class ProviderDetails : Component<ProviderDetailsProps>
             return FormField(
                     box,
                     label: field.Label,
-                    required: field.IsPrimaryKey,
-                    description: field.Aliases.Count > 1
-                        ? $"Use any of: {string.Join(", ", field.Aliases)}."
-                        : $"Environment variable: {field.Name}")
+                    required: field.IsPrimaryKey)
                 .Margin(0, 12, 0, 0);
         }
 
@@ -195,17 +181,8 @@ internal sealed class ProviderDetails : Component<ProviderDetailsProps>
 
         return FormField(
                 textBox,
-                label: field.Label,
-                description: $"Environment variable: {field.Name}")
+                label: field.Label)
             .Margin(0, 12, 0, 0);
-    }
-
-    private static Element BuildKeyHint(ProviderDetailsState state)
-    {
-        return state.Stored?.HasApiKey is true && string.IsNullOrWhiteSpace(state.ApiKey)
-            ? Body("An API key is already configured for this provider. Leave blank to keep it, or paste a new one.")
-                .Foreground(Theme.SecondaryText)
-            : Empty();
     }
 
     private static Element BuildHostSection(
