@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Sebastian.Windows.Components.Setup;
 using Sebastian.Windows.Setup;
+using AppContexts = Sebastian.Windows.Bootstrap.AppContexts;
 using static Microsoft.UI.Reactor.Factories;
 
 namespace Sebastian.Windows.Pages;
@@ -12,8 +13,11 @@ internal sealed class SetupPage : Component
 {
     public override Element Render()
     {
-        (var step, var setStep) = UseState(-1);
+        var setup = UseContext(AppContexts.Setup);
+        (var step, var setStep) = UseState(setup.IsPatConfigured ? 1 : -1);
         (var verifiedPat, var setVerifiedPat) = UseState<PatValidation?>(null);
+        var initialDraft = UseMemo(static () => new GitHubAppDraft(), []);
+        (var githubAppDraft, var setGithubAppDraft) = UseState(initialDraft);
         var wide = UseBreakpoint(720);
         (var windowWidth, var _) = UseWindowSize();
         var padding = wide ? 48 : 24;
@@ -24,12 +28,13 @@ internal sealed class SetupPage : Component
         {
             content = Column(
                 Math.Min(520, contentWidth),
-                Welcome(wide, () => setStep(0)));
+                Welcome(wide, () => setStep(setup.IsPatConfigured ? 1 : 0)));
         }
         else
         {
-            Element stepContent = step == 0
-                ? Component<PatStep, PatStepProps>(
+            Element stepContent = step switch
+            {
+                0 => Component<PatStep, PatStepProps>(
                     new(
                         () => setStep(-1),
                         validation =>
@@ -40,8 +45,19 @@ internal sealed class SetupPage : Component
                             }
 
                             setStep(1);
-                        }))
-                : GitHubAppPlaceholder(verifiedPat, () => setStep(0));
+                        })),
+                1 => Component<GitHubAppStep, GitHubAppStepProps>(
+                    new(
+                        githubAppDraft,
+                        setGithubAppDraft,
+                        verifiedPat,
+                        () => setStep(0),
+                        () => setStep(2))),
+                _ => NextStepPlaceholder(
+                    "Provider and API key",
+                    "Choose a provider and verify its API key. This step comes next.",
+                    () => setStep(1)),
+            };
 
             content = Column(
                 contentWidth,
@@ -87,19 +103,16 @@ internal sealed class SetupPage : Component
                     .AutomationName("Get started with Sebastian"));
     }
 
-    private static StackElement GitHubAppPlaceholder(PatValidation? verified, Action back)
+    private static StackElement NextStepPlaceholder(string title, string description, Action back)
     {
         return VStack(
             8,
-            Title("GitHub App"),
-            Body("The GitHub App step comes next.").Foreground(Theme.SecondaryText),
-            verified is null
-                ? Empty()
-                : InfoBar(
-                    $"Connected as {verified.Login}",
-                    $"{verified.RepositoryCount} repositories accessible.")
-                    .Success()
-                    .IsClosable(false),
+            Title(title)
+                .TextWrapping(TextWrapping.Wrap)
+                .HeadingLevel(AutomationHeadingLevel.Level1),
+            Body(description)
+                .Foreground(Theme.SecondaryText)
+                .TextWrapping(TextWrapping.Wrap),
             Button("Back", back)
                 .SubtleButton()
                 .HAlign(HorizontalAlignment.Left)

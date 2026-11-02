@@ -85,7 +85,7 @@ The decision key uses the same `agent:<provider>:api-key` entry as chat. A diffe
 
 | Key | Store | Notes |
 |---|---|---|
-| `setup:step` | plain | Last wizard step, used only to resume an incomplete first run. Removed on finish. |
+| `setup:step` | plain | Last completed wizard step. Removed on finish. |
 
 ### 4.4 Required setup
 
@@ -120,8 +120,8 @@ Rules:
 - It opens when `SetupState.IsComplete` is false. On first run, the board and chat are unreachable until it completes.
 - It also opens from Settings → **Run setup again**; in that mode Cancel returns to Settings and the stored values are prefilled. A first run has no Cancel.
 - Finishing navigates to Home when a project exists, otherwise to the empty board with "Add your first project".
-- `setup:step` stores the last completed step so a restart resumes there. If an earlier step's required keys are missing, the wizard returns to the first incomplete step.
-- A closing of the app mid-wizard keeps every value already tested and saved; tests are not persisted, so a resumed step with stored values shows `Configured` and allows Next. The final Review step re-tests everything before Finish.
+- `setup:step` stores the last completed step. On entry, the wizard opens at the first step whose required keys are missing; completed steps are skipped. Back still visits a completed step, prefilled.
+- A closing of the app mid-wizard keeps every value already tested and saved; tests are not persisted, so a completed step visited via Back shows `Configured` and allows Next. The final Review step re-tests everything before Finish.
 
 ### 5.2 Steps
 
@@ -212,7 +212,7 @@ Every step implements the same rule:
 - A test runs for at most 30 seconds, disables the action while running, and shows the provider's error verbatim.
 - Next is enabled whenever there is something to test (a non-empty field, or a value already stored), and the test runs when Next is pressed: a pass advances, a failure shows the warning and stays on the step. Finish stays disabled until every step's test passed.
 - Settings edits follow the same rule: a replacement secret or model is tested before it is written. If the test fails, the old value stays.
-- Tests are not persisted. A resumed step with stored values shows `Configured` and may continue; Review re-tests.
+- Tests are not persisted. A completed step visited via Back shows `Configured` and may continue; Review re-tests.
 
 ## 6. Catalog
 
