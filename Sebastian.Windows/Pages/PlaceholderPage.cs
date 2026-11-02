@@ -5,12 +5,13 @@ using static Microsoft.UI.Reactor.Factories;
 
 namespace Sebastian.Windows.Pages;
 
-record PlaceholderPageProps(string Heading);
+internal sealed record PlaceholderPageProps(string Heading);
 
-class PlaceholderPage : Component<PlaceholderPageProps>
+internal sealed class PlaceholderPage : Component<PlaceholderPageProps>
 {
-    public override Element Render() =>
-        Border(
+    public override Element Render()
+    {
+        return Border(
             VStack(8,
                 Title(Props.Heading),
                 Body("Coming soon.").Foreground(Theme.SecondaryText)
@@ -18,4 +19,5 @@ class PlaceholderPage : Component<PlaceholderPageProps>
              .VAlign(VerticalAlignment.Center)
         ).Background(Theme.SolidBackground)
          .Flex(grow: 1);
+    }
 }

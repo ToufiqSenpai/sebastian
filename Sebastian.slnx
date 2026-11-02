@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="Sebastian.Libs.Tests/Sebastian.Libs.Tests.csproj" />
+  <Project Path="Sebastian.Libs/Sebastian.Libs.csproj" />
+  <Project Path="Sebastian.Windows/Sebastian.Windows.csproj">
+    <Platform Project="x64" />
+  </Project>
+</Solution>

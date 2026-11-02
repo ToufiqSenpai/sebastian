@@ -32,10 +32,38 @@ This is a Microsoft.UI.Reactor app. Before touching UI, navigation, state,stylin
 
 Include the documentation pages you used in your change summary. A UI change made without checking these docs is incomplete.
 
+## Reactor mental model (React parity)
+
+Reactor keeps React's mental model in C#: a component returns an element tree, hooks own state/effects/context, and props are immutable records. If you know React, trust the shape but verify the API names against the pinned package.
+
+| React | Reactor |
+|---|---|
+| `function App() {}` | `class App : Component { override Element Render() }` |
+| `useState` / `useReducer` | `UseState` / `UseReducer` |
+| `useEffect(fn, [deps])` | `UseEffect(fn, deps)` |
+| `useMemo` / `useCallback` / `useRef` | `UseMemo` / `UseCallback` / `UseRef` |
+| `useContext(Ctx)` | `UseContext(Ctx)` |
+| `<Provider value={x}>` | `element.Provide(Ctx, x)` |
+| `props` | `Props` on `Component<TProps>` |
+| `<MyComponent />` | `Component<MyComponent>()` or `Component<MyComponent, MyProps>(new(...))` |
+| `key={id}` | `.WithKey(id)` |
+| `{cond && <X/>}` | `cond ? X() : null` |
+| `items.map(...)` | `items.Select(...).ToArray()` |
+
+Rules:
+
+- Call hooks in the same order every render; never inside `if`/loops. Only from `Render()` or a function-component body.
+- Prefer `Component<TProps>` with a record for props; use propless `Component` when there is no data to pass.
+- `UseState` does not re-render when a `List<T>` is mutated in place; use `UseReducer` for collections.
+- Give list items a stable key with `.WithKey(...)`.
+- Use async hooks for async work: `UseResource` for reads, `UseMutation` for writes. Use `UsePersisted` for state that must survive unmount.
+- Use `Context<T>` + `.Provide()` for app-wide services and deep dependencies; consume with `UseContext`. Shared contexts live in `Bootstrap/AppContexts.cs`. Pass data and callbacks through props, not services that would otherwise be prop-drilled. `SetupService` is provided once at the root in `Program.cs` and consumed by `PatStep` via `UseContext(AppContexts.Setup)`.
+
 ## Project conventions
 
 - Pure C# Reactor: no `.xaml`, no code-behind, no ViewModels, no data binding.
 - Pages live in `Pages/` under `Sebastian.Windows.Pages`; typed routes live in `Pages/Route.cs`.
+- Components used by pages live in `Components/<Area>/` under `Sebastian.Windows.Components.<Area>`. For example, `Components/Setup/PatStep.cs` is in `Sebastian.Windows.Components.Setup`.
 
 ## Run
 
@@ -55,7 +83,7 @@ needs to load its hot-reload agent.
 
 Hot reload does **not** work reliably in this packaged setup: after a save,
 `dotnet watch` prints "C# and Razor changes applied", but the running window keeps the
-old UI — observed on `App.cs` and `Pages/HomePage.cs`, and navigating away and back does
+old UI — observed on `Bootstrap/App.cs` and `Pages/HomePage.cs`, and navigating away and back does
 not help. Restart instead: stop the watch process and start it again (or press `Ctrl+R`
 in the watch terminal), then verify the window actually changed. Do not trust the watch
 log as proof a change landed.

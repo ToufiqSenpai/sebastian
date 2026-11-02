@@ -1,0 +1,16 @@
+root = true
+
+[*.cs]
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+
+# File-scoped namespaces, matching the ReSharper default.
+csharp_style_namespace_declarations = file_scoped:warning
+# Roslynator (ReSharper-like inspections). Kept at warning so build fails on them.
+dotnet_analyzer_diagnostic.category-Roslynator.severity = warning
+# Repo uses plain // comments; no XML docs anywhere.
+dotnet_diagnostic.RCS1181.severity = none
+
+# Require var.
+csharp_style_var_for_built_in_types = true:warning
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_elsewhere = true:warning

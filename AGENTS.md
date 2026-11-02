@@ -14,3 +14,11 @@ This repository has a generated `openwiki/` evidence index. It is optional just-
 The scheduled OpenWiki GitHub Actions workflow refreshes the repository wiki. Do not hand-edit generated OpenWiki pages unless explicitly asked; prefer updating source code/docs and letting OpenWiki regenerate.
 
 <!-- OPENWIKI:END -->
+
+## Naming
+
+- Interfaces use the `I` prefix: `ISettings`, `IGitHubPersonalService`.
+- Implementation classes drop the `I` prefix and use the interface name, optionally with a qualifier that describes the environment or strategy.
+  - `ISettings` -> `LocalSettings` (Windows adapter), `InMemorySettings` (test fake)
+  - `IGitHubPersonalService` -> `GitHubPersonalService`
+- `I` is reserved for interfaces; never prefix a class with it.

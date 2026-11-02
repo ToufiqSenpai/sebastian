@@ -1,9 +1,10 @@
 namespace Sebastian.Windows.Pages;
 
-abstract record Route
+internal abstract record Route
 {
-    public sealed record Home : Route;
-    public sealed record Kanban : Route;
-    public sealed record Project(string Name) : Route;
-    public sealed record Settings : Route;
+    internal sealed record Home : Route;
+    internal sealed record Kanban : Route;
+    internal sealed record Project(string Name) : Route;
+    internal sealed record Settings : Route;
+    internal sealed record Setup : Route;
 }

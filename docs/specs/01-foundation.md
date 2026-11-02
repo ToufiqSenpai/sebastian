@@ -95,7 +95,7 @@ Rules:
 - Shared analyzer settings (`TreatWarningsAsErrors`, `AnalysisLevel latest-all`, `EnforceCodeStyleInBuild`) live in a root `Directory.Build.props`. `IsAotCompatible=true` is set on the four libraries. `PublishAot`, `InvariantGlobalization`, and the explicit `RuntimeIdentifier` stay on `Sebastian.Windows` only (section 4.2).
 - `Sebastian.Webhook` carries `FrameworkReference Microsoft.AspNetCore.App`; `Sebastian.Windows` carries it too because it builds and runs the `WebApplication`.
 - A test project references its library directly and other libraries transitively; only the library under test gets `InternalsVisibleTo`. Every test seam in section 12 has one owning project.
-- The app's window bootstrap builds the host, creates the project runtimes, starts the host, then renders the shell. The existing `App.cs` navigation stays; the `Projects` items list the registered projects and add, switch, or remove them.
+- The app's window bootstrap builds the host, creates the project runtimes, starts the host, then renders the shell. The existing `Bootstrap/App.cs` navigation stays; the `Projects` items list the registered projects and add, switch, or remove them.
 
 ### 4.2 AOT
 

@@ -9,34 +9,35 @@ using static Microsoft.UI.Reactor.Factories;
 
 namespace Sebastian.Windows.Pages;
 
-record Attachment(string Name, string Path);
-
-class HomePage : Component
+internal sealed class HomePage : Component
 {
-    static readonly string[] Projects = ["sebastian", "acme-web"];
-    static readonly string[] Modes = ["Standard Mode", "Spec Mode"];
-    static readonly string[] Models = ["Opus 5.5", "DeepSeek V4.1 Flash"];
-    static readonly string[] Efforts = ["Low", "Medium", "High", "Max"];
+    private static readonly string[] Projects = ["sebastian", "acme-web"];
+    private static readonly string[] Modes = ["Standard Mode", "Spec Mode"];
+    private static readonly string[] Models = ["Opus 5.5", "DeepSeek V4.1 Flash"];
+    private static readonly string[] Efforts = ["Low", "Medium", "High", "Max"];
 
     public override Element Render()
     {
         // Keep the composer column proportional: a fixed 864 cap fills the whole
         // pane once the default window is below ~1260 DIP, which reads as oversized.
-        var (windowWidth, _) = UseWindowSize();
+        (var windowWidth, var _) = UseWindowSize();
         var columnWidth = Math.Min(864, Math.Max(480, windowWidth * 0.5));
         var roomy = windowWidth >= 720;
 
-        var (draft, setDraft) = UseState("");
-        var (project, setProject) = UsePersisted("project:active", Projects[0], PersistedScope.Application);
-        var (mode, setMode) = UsePersisted("chat:mode", Modes[0], PersistedScope.Application);
-        var (model, setModel) = UsePersisted("agent:model", Models[0], PersistedScope.Application);
-        var (effort, setEffort) = UsePersisted("agent:effort", Efforts[^1], PersistedScope.Application);
-        var (attachments, updateAttachments) = UseReducer(Array.Empty<Attachment>());
+        (var draft, var setDraft) = UseState("");
+        (var project, var setProject) = UsePersisted("project:active", Projects[0], PersistedScope.Application);
+        (var mode, var setMode) = UsePersisted("chat:mode", Modes[0], PersistedScope.Application);
+        (var model, var setModel) = UsePersisted("agent:model", Models[0], PersistedScope.Application);
+        (var effort, var setEffort) = UsePersisted("agent:effort", Efforts[^1], PersistedScope.Application);
+        (var attachments, var updateAttachments) = UseReducer(Array.Empty<Attachment>());
         var window = UseWindow();
 
         async void PickFiles()
         {
-            if (window is null) return;
+            if (window is null)
+            {
+                return;
+            }
 
             var picker = new FileOpenPicker
             {
@@ -48,7 +49,10 @@ class HomePage : Component
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             var files = await picker.PickMultipleFilesAsync();
-            if (files is null || files.Count == 0) return;
+            if (files is null || files.Count == 0)
+            {
+                return;
+            }
 
             updateAttachments(list =>
             [
@@ -62,7 +66,10 @@ class HomePage : Component
         {
             var parts = new List<Element>();
             if (icon is not null)
+            {
                 parts.Add(icon.VAlign(VerticalAlignment.Center));
+            }
+
             parts.Add(Body(label)
                 .Foreground(Theme.SecondaryText)
                 .VAlign(VerticalAlignment.Center));
@@ -73,7 +80,7 @@ class HomePage : Component
                 .VAlign(VerticalAlignment.Center));
 
             return MenuFlyout(
-                Button(HStack(6, parts.ToArray()))
+                Button(HStack(6, [.. parts]))
                     .SubtleButton()
                     .Padding(horizontal: 4, vertical: 2)
                     .AutomationName(automationName),
@@ -84,13 +91,13 @@ class HomePage : Component
             TextBlock("\uE8B7").FontFamily("Segoe Fluent Icons").FontSize(14).Foreground(Theme.SecondaryText),
             project,
             "Project",
-            Projects.Select(p => RadioMenuItem(p, "project", p == project, () => setProject(p))).ToArray());
+            [.. Projects.Select(p => RadioMenuItem(p, "project", p == project, () => setProject(p)))]);
 
         var modeChip = MenuChip(
             TextBlock("\uE77B").FontFamily("Segoe Fluent Icons").FontSize(14).Foreground(Theme.SecondaryText),
             mode,
             "Mode",
-            Modes.Select(m => RadioMenuItem(m, "mode", m == mode, () => setMode(m))).ToArray());
+            [.. Modes.Select(m => RadioMenuItem(m, "mode", m == mode, () => setMode(m)))]);
 
         var modelChip = MenuChip(
             null,
@@ -98,9 +105,9 @@ class HomePage : Component
             "Model and reasoning effort",
             [
                 MenuSubItem("Model",
-                    Models.Select(m => RadioMenuItem(m, "model", m == model, () => setModel(m))).ToArray()),
+                    [.. Models.Select(m => RadioMenuItem(m, "model", m == model, () => setModel(m)))]),
                 MenuSubItem("Effort",
-                    Efforts.Select(e => RadioMenuItem(e, "effort", e == effort, () => setEffort(e))).ToArray()),
+                    [.. Efforts.Select(e => RadioMenuItem(e, "effort", e == effort, () => setEffort(e)))]),
             ]);
 
         var plusButton = MenuFlyout(
@@ -149,7 +156,7 @@ class HomePage : Component
             ).Padding(24, 16, 24, 0);
 
         var attachmentRow = When(attachments.Length > 0, () =>
-            FlexRow(attachments.Select(a =>
+            FlexRow([.. attachments.Select(a =>
                     Border(HStack(6,
                             TextBlock("\uE8A5")
                                 .FontFamily("Segoe Fluent Icons")
@@ -159,7 +166,7 @@ class HomePage : Component
                             Button(TextBlock("\uE711")
                                         .FontFamily("Segoe Fluent Icons")
                                         .FontSize(10),
-                                    () => updateAttachments(list => list.Where(x => x.Path != a.Path).ToArray()))
+                                    () => updateAttachments(list => [.. list.Where(x => x.Path != a.Path)]))
                                 .SubtleButton()
                                 .Width(20)
                                 .Height(20)
@@ -173,7 +180,7 @@ class HomePage : Component
                         .Background(Theme.SubtleFill)
                         .CornerRadius(12)
                         .WithKey(a.Path)
-                ).ToArray())
+                )])
                 with
             { Wrap = FlexWrap.Wrap, ColumnGap = 8, RowGap = 8 }
         ).Padding(24, 8, 24, 0);
@@ -200,11 +207,11 @@ class HomePage : Component
             .Margin(12, 0, 12, 12);
 
         var contextChips = (FlexRow([projectChip, modeChip]) with
-            {
-                Wrap = FlexWrap.Wrap,
-                ColumnGap = 12,
-                RowGap = 4,
-            })
+        {
+            Wrap = FlexWrap.Wrap,
+            ColumnGap = 12,
+            RowGap = 4,
+        })
             .HAlign(HorizontalAlignment.Left)
             .Margin(36, 0, 36, 0);
 
@@ -222,4 +229,6 @@ class HomePage : Component
             .Padding(48, 24)
             .Flex(grow: 1);
     }
+
+    private sealed record Attachment(string Name, string Path);
 }

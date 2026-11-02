@@ -138,7 +138,7 @@ Rules:
 ### 5.3 GitHub PAT
 
 - A classic token with the `repo` scope is required. Fine-grained tokens are accepted only if the spike confirms the account-level permissions needed to create repositories and hooks; until then the wizard explains the classic `repo` requirement.
-- The test calls `GET /user` and `GET /user/repos?per_page=1`. It reads `x-oauth-scopes`, requires `repo`, and shows the login and the accessible repository count.
+- The test calls `GET /user` and `GET /user/repos?per_page=1`. It reads `x-oauth-scopes` and requires `repo`. A pass shows the login and the accessible repository count on the next step.
 - An empty or rejected token stays on the step. The previous token, if any, is not replaced.
 - The token is used only by `IGitHubPersonalService`: list repositories, create a repository, and create or update a repository webhook. It never enters a git command.
 
@@ -210,7 +210,7 @@ Every step implements the same rule:
 
 - Changing any field resets the step to `Untested` and clears the previously tested value.
 - A test runs for at most 30 seconds, disables the action while running, and shows the provider's error verbatim.
-- Next and Finish stay disabled unless the current values passed.
+- Next is enabled whenever there is something to test (a non-empty field, or a value already stored), and the test runs when Next is pressed: a pass advances, a failure shows the warning and stays on the step. Finish stays disabled until every step's test passed.
 - Settings edits follow the same rule: a replacement secret or model is tested before it is written. If the test fails, the old value stays.
 - Tests are not persisted. A resumed step with stored values shows `Configured` and may continue; Review re-tests.
 
