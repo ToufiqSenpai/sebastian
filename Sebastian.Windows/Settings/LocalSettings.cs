@@ -1,10 +1,8 @@
-using System.Diagnostics.CodeAnalysis;
 using Windows.Storage;
 using Sebastian.Libs.Settings;
 
 namespace Sebastian.Windows.Settings;
 
-[SuppressMessage("Performance", "CA1812", Justification = "Created by the DI container.")]
 internal sealed class LocalSettings : ISettings
 {
     public bool Has(string key)

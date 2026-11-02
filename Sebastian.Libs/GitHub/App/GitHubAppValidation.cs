@@ -6,7 +6,7 @@ public sealed record GitHubAppValidation(
     string AppSlug,
     string InstallationLogin,
     int RepositoryCount,
-    string InstallUrl,
+    Uri? InstallUrl,
     string? Error)
 {
     public static GitHubAppValidation Passed(
@@ -14,7 +14,7 @@ public sealed record GitHubAppValidation(
         string appSlug,
         string installationLogin,
         int repositoryCount,
-        string installUrl)
+        Uri installUrl)
     {
         return new GitHubAppValidation(
             true,
@@ -34,7 +34,7 @@ public sealed record GitHubAppValidation(
             AppSlug: string.Empty,
             InstallationLogin: string.Empty,
             RepositoryCount: 0,
-            InstallUrl: string.Empty,
+            InstallUrl: null,
             error);
     }
 }

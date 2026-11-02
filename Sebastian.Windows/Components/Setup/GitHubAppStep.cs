@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Security.Cryptography;
 using Microsoft.UI;
@@ -93,7 +92,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             setCopied(true);
         }
 
-        [SuppressMessage("Design", "CA1031", Justification = "A failed file read is shown inline; the step stays usable.")]
         async Task PickKeyAsync()
         {
             if (window is null)
@@ -128,7 +126,7 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                 setKeyError(null);
                 Update(value => value with { PrivateKey = text, PrivateKeyFileName = file.Name });
             }
-            catch (Exception exception)
+            catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 setKeyError($"Could not read the file: {exception.Message}");
             }
@@ -302,10 +300,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             keyValid &&
             !test.IsPending;
 
-        [SuppressMessage(
-            "Design",
-            "CA1031",
-            Justification = "Failures are surfaced through test.Error; staying on the step is intentional.")]
         async Task SubmitAsync()
         {
             if (!canNext || test.IsPending)
@@ -318,14 +312,16 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                 draft.InstallationId.Trim(),
                 draft.PrivateKey,
                 draft.WebhookSecret,
-                draft.WebhookUrl.Trim());
+                string.IsNullOrWhiteSpace(draft.WebhookUrl)
+                    ? null
+                    : new Uri(draft.WebhookUrl.Trim(), UriKind.Absolute));
 
             GitHubAppValidation result;
             try
             {
                 result = await test.RunAsync(credentials).ConfigureAwait(true);
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 return;
             }

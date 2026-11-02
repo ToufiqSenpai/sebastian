@@ -18,7 +18,7 @@ public sealed class GitHubAppServiceTests
     public async Task ValidAppReturnsNameLoginAndRepositoryCount()
     {
         var requests = new List<HttpRequestMessage>();
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(
             (request, _) =>
             {
                 requests.Add(request);
@@ -31,6 +31,7 @@ public sealed class GitHubAppServiceTests
                     var path => throw new InvalidOperationException($"Unexpected request: {path}"),
                 });
             });
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateAsync(
             Credentials(),
@@ -41,7 +42,9 @@ public sealed class GitHubAppServiceTests
         Assert.Equal("sebastian", result.AppSlug);
         Assert.Equal("octocat", result.InstallationLogin);
         Assert.Equal(7, result.RepositoryCount);
-        Assert.Equal("https://github.com/apps/sebastian/installations/new", result.InstallUrl);
+        Assert.Equal(
+            new Uri("https://github.com/apps/sebastian/installations/new", UriKind.Absolute),
+            result.InstallUrl);
 
         var appRequests = requests
             .Where(request => !request.RequestUri!.AbsolutePath.StartsWith(
@@ -71,7 +74,7 @@ public sealed class GitHubAppServiceTests
     [Fact]
     public async Task InstallationMustBelongToTheApp()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(
             (request, _) => Task.FromResult(
                 request.RequestUri!.AbsolutePath switch
                 {
@@ -81,6 +84,7 @@ public sealed class GitHubAppServiceTests
                         """[{"id":7,"account":{"login":"other"}}]"""),
                     var path => throw new InvalidOperationException($"Unexpected request: {path}"),
                 }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateAsync(
             Credentials(),
@@ -93,9 +97,10 @@ public sealed class GitHubAppServiceTests
     [Fact]
     public async Task RejectedAppReturnsFailure()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(
             (_, _) => Task.FromResult(
                 Json(HttpStatusCode.Unauthorized, """{"message":"Bad credentials"}""")));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateAsync(
             Credentials(),
@@ -109,12 +114,13 @@ public sealed class GitHubAppServiceTests
     public async Task InvalidPrivateKeyFailsBeforeCallingGitHub()
     {
         var calls = 0;
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(
             (_, _) =>
             {
                 calls++;
                 return Task.FromResult(Json(HttpStatusCode.OK, AppBody));
             });
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateAsync(
             Credentials() with { PrivateKey = "not a pem" },
@@ -127,13 +133,13 @@ public sealed class GitHubAppServiceTests
     [Fact]
     public async Task TimeoutFailsWithProviderMessage()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(
             async (_, cancellationToken) =>
             {
                 await Task.Delay(500, cancellationToken).ConfigureAwait(false);
                 return Json(HttpStatusCode.OK, AppBody);
-            },
-            TimeSpan.FromMilliseconds(50));
+            });
+        using var service = CreateService(serviceHandler, TimeSpan.FromMilliseconds(50));
 
         var result = await service.ValidateAsync(
             Credentials(),
@@ -151,7 +157,7 @@ public sealed class GitHubAppServiceTests
             "42",
             rsa.ExportRSAPrivateKeyPem(),
             "webhook-secret-value",
-            string.Empty);
+            WebhookUrl: null);
     }
 
     private static byte[] DecodeBase64Url(string value)
@@ -165,16 +171,12 @@ public sealed class GitHubAppServiceTests
         return Convert.FromBase64String(normalized);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "Reliability",
-        "CA2000",
-        Justification = "The service owns and disposes the handler.")]
     private static GitHubAppService CreateService(
-        Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> handler,
+        StubHttpMessageHandler handler,
         TimeSpan? timeout = null)
     {
         return new GitHubAppService(
-            new StubHttpMessageHandler(handler),
+            handler,
             timeout ?? TimeSpan.FromSeconds(5));
     }
 

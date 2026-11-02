@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Sebastian.Libs.GitHub.App;
 using Sebastian.Libs.GitHub.Personal;
@@ -6,7 +5,6 @@ using Sebastian.Libs.Settings;
 
 namespace Sebastian.Windows.Setup;
 
-[SuppressMessage("Performance", "CA1812", Justification = "Created by the DI container.")]
 internal sealed class SetupService
 {
     private readonly KeyValueStore _store;

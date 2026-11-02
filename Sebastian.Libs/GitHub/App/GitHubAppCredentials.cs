@@ -5,11 +5,11 @@ public sealed record GitHubAppCredentials(
     string InstallationId,
     string PrivateKey,
     string WebhookSecret,
-    string WebhookUrl);
+    Uri? WebhookUrl);
 
 public sealed record GitHubAppStoredState(
     string AppId,
     string InstallationId,
-    string WebhookUrl,
+    Uri? WebhookUrl,
     bool HasPrivateKey,
     bool HasWebhookSecret);

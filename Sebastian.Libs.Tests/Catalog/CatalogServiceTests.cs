@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -58,9 +57,9 @@ public sealed class CatalogServiceTests : IDisposable
     public async Task DownloadsParsesAndCachesCatalog()
     {
         var time = new TestTimeProvider(Now);
-        using var service = CreateService(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")),
-            time);
+        using var serviceHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")));
+        using var service = CreateService(serviceHandler, time);
 
         var catalog = await service.GetAsync(CancellationToken.None);
 
@@ -86,16 +85,16 @@ public sealed class CatalogServiceTests : IDisposable
     public async Task NotModifiedKeepsCacheAndUpdatesCheckedAt()
     {
         var time = new TestTimeProvider(Now);
-        using (var first = CreateService(
-                   (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")),
-                   time))
+        using var firstHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "W/\"weak\"")));
+        using (var first = CreateService(firstHandler, time))
         {
             _ = await first.GetAsync(CancellationToken.None);
         }
 
         time.Now = Now.AddHours(1);
         var ifNoneMatch = string.Empty;
-        using var second = CreateService(
+        using var secondHandler = new StubHttpMessageHandler(
             (request, _) =>
             {
                 if (request.Headers.TryGetValues("If-None-Match", out var values))
@@ -104,8 +103,8 @@ public sealed class CatalogServiceTests : IDisposable
                 }
 
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotModified));
-            },
-            time);
+            });
+        using var second = CreateService(secondHandler, time);
 
         var catalog = await second.GetAsync(CancellationToken.None);
 
@@ -119,16 +118,16 @@ public sealed class CatalogServiceTests : IDisposable
     public async Task FailedRefreshReturnsStaleCache()
     {
         var time = new TestTimeProvider(Now);
-        using (var first = CreateService(
-                   (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "\"abc\"")),
-                   time))
+        using var firstHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson, etag: "\"abc\"")));
+        using (var first = CreateService(firstHandler, time))
         {
             _ = await first.GetAsync(CancellationToken.None);
         }
 
-        using var second = CreateService(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")),
-            time);
+        using var secondHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")));
+        using var second = CreateService(secondHandler, time);
 
         var catalog = await second.GetAsync(CancellationToken.None);
 
@@ -141,9 +140,9 @@ public sealed class CatalogServiceTests : IDisposable
     public async Task FailsWhenThereIsNoCache()
     {
         var time = new TestTimeProvider(Now);
-        using var service = CreateService(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")),
-            time);
+        using var serviceHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")));
+        using var service = CreateService(serviceHandler, time);
 
         _ = await Assert.ThrowsAsync<CatalogException>(
             () => service.GetAsync(CancellationToken.None));
@@ -159,9 +158,9 @@ public sealed class CatalogServiceTests : IDisposable
             CancellationToken.None);
 
         var time = new TestTimeProvider(Now);
-        using var service = CreateService(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")),
-            time);
+        using var serviceHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.InternalServerError, "boom")));
+        using var service = CreateService(serviceHandler, time);
 
         _ = await Assert.ThrowsAsync<CatalogException>(
             () => service.GetAsync(CancellationToken.None));
@@ -177,9 +176,9 @@ public sealed class CatalogServiceTests : IDisposable
             CancellationToken.None);
 
         var time = new TestTimeProvider(Now);
-        using var service = CreateService(
-            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson)),
-            time);
+        using var serviceHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson)));
+        using var service = CreateService(serviceHandler, time);
 
         var catalog = await service.GetAsync(CancellationToken.None);
 
@@ -194,7 +193,7 @@ public sealed class CatalogServiceTests : IDisposable
     public async Task OversizeResponseIsRejected()
     {
         var time = new TestTimeProvider(Now);
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(
             (_, _) =>
             {
                 var content = new ByteArrayContent([1]);
@@ -203,8 +202,8 @@ public sealed class CatalogServiceTests : IDisposable
                 {
                     Content = content,
                 });
-            },
-            time);
+            });
+        using var service = CreateService(serviceHandler, time);
 
         _ = await Assert.ThrowsAsync<CatalogException>(
             () => service.GetAsync(CancellationToken.None));
@@ -214,22 +213,22 @@ public sealed class CatalogServiceTests : IDisposable
     public async Task NoEtagUsesCacheForTwentyFourHours()
     {
         var time = new TestTimeProvider(Now);
-        using (var first = CreateService(
-                   (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson)),
-                   time))
+        using var firstHandler = new StubHttpMessageHandler(
+            (_, _) => Task.FromResult(Json(HttpStatusCode.OK, CatalogJson)));
+        using (var first = CreateService(firstHandler, time))
         {
             _ = await first.GetAsync(CancellationToken.None);
         }
 
         time.Now = Now.AddHours(23);
         var dayRequests = 0;
-        using (var second = CreateService(
-                   (_, _) =>
-                   {
-                       dayRequests++;
-                       return Task.FromResult(Json(HttpStatusCode.OK, CatalogJson));
-                   },
-                   time))
+        using var secondHandler = new StubHttpMessageHandler(
+            (_, _) =>
+            {
+                dayRequests++;
+                return Task.FromResult(Json(HttpStatusCode.OK, CatalogJson));
+            });
+        using (var second = CreateService(secondHandler, time))
         {
             var catalog = await second.GetAsync(CancellationToken.None);
             Assert.Equal(2, catalog.Providers.Count);
@@ -239,13 +238,13 @@ public sealed class CatalogServiceTests : IDisposable
 
         time.Now = Now.AddHours(25);
         var nextDayRequests = 0;
-        using var third = CreateService(
+        using var thirdHandler = new StubHttpMessageHandler(
             (_, _) =>
             {
                 nextDayRequests++;
                 return Task.FromResult(Json(HttpStatusCode.OK, CatalogJson));
-            },
-            time);
+            });
+        using var third = CreateService(thirdHandler, time);
         _ = await third.GetAsync(CancellationToken.None);
 
         Assert.Equal(1, nextDayRequests);
@@ -256,14 +255,14 @@ public sealed class CatalogServiceTests : IDisposable
     {
         var time = new TestTimeProvider(Now);
         var calls = 0;
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(
             async (_, _) =>
             {
                 _ = Interlocked.Increment(ref calls);
                 await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
                 return Json(HttpStatusCode.OK, CatalogJson);
-            },
-            time);
+            });
+        using var service = CreateService(serviceHandler, time);
 
         var first = service.GetAsync(CancellationToken.None);
         var second = service.GetAsync(CancellationToken.None);
@@ -282,16 +281,12 @@ public sealed class CatalogServiceTests : IDisposable
 
     private static DateTimeOffset Now { get; } = new(2026, 11, 1, 0, 0, 0, TimeSpan.Zero);
 
-    [SuppressMessage(
-        "Reliability",
-        "CA2000",
-        Justification = "The service under test owns and disposes the handler.")]
     private CatalogService CreateService(
-        Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> handler,
+        StubHttpMessageHandler handler,
         TestTimeProvider time)
     {
         return new CatalogService(
-            new StubHttpMessageHandler(handler),
+            handler,
             _directory,
             TimeSpan.FromSeconds(5),
             time);

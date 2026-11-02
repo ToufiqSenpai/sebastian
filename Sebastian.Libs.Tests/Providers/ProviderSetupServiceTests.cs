@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 using Sebastian.Libs.Catalog;
@@ -22,7 +21,8 @@ public sealed class ProviderSetupServiceTests : IDisposable
     public async Task PassingTestStoresProviderAndKeyWithoutOverrides()
     {
         var store = CreateStore();
-        using var tester = CreateTester(OkModels);
+        using var testerHandler = new StubHttpMessageHandler(OkModels);
+        using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
         var provider = OpenAiProvider();
 
@@ -30,7 +30,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
             new ProviderSelection(
                 provider,
                 ProviderAdapter.OpenAiCompatible,
-                "https://api.openai.com/v1",
+                new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
                 new ProviderCredentials("sk-test", EmptyEnv())),
             CancellationToken.None);
@@ -47,16 +47,17 @@ public sealed class ProviderSetupServiceTests : IDisposable
     {
         var store = CreateStore();
         store.Set("agent:openai:api-key", "old-key", isSecret: true);
-        using var tester = CreateTester(
+        using var testerHandler = new StubHttpMessageHandler(
             (_, _) => Task.FromResult(
                 Json(HttpStatusCode.Unauthorized, """{"error":"bad key"}""")));
+        using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
 
         var result = await setup.TestAndSaveAsync(
             new ProviderSelection(
                 OpenAiProvider(),
                 ProviderAdapter.OpenAiCompatible,
-                "https://api.openai.com/v1",
+                new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
                 new ProviderCredentials("new-key", EmptyEnv())),
             CancellationToken.None);
@@ -71,20 +72,21 @@ public sealed class ProviderSetupServiceTests : IDisposable
     {
         var store = CreateStore();
         store.Set("agent:openai:api-key", "stored-key", isSecret: true);
-        using var tester = CreateTester(
+        using var testerHandler = new StubHttpMessageHandler(
             (request, _) =>
             {
                 Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
                 Assert.Equal("stored-key", request.Headers.Authorization?.Parameter);
                 return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[]}"""));
             });
+        using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
 
         var result = await setup.TestAndSaveAsync(
             new ProviderSelection(
                 OpenAiProvider(),
                 ProviderAdapter.OpenAiCompatible,
-                "https://api.openai.com/v1",
+                new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
                 new ProviderCredentials(null, EmptyEnv())),
             CancellationToken.None);
@@ -97,7 +99,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
     public async Task AzureResourceIsPlainAndKeyIsSecret()
     {
         var store = CreateStore();
-        using var tester = CreateTester(
+        using var testerHandler = new StubHttpMessageHandler(
             (request, _) =>
             {
                 Assert.Equal(
@@ -107,6 +109,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
                 Assert.Equal("azure-key", keys.Single());
                 return Task.FromResult(Json(HttpStatusCode.OK, """{"data":[{"id":"deployment"}]}"""));
             });
+        using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
         var provider = TestCatalog.Provider(
             "azure",
@@ -121,7 +124,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
             new ProviderSelection(
                 provider,
                 ProviderAdapter.Azure,
-                "https://my-resource.openai.azure.com/openai/v1",
+                new Uri("https://my-resource.openai.azure.com/openai/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
                 new ProviderCredentials("azure-key", env)),
             CancellationToken.None);
@@ -141,7 +144,8 @@ public sealed class ProviderSetupServiceTests : IDisposable
     public async Task CustomEndpointStoresAndThenRemovesOverrides()
     {
         var store = CreateStore();
-        using var tester = CreateTester(OkModels);
+        using var testerHandler = new StubHttpMessageHandler(OkModels);
+        using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
         var provider = OpenAiProvider();
 
@@ -149,7 +153,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
             new ProviderSelection(
                 provider,
                 ProviderAdapter.Anthropic,
-                "https://proxy.example/v1",
+                new Uri("https://proxy.example/v1", UriKind.Absolute),
                 IsCustomEndpoint: true,
                 new ProviderCredentials("sk-test", EmptyEnv())),
             CancellationToken.None);
@@ -162,7 +166,7 @@ public sealed class ProviderSetupServiceTests : IDisposable
             new ProviderSelection(
                 provider,
                 ProviderAdapter.OpenAiCompatible,
-                "https://api.openai.com/v1",
+                new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
                 new ProviderCredentials("sk-test", EmptyEnv())),
             CancellationToken.None);
@@ -177,14 +181,15 @@ public sealed class ProviderSetupServiceTests : IDisposable
     {
         var store = CreateStore();
         store.Set("agent:anthropic:api-key", "other-key", isSecret: true);
-        using var tester = CreateTester(OkModels);
+        using var testerHandler = new StubHttpMessageHandler(OkModels);
+        using var tester = CreateTester(testerHandler);
         var setup = new ProviderSetupService(store, tester);
 
         _ = await setup.TestAndSaveAsync(
             new ProviderSelection(
                 OpenAiProvider(),
                 ProviderAdapter.OpenAiCompatible,
-                "https://api.openai.com/v1",
+                new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 IsCustomEndpoint: false,
                 new ProviderCredentials("sk-test", EmptyEnv())),
             CancellationToken.None);
@@ -218,14 +223,9 @@ public sealed class ProviderSetupServiceTests : IDisposable
         return new KeyValueStore(_settings, _directory);
     }
 
-    [SuppressMessage(
-        "Reliability",
-        "CA2000",
-        Justification = "The tester owns and disposes the handler.")]
-    private static ProviderTester CreateTester(
-        Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> handler)
+    private static ProviderTester CreateTester(StubHttpMessageHandler handler)
     {
-        return new ProviderTester(new StubHttpMessageHandler(handler), TimeSpan.FromSeconds(5));
+        return new ProviderTester(handler, TimeSpan.FromSeconds(5));
     }
 
     private static Task<HttpResponseMessage> OkModels(

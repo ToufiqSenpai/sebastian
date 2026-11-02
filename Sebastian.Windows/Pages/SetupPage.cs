@@ -27,7 +27,7 @@ internal sealed class SetupPage : Component
                 return new GitHubAppDraft(
                     AppId: state.AppId,
                     InstallationId: state.InstallationId,
-                    WebhookUrl: state.WebhookUrl,
+                    WebhookUrl: state.WebhookUrl?.OriginalString ?? string.Empty,
                     HasStoredPrivateKey: state.HasPrivateKey,
                     HasStoredWebhookSecret: state.HasWebhookSecret);
             },

@@ -43,7 +43,7 @@ public sealed class ProviderAdaptersTests
     [InlineData("google", "https://generativelanguage.googleapis.com/v1beta/openai/")]
     public void DefaultEndpointsMatchSpec(string providerId, string expected)
     {
-        Assert.Equal(expected, ProviderAdapters.DefaultBaseUrl(providerId));
+        Assert.Equal(new Uri(expected, UriKind.Absolute), ProviderAdapters.DefaultBaseUrl(providerId));
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public sealed class ProviderAdaptersTests
             api: "https://openrouter.ai/api/v1");
 
         Assert.Equal(
-            "https://openrouter.ai/api/v1",
+            new Uri("https://openrouter.ai/api/v1", UriKind.Absolute),
             ProviderAdapters.ResolveBaseUrl(provider));
     }
 
@@ -73,7 +73,7 @@ public sealed class ProviderAdaptersTests
         };
 
         Assert.Equal(
-            "https://my-resource.openai.azure.com/openai/v1",
+            new Uri("https://my-resource.openai.azure.com/openai/v1", UriKind.Absolute),
             ProviderAdapters.ResolveBaseUrl(provider, env));
     }
 
@@ -84,7 +84,7 @@ public sealed class ProviderAdaptersTests
         Assert.Null(ProviderAdapters.BuildAzureBaseUrl("-bad"));
         Assert.Null(ProviderAdapters.BuildAzureBaseUrl(""));
         Assert.Equal(
-            "https://good-resource.openai.azure.com/openai/v1",
+            new Uri("https://good-resource.openai.azure.com/openai/v1", UriKind.Absolute),
             ProviderAdapters.BuildAzureBaseUrl("good-resource"));
     }
 
@@ -109,7 +109,7 @@ public sealed class ProviderAdaptersTests
         var result = ProviderAdapters.ValidateBaseUrl("https://api.example.com/v1/");
 
         Assert.True(result.IsValid);
-        Assert.Equal("https://api.example.com/v1", result.Normalized);
+        Assert.Equal(new Uri("https://api.example.com/v1", UriKind.Absolute), result.Url);
     }
 
     [Fact]
@@ -123,11 +123,11 @@ public sealed class ProviderAdaptersTests
         Assert.Equal("api.openai.com", ProviderAdapters.DocumentedHost(provider));
         Assert.False(
             ProviderAdapters.NeedsHostConfirmation(
-                "https://api.openai.com/v1",
+                new Uri("https://api.openai.com/v1", UriKind.Absolute),
                 provider));
         Assert.True(
             ProviderAdapters.NeedsHostConfirmation(
-                "https://proxy.example/v1",
+                new Uri("https://proxy.example/v1", UriKind.Absolute),
                 provider));
     }
 
@@ -145,12 +145,12 @@ public sealed class ProviderAdaptersTests
 
         Assert.False(
             ProviderAdapters.NeedsHostConfirmation(
-                "https://my-resource.openai.azure.com/openai/v1",
+                new Uri("https://my-resource.openai.azure.com/openai/v1", UriKind.Absolute),
                 provider,
                 env));
         Assert.True(
             ProviderAdapters.NeedsHostConfirmation(
-                "https://other.openai.azure.com/openai/v1",
+                new Uri("https://other.openai.azure.com/openai/v1", UriKind.Absolute),
                 provider,
                 env));
     }

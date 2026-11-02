@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Sebastian.Libs;
+using Sebastian.Libs.GitHub.App;
+using Sebastian.Libs.GitHub.Personal;
 using Sebastian.Libs.Settings;
 using Sebastian.Windows.Settings;
 using Sebastian.Windows.Setup;
@@ -12,8 +14,11 @@ internal static class AppServices
     {
         var services = new ServiceCollection();
 
-        _ = services.AddSingleton<ISettings, LocalSettings>();
-        _ = services.AddSingleton<SetupService>();
+        _ = services.AddSingleton<ISettings>(_ => new LocalSettings());
+        _ = services.AddSingleton(sp => new SetupService(
+            sp.GetRequiredService<KeyValueStore>(),
+            sp.GetRequiredService<IGitHubPersonalService>(),
+            sp.GetRequiredService<GitHubAppSetupService>()));
         _ = services.AddSebastianLibs();
 
         return services.BuildServiceProvider(new ServiceProviderOptions

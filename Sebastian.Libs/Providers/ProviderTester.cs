@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
@@ -47,17 +46,15 @@ public sealed class ProviderTester : IDisposable
     private const int MaxErrorBody = 4096;
 
     private readonly HttpClient _httpClient;
+    private readonly HttpMessageHandler? _ownedHandler;
     private readonly TimeSpan _timeout;
 
-    [SuppressMessage(
-        "Reliability",
-        "CA2000",
-        Justification = "The HttpClient owns and disposes the handler.")]
     public ProviderTester(
         HttpMessageHandler? finalHandler = null,
         TimeSpan? timeout = null)
     {
-        _httpClient = new HttpClient(finalHandler ?? new HttpClientHandler())
+        _ownedHandler = finalHandler is null ? new HttpClientHandler() : null;
+        _httpClient = new HttpClient(finalHandler ?? _ownedHandler!)
         {
             Timeout = Timeout.InfiniteTimeSpan,
         };
@@ -68,18 +65,19 @@ public sealed class ProviderTester : IDisposable
     public void Dispose()
     {
         _httpClient.Dispose();
+        _ownedHandler?.Dispose();
     }
 
     public async Task<ProviderTestResult> TestAsync(
         ProviderAdapter adapter,
-        string baseUrl,
+        Uri baseUrl,
         ProviderCredentials credentials,
         IReadOnlyList<CatalogModel> catalogModels,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(credentials);
         ArgumentNullException.ThrowIfNull(catalogModels);
-        ArgumentException.ThrowIfNullOrWhiteSpace(baseUrl);
+        ArgumentNullException.ThrowIfNull(baseUrl);
 
         var apiKey = credentials.ApiKey?.Trim();
         if (string.IsNullOrWhiteSpace(apiKey))
@@ -153,7 +151,7 @@ public sealed class ProviderTester : IDisposable
 
     private async Task<HttpResponseMessage> SendModelsRequestAsync(
         ProviderAdapter adapter,
-        string baseUrl,
+        Uri baseUrl,
         string apiKey,
         CancellationToken cancellationToken)
     {
@@ -167,7 +165,7 @@ public sealed class ProviderTester : IDisposable
 
     private async Task<ProviderTestResult> FallbackAsync(
         ProviderAdapter adapter,
-        string baseUrl,
+        Uri baseUrl,
         string apiKey,
         IReadOnlyList<CatalogModel> catalogModels,
         CancellationToken cancellationToken)
@@ -213,9 +211,9 @@ public sealed class ProviderTester : IDisposable
                 .ConfigureAwait(false);
     }
 
-    private static Uri ModelsUri(ProviderAdapter adapter, string baseUrl)
+    private static Uri ModelsUri(ProviderAdapter adapter, Uri baseUrl)
     {
-        var trimmed = baseUrl.Trim().TrimEnd('/');
+        var trimmed = ProviderAdapters.ToText(baseUrl);
         var path = adapter == ProviderAdapter.Anthropic &&
             !trimmed.EndsWith("/v1", StringComparison.OrdinalIgnoreCase)
             ? "/v1/models"
@@ -224,9 +222,9 @@ public sealed class ProviderTester : IDisposable
         return new Uri(trimmed + path, UriKind.Absolute);
     }
 
-    private static Uri ChatUri(ProviderAdapter adapter, string baseUrl)
+    private static Uri ChatUri(ProviderAdapter adapter, Uri baseUrl)
     {
-        var trimmed = baseUrl.Trim().TrimEnd('/');
+        var trimmed = ProviderAdapters.ToText(baseUrl);
         var path = adapter switch
         {
             ProviderAdapter.OpenAiCompatible => "/chat/completions",

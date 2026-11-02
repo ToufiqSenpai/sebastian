@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 using Sebastian.Libs.GitHub.Personal;
@@ -13,7 +12,7 @@ public sealed class GitHubPersonalServiceTests
     public async Task ValidTokenReturnsLoginRepositoryCountAndScopes()
     {
         var requests = new List<CapturedRequest>();
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             requests,
             request => request.RequestUri!.AbsolutePath switch
             {
@@ -29,7 +28,8 @@ public sealed class GitHubPersonalServiceTests
                         "Link",
                         "<https://api.github.com/user/repos?per_page=1&page=7>; rel=\"last\"")),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -54,7 +54,7 @@ public sealed class GitHubPersonalServiceTests
     [Fact]
     public async Task RepositoryCountReadsLastPageWhenPageIsNotLastParameter()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
@@ -70,7 +70,8 @@ public sealed class GitHubPersonalServiceTests
                         "Link",
                         "<https://api.github.com/user/repos?page=12&per_page=1>; rel=\"last\"")),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -81,7 +82,7 @@ public sealed class GitHubPersonalServiceTests
     [Fact]
     public async Task MissingRepoScopeFails()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
@@ -91,7 +92,8 @@ public sealed class GitHubPersonalServiceTests
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "read:org")),
                 "/user/repos" => Json(HttpStatusCode.OK, "[]"),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -105,14 +107,15 @@ public sealed class GitHubPersonalServiceTests
     [Fact]
     public async Task MissingScopeHeaderFailsWithClassicTokenHint()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
                 "/user" => Json(HttpStatusCode.OK, UserBody),
                 "/user/repos" => Json(HttpStatusCode.OK, "[]"),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -125,13 +128,14 @@ public sealed class GitHubPersonalServiceTests
     public async Task UnauthorizedReturnsGitHubMessageAndStops()
     {
         var requests = new List<CapturedRequest>();
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             requests,
             request => request.RequestUri!.AbsolutePath switch
             {
                 "/user" => Json(HttpStatusCode.Unauthorized, /*lang=json,strict*/ """{"message":"Bad credentials"}"""),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -143,7 +147,7 @@ public sealed class GitHubPersonalServiceTests
     [Fact]
     public async Task EmptyRepositoryListWithoutLinkReturnsZero()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
@@ -153,7 +157,8 @@ public sealed class GitHubPersonalServiceTests
                     response => response.Headers.TryAddWithoutValidation("x-oauth-scopes", "repo")),
                 "/user/repos" => Json(HttpStatusCode.OK, "[]"),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -164,7 +169,7 @@ public sealed class GitHubPersonalServiceTests
     [Fact]
     public async Task SingleRepositoryWithoutLinkReturnsOne()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
@@ -177,7 +182,8 @@ public sealed class GitHubPersonalServiceTests
                                          /*lang=json,strict*/
                                          """[{"full_name":"octocat/Hello-World"}]"""),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -188,7 +194,7 @@ public sealed class GitHubPersonalServiceTests
     [Fact]
     public async Task RateLimitOnRepositoryListReturnsGitHubMessage()
     {
-        using var service = CreateService(
+        using var serviceHandler = new StubHttpMessageHandler(Record(
             [],
             request => request.RequestUri!.AbsolutePath switch
             {
@@ -201,7 +207,8 @@ public sealed class GitHubPersonalServiceTests
                                          /*lang=json,strict*/
                                          """{"message":"API rate limit exceeded"}"""),
                 var path => throw new InvalidOperationException($"Unexpected request: {path}"),
-            });
+            }));
+        using var service = CreateService(serviceHandler);
 
         var result = await service.ValidateTokenAsync("ghp_test", CancellationToken.None);
 
@@ -227,20 +234,22 @@ public sealed class GitHubPersonalServiceTests
         Assert.Contains("did not respond", result.Error, StringComparison.Ordinal);
     }
 
-    [SuppressMessage("Reliability", "CA2000", Justification = "Ownership transfers to GitHubPersonalService, which disposes the handler.")]
     private static GitHubPersonalService CreateService(
-        List<CapturedRequest> requests,
-        Func<HttpRequestMessage, HttpResponseMessage> responder,
+        StubHttpMessageHandler handler,
         TimeSpan? timeout = null)
     {
-        var handler = new StubHttpMessageHandler(
-            (request, _) =>
-            {
-                requests.Add(Capture(request));
-                return Task.FromResult(responder(request));
-            });
-
         return new GitHubPersonalService(handler, timeout);
+    }
+
+    private static Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> Record(
+        List<CapturedRequest> requests,
+        Func<HttpRequestMessage, HttpResponseMessage> responder)
+    {
+        return (request, _) =>
+        {
+            requests.Add(Capture(request));
+            return Task.FromResult(responder(request));
+        };
     }
 
     private static HttpResponseMessage Json(

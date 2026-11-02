@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.UI.Reactor;
 using Microsoft.UI.Reactor.Core;
 using Microsoft.UI.Reactor.Hooks;
@@ -79,7 +78,8 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
                     ProviderAdapter.OpenAiCompatible;
                 var adapter = ProviderAdapters.ParseApi(stored.Api) ?? inferred;
 
-                setBaseUrl(stored.BaseUrl ?? "");
+                setBaseUrl(
+                    stored.BaseUrl is null ? string.Empty : ProviderAdapters.ToText(stored.BaseUrl));
                 setCustomEndpoint(stored.Api is not null);
                 setAdapterIndex(ProviderAdapters.ToIndex(adapter));
                 updateEnv(
@@ -132,13 +132,16 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
         var defaultBaseUrl = provider is null
             ? null
             : ProviderAdapters.ResolveBaseUrl(provider, envValues);
+        var defaultBaseText = defaultBaseUrl is null
+            ? null
+            : ProviderAdapters.ToText(defaultBaseUrl);
 
         var effectiveBaseUrl = (provider, effectiveAdapter, customEndpoint) switch
         {
             (null, _, _) => string.Empty,
-            (_, ProviderAdapter.Azure, false) => defaultBaseUrl ?? string.Empty,
+            (_, ProviderAdapter.Azure, false) => defaultBaseText ?? string.Empty,
             _ => string.IsNullOrWhiteSpace(baseUrl)
-                ? defaultBaseUrl ?? string.Empty
+                ? defaultBaseText ?? string.Empty
                 : baseUrl,
         };
 
@@ -150,7 +153,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             : null;
         var baseValidation = resourceError is null
             ? ProviderAdapters.ValidateBaseUrl(effectiveBaseUrl)
-            : new BaseUrlValidation(false, string.Empty, resourceError);
+            : new BaseUrlValidation(false, null, resourceError);
 
         var destinationHost = Uri.TryCreate(
             effectiveBaseUrl,
@@ -160,7 +163,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             : null;
         var needsConfirmation = provider is not null &&
             destinationHost is not null &&
-            ProviderAdapters.NeedsHostConfirmation(effectiveBaseUrl, provider, envValues);
+            ProviderAdapters.NeedsHostConfirmation(baseValidation.Url, provider, envValues);
         var hostConfirmed = destinationHost is not null &&
             string.Equals(confirmedHost, destinationHost, StringComparison.OrdinalIgnoreCase);
 
@@ -225,10 +228,6 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             test.Reset();
         }
 
-        [SuppressMessage(
-            "Design",
-            "CA1031",
-            Justification = "Failures are surfaced through test.Error; staying on the page is intentional.")]
         async Task SubmitAsync()
         {
             if (!canTest || test.IsPending || provider is null || primary is null)
@@ -239,7 +238,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             var selection = new ProviderSelection(
                 provider,
                 effectiveAdapter,
-                baseValidation.Normalized,
+                baseValidation.Url!,
                 customEndpoint,
                 new ProviderCredentials(
                     apiKey,
@@ -252,7 +251,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             {
                 result = await test.RunAsync(selection).ConfigureAwait(true);
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 return;
             }
@@ -579,14 +578,14 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
                             TextBox(
                                     baseUrl,
                                     UpdateBaseUrl,
-                                    placeholderText: defaultBaseUrl ?? "https://…")
+                                    placeholderText: defaultBaseText ?? "https://…")
                                 .IsEnabled(!test.IsPending)
                                 .AutomationName("Provider base URL"),
                             label: "Base URL",
-                            required: defaultBaseUrl is null,
-                            description: defaultBaseUrl is null
+                            required: defaultBaseText is null,
+                            description: defaultBaseText is null
                                 ? "The provider endpoint."
-                                : $"Default: {defaultBaseUrl}"),
+                                : $"Default: {defaultBaseText}"),
                         baseValidation.Error is null
                             ? Empty()
                             : Caption(baseValidation.Error)

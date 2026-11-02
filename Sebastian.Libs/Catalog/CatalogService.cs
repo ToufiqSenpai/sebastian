@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Text.Json;
@@ -10,12 +9,13 @@ public sealed class CatalogService : IDisposable
 {
     private const string SourceUrl = "https://models.dev/api.json";
     private const string UserAgent = "Sebastian/0.1";
-    private const long MaxBytes = 16L * 1024 * 1024;
+    private const long MaxBytes = 64L * 1024 * 1024;
     private const int MaxErrorBody = 4096;
 
     private static readonly TimeSpan NoEtagRefreshInterval = TimeSpan.FromHours(24);
 
     private readonly HttpClient _httpClient;
+    private readonly HttpMessageHandler? _ownedHandler;
     private readonly string _cacheDirectory;
     private readonly string _modelsPath;
     private readonly string _metaPath;
@@ -31,7 +31,11 @@ public sealed class CatalogService : IDisposable
         TimeSpan? timeout = null,
         TimeProvider? timeProvider = null)
     {
-        _httpClient = CreateHttpClient(finalHandler);
+        _ownedHandler = finalHandler is null ? new HttpClientHandler() : null;
+        _httpClient = new HttpClient(finalHandler ?? _ownedHandler!)
+        {
+            Timeout = Timeout.InfiniteTimeSpan,
+        };
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
 
         _cacheDirectory = Path.GetFullPath(
@@ -49,6 +53,7 @@ public sealed class CatalogService : IDisposable
     public void Dispose()
     {
         _httpClient.Dispose();
+        _ownedHandler?.Dispose();
         _gate.Dispose();
     }
 
@@ -541,18 +546,6 @@ public sealed class CatalogService : IDisposable
         {
             // Best-effort cleanup of a temporary file.
         }
-    }
-
-    [SuppressMessage(
-        "Reliability",
-        "CA2000",
-        Justification = "The HttpClient owns and disposes the handler.")]
-    private static HttpClient CreateHttpClient(HttpMessageHandler? finalHandler)
-    {
-        return new HttpClient(finalHandler ?? new HttpClientHandler())
-        {
-            Timeout = Timeout.InfiniteTimeSpan,
-        };
     }
 
     private sealed record RefreshResult(ModelCatalog? Catalog, string? Error)

@@ -165,7 +165,7 @@ public sealed class GitHubAppService : IGitHubAppService, IDisposable
                     slug,
                     login,
                     repositoryCount,
-                    $"https://github.com/apps/{slug}/installations/new");
+                    new Uri($"https://github.com/apps/{slug}/installations/new", UriKind.Absolute));
             }
             catch (ApiException exception)
             {

@@ -26,7 +26,7 @@ public sealed class GitHubAppSetupServiceTests : IDisposable
                 "42",
                 "pem-key",
                 "webhook-secret-value",
-                "https://example.com/hook"),
+                new Uri("https://example.com/hook", UriKind.Absolute)),
             CancellationToken.None);
 
         Assert.True(result.Success);
@@ -41,7 +41,9 @@ public sealed class GitHubAppSetupServiceTests : IDisposable
         var state = setup.LoadState();
         Assert.Equal("123", state.AppId);
         Assert.Equal("42", state.InstallationId);
-        Assert.Equal("https://example.com/hook", state.WebhookUrl);
+        Assert.Equal(
+            new Uri("https://example.com/hook", UriKind.Absolute),
+            state.WebhookUrl);
         Assert.True(state.HasPrivateKey);
         Assert.True(state.HasWebhookSecret);
     }
@@ -66,7 +68,7 @@ public sealed class GitHubAppSetupServiceTests : IDisposable
                 "42",
                 "new-key",
                 "new-secret-value",
-                "https://example.com/new"),
+                new Uri("https://example.com/new", UriKind.Absolute)),
             CancellationToken.None);
 
         Assert.False(result.Success);
@@ -87,7 +89,7 @@ public sealed class GitHubAppSetupServiceTests : IDisposable
         var setup = new GitHubAppSetupService(store, fake);
 
         var result = await setup.TestAndSaveAsync(
-            new GitHubAppCredentials("123", "42", string.Empty, string.Empty, string.Empty),
+            new GitHubAppCredentials("123", "42", string.Empty, string.Empty, WebhookUrl: null),
             CancellationToken.None);
 
         Assert.True(result.Success);
@@ -110,7 +112,7 @@ public sealed class GitHubAppSetupServiceTests : IDisposable
                 "42",
                 "pem-key",
                 "webhook-secret-value",
-                string.Empty),
+                WebhookUrl: null),
             CancellationToken.None);
 
         Assert.False(store.Has("github:webhook-url"));
@@ -153,7 +155,7 @@ public sealed class GitHubAppSetupServiceTests : IDisposable
             "sebastian",
             "octocat",
             3,
-            "https://github.com/apps/sebastian/installations/new");
+            new Uri("https://github.com/apps/sebastian/installations/new", UriKind.Absolute));
 
         public GitHubAppCredentials? LastCredentials { get; private set; }
 

@@ -24,10 +24,12 @@ public sealed class GitHubAppSetupService
 
     public GitHubAppStoredState LoadState()
     {
+        var webhookUrl = _store["github:webhook-url"];
+
         return new GitHubAppStoredState(
             _store["github:app-id"] ?? string.Empty,
             _store["github:installation-id"] ?? string.Empty,
-            _store["github:webhook-url"] ?? string.Empty,
+            Uri.TryCreate(webhookUrl, UriKind.Absolute, out var parsed) ? parsed : null,
             Has("github:app-key"),
             Has("github:webhook-secret"));
     }
@@ -40,7 +42,7 @@ public sealed class GitHubAppSetupService
 
         var appId = candidate.AppId.Trim();
         var installationId = candidate.InstallationId.Trim();
-        var webhookUrl = candidate.WebhookUrl.Trim();
+        var webhookUrl = candidate.WebhookUrl;
         var privateKey = string.IsNullOrWhiteSpace(candidate.PrivateKey)
             ? _store["github:app-key"]
             : candidate.PrivateKey;
@@ -87,13 +89,16 @@ public sealed class GitHubAppSetupService
             _store.Set("github:webhook-secret", candidate.WebhookSecret, isSecret: true);
         }
 
-        if (string.IsNullOrWhiteSpace(webhookUrl))
+        if (webhookUrl is null)
         {
             _store.Remove("github:webhook-url");
         }
         else
         {
-            _store.Set("github:webhook-url", webhookUrl, isSecret: false);
+            _store.Set(
+                "github:webhook-url",
+                webhookUrl.OriginalString.TrimEnd('/'),
+                isSecret: false);
         }
 
         return result;

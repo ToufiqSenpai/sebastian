@@ -6,14 +6,14 @@ namespace Sebastian.Libs.Providers;
 public sealed record ProviderSelection(
     CatalogProvider Provider,
     ProviderAdapter Adapter,
-    string BaseUrl,
+    Uri BaseUrl,
     bool IsCustomEndpoint,
     ProviderCredentials Credentials);
 
 public sealed record ProviderStoredState(
     string? ProviderId,
     string? Api,
-    string? BaseUrl,
+    Uri? BaseUrl,
     bool HasApiKey,
     IReadOnlyDictionary<string, string> PlainEnv);
 
@@ -56,7 +56,7 @@ public sealed class ProviderSetupService
         return new ProviderStoredState(
             SelectedProviderId,
             _store[ApiSetting(provider.Id)],
-            _store[BaseUrlSetting(provider.Id)],
+            ProviderAdapters.NormalizeBaseUrl(_store[BaseUrlSetting(provider.Id)]),
             _store.Has(ApiKeySetting(provider.Id)),
             plainEnv);
     }
@@ -142,18 +142,15 @@ public sealed class ProviderSetupService
             _store.Remove(ApiSetting(provider.Id));
         }
 
-        var normalizedBase = ProviderAdapters.NormalizeBaseUrl(selection.BaseUrl);
         var defaultBase = ProviderAdapters.ResolveBaseUrl(provider, credentials.Values);
-        var defaultNormalized = ProviderAdapters.NormalizeBaseUrl(defaultBase);
 
-        if (string.IsNullOrEmpty(normalizedBase))
+        if (selection.IsCustomEndpoint ||
+            !Uri.Equals(selection.BaseUrl, defaultBase))
         {
-            _store.Remove(BaseUrlSetting(provider.Id));
-        }
-        else if (selection.IsCustomEndpoint ||
-                 !string.Equals(normalizedBase, defaultNormalized, StringComparison.Ordinal))
-        {
-            _store.Set(BaseUrlSetting(provider.Id), normalizedBase, isSecret: false);
+            _store.Set(
+                BaseUrlSetting(provider.Id),
+                ProviderAdapters.ToText(selection.BaseUrl),
+                isSecret: false);
         }
         else
         {

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.UI.Reactor;
 using Microsoft.UI.Reactor.Core;
 using Microsoft.UI.Reactor.Layout;
@@ -79,7 +78,6 @@ internal sealed class PatStep : Component<PatStepProps>
             _ => Empty(),
         };
 
-        [SuppressMessage("Design", "CA1031", Justification = "Failures are surfaced through test.Error; staying on the page is intentional.")]
         async Task SubmitAsync()
         {
             if (test.IsPending)
@@ -98,7 +96,7 @@ internal sealed class PatStep : Component<PatStepProps>
             {
                 validation = await test.RunAsync(token).ConfigureAwait(true);
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 // test.Error holds the user-facing message; the InfoBar shows it and we stay.
                 return;

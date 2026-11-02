@@ -12,7 +12,7 @@ public enum ProviderAdapter
 
 public readonly record struct BaseUrlValidation(
     bool IsValid,
-    string Normalized,
+    Uri? Url,
     string? Error);
 
 public static class ProviderAdapters
@@ -57,12 +57,14 @@ public static class ProviderAdapters
         return string.IsNullOrWhiteSpace(npm) ? null : LookupAdapter(npm.Trim());
     }
 
-    public static string? DefaultBaseUrl(string providerId)
+    public static Uri? DefaultBaseUrl(string providerId)
     {
-        return DefaultBaseUrls.TryGetValue(providerId, out var baseUrl) ? baseUrl : null;
+        return DefaultBaseUrls.TryGetValue(providerId, out var baseUrl)
+            ? new Uri(baseUrl, UriKind.Absolute)
+            : null;
     }
 
-    public static string? ResolveBaseUrl(
+    public static Uri? ResolveBaseUrl(
         CatalogProvider provider,
         IReadOnlyDictionary<string, string>? env = null)
     {
@@ -91,12 +93,12 @@ public static class ProviderAdapters
         return null;
     }
 
-    public static string? BuildAzureBaseUrl(string? resourceName)
+    public static Uri? BuildAzureBaseUrl(string? resourceName)
     {
         var resource = NormalizeAzureResourceName(resourceName);
         return resource is null
             ? null
-            : $"https://{resource}.openai.azure.com/openai/v1";
+            : new Uri($"https://{resource}.openai.azure.com/openai/v1", UriKind.Absolute);
     }
 
     public static string? NormalizeAzureResourceName(string? value)
@@ -126,21 +128,34 @@ public static class ProviderAdapters
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return new BaseUrlValidation(false, string.Empty, "Enter a base URL.");
+            return new BaseUrlValidation(false, null, "Enter a base URL.");
         }
 
         var trimmed = value.Trim();
         return trimmed.Contains("${", StringComparison.Ordinal)
             ? new BaseUrlValidation(
                 false,
-                string.Empty,
+                null,
                 "Replace the template placeholder in the base URL.")
             : ValidateUri(trimmed);
     }
 
-    public static string? NormalizeBaseUrl(string? value)
+    public static Uri? NormalizeBaseUrl(string? value)
     {
-        return string.IsNullOrWhiteSpace(value) ? null : value.Trim().TrimEnd('/');
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var trimmed = value.Trim().TrimEnd('/');
+        return Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) ? uri : null;
+    }
+
+    public static string ToText(Uri url)
+    {
+        ArgumentNullException.ThrowIfNull(url);
+
+        return url.OriginalString.TrimEnd('/');
     }
 
     public static string? DocumentedHost(
@@ -151,16 +166,16 @@ public static class ProviderAdapters
 
         var candidates = new[]
         {
-            provider.Api,
+            NormalizeBaseUrl(provider.Api),
             ResolveBaseUrl(provider, env),
-            provider.Doc,
+            NormalizeBaseUrl(provider.Doc),
         };
 
         foreach (var candidate in candidates)
         {
-            if (Uri.TryCreate(candidate, UriKind.Absolute, out var uri))
+            if (candidate is not null)
             {
-                return uri.Host;
+                return candidate.Host;
             }
         }
 
@@ -168,20 +183,20 @@ public static class ProviderAdapters
     }
 
     public static bool NeedsHostConfirmation(
-        string baseUrl,
+        Uri? baseUrl,
         CatalogProvider provider,
         IReadOnlyDictionary<string, string>? env = null)
     {
         ArgumentNullException.ThrowIfNull(provider);
 
-        if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var destination))
+        if (baseUrl is null)
         {
             return false;
         }
 
         var documented = DocumentedHost(provider, env);
         return documented is null ||
-            !string.Equals(destination.Host, documented, StringComparison.OrdinalIgnoreCase);
+            !string.Equals(baseUrl.Host, documented, StringComparison.OrdinalIgnoreCase);
     }
 
     public static string ToApi(ProviderAdapter adapter)
@@ -245,7 +260,7 @@ public static class ProviderAdapters
         return AdaptersByNpm.TryGetValue(npm, out var adapter) ? adapter : null;
     }
 
-    private static string? ResolveDefaultBaseUrl(
+    private static Uri? ResolveDefaultBaseUrl(
         CatalogProvider provider,
         IReadOnlyDictionary<string, string>? env)
     {
@@ -261,31 +276,32 @@ public static class ProviderAdapters
             : "Use only letters, numbers, and hyphens.";
     }
 
-    private static BaseUrlValidation ValidateScheme(Uri uri, string original)
+    private static BaseUrlValidation ValidateScheme(Uri uri)
     {
         return uri.Scheme == Uri.UriSchemeHttps ||
             (uri.Scheme == Uri.UriSchemeHttp && uri.IsLoopback)
-            ? new BaseUrlValidation(true, NormalizeBaseUrl(original)!, Error: null)
+            ? new BaseUrlValidation(true, uri, Error: null)
             : new BaseUrlValidation(
                 false,
-                string.Empty,
+                null,
                 "Use HTTPS. HTTP is allowed only for localhost.");
     }
 
-    private static BaseUrlValidation ValidateParsedUri(Uri uri, string original)
+    private static BaseUrlValidation ValidateParsedUri(Uri uri)
     {
         return !string.IsNullOrEmpty(uri.UserInfo)
             ? new BaseUrlValidation(
                 false,
-                string.Empty,
+                null,
                 "A base URL cannot include credentials.")
-            : ValidateScheme(uri, original);
+            : ValidateScheme(uri);
     }
 
     private static BaseUrlValidation ValidateUri(string value)
     {
-        return Uri.TryCreate(value, UriKind.Absolute, out var uri)
-            ? ValidateParsedUri(uri, value)
-            : new BaseUrlValidation(false, string.Empty, "Enter an absolute URL.");
+        var normalized = NormalizeBaseUrl(value);
+        return normalized is not null
+            ? ValidateParsedUri(normalized)
+            : new BaseUrlValidation(false, null, "Enter an absolute URL.");
     }
 }
