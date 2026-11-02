@@ -2,8 +2,10 @@ name: OpenWiki Update
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 8 * * *"
+  # Disabled for now: the scheduled documentation run is paused.
+  # Re-enable the block below to resume the daily update.
+  # schedule:
+  #   - cron: "0 8 * * *"
 
 permissions:
   contents: write
