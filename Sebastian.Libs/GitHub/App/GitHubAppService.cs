@@ -30,7 +30,7 @@ public sealed class GitHubAppService(
         ArgumentNullException.ThrowIfNull(credentials);
 
         var appId = credentials.AppId.Trim();
-        if (ParseCredentials(credentials, out var appIdValue, out var installationId) is { } invalid)
+        if (ParseCredentials(credentials, out var installationId) is { } invalid)
         {
             return invalid;
         }
@@ -135,14 +135,13 @@ public sealed class GitHubAppService(
 
     private static GitHubAppValidation? ParseCredentials(
         GitHubAppCredentials credentials,
-        out long appId,
         out int installationId)
     {
         if (!long.TryParse(
                 credentials.AppId.Trim(),
                 NumberStyles.None,
                 CultureInfo.InvariantCulture,
-                out appId) ||
+                out var appId) ||
             appId <= 0)
         {
             installationId = 0;

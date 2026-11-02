@@ -155,29 +155,22 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
 
         async Task SubmitAsync()
         {
-            if (!canTest || test.IsPending || provider is null || primary is null)
-            {
-                return;
-            }
-
-            var selection = new ProviderSelection(
+            var selection = BuildSelection(
+                canTest,
+                test.IsPending,
                 provider,
-                endpoint.Adapter,
-                validation.Url!,
+                primary,
+                endpoint,
+                validation,
                 customEndpoint,
                 envValues);
-
-            ProviderTestResult result;
-            try
-            {
-                result = await test.RunAsync(selection).ConfigureAwait(true);
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
+            if (selection is null)
             {
                 return;
             }
 
-            if (result.Success)
+            var result = await RunTestAsync(test, selection).ConfigureAwait(true);
+            if (result?.Success is true)
             {
                 Props.Next(result);
             }
@@ -262,6 +255,39 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
                     .Grid(row: 1, column: 0),
             ])
             .Height(pageHeight);
+    }
+
+    private static ProviderSelection? BuildSelection(
+        bool canTest,
+        bool pending,
+        CatalogProvider? provider,
+        ProviderField? primary,
+        ProviderEndpoint endpoint,
+        BaseUrlValidation validation,
+        bool customEndpoint,
+        Dictionary<string, string> env)
+    {
+        return !canTest ||
+            pending ||
+            provider is null ||
+            primary is null ||
+            validation.Url is null
+            ? null
+            : new ProviderSelection(provider, endpoint.Adapter, validation.Url, customEndpoint, env);
+    }
+
+    private static async Task<ProviderTestResult?> RunTestAsync(
+        Mutation<ProviderSelection, ProviderTestResult> test,
+        ProviderSelection selection)
+    {
+        try
+        {
+            return await test.RunAsync(selection).ConfigureAwait(true);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return null;
+        }
     }
 
     private static ModelCatalog? CatalogData(AsyncValue<ModelCatalog> catalog)

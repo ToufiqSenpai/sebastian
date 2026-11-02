@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Microsoft.UI.Reactor;
 using Microsoft.UI.Reactor.Controls.Validation;
 using Microsoft.UI.Reactor.Core;
+using Microsoft.UI.Reactor.Hooks;
 using Microsoft.UI.Reactor.Layout;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
@@ -68,260 +69,25 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
         var test = UseMutation<GitHubAppCredentials, GitHubAppValidation>(
             setup.TestAndSaveGitHubAppAsync);
 
-        void Update(Func<GitHubAppDraft, GitHubAppDraft> change)
+        void SetDraft(GitHubAppDraft next)
         {
-            Props.SetDraft(change(draft));
+            Props.SetDraft(next);
             test.Reset();
         }
 
-        void GenerateSecret()
-        {
-            Update(value => value with { WebhookSecret = NewWebhookSecret() });
-            setCopied(false);
-        }
+        var fields = BuildFields(
+            draft,
+            validation,
+            SetDraft,
+            copied,
+            setCopied,
+            keyError,
+            () => _ = PickKeyAsync(window, draft, SetDraft, setKeyError));
+        var canNext = CanContinue(draft, secretValid, keyValid, test.IsPending);
+        var status = BuildStatus(test);
+        var patInfo = BuildPatInfo(Props.Pat);
 
-        void CopySecret()
-        {
-            if (string.IsNullOrEmpty(draft.WebhookSecret))
-            {
-                return;
-            }
-
-            var package = new DataPackage();
-            package.SetText(draft.WebhookSecret);
-            Clipboard.SetContent(package);
-            setCopied(true);
-        }
-
-        async Task PickKeyAsync()
-        {
-            if (window is null)
-            {
-                return;
-            }
-
-            var file = await FilePicker.PickFileAsync(window, ".pem").ConfigureAwait(true);
-            if (file is null)
-            {
-                return;
-            }
-
-            try
-            {
-                var text = await FileIO.ReadTextAsync(file);
-                if (!GitHubPrivateKey.IsValid(text))
-                {
-                    setKeyError("That file does not contain a valid PEM private key.");
-                    return;
-                }
-
-                setKeyError(null);
-                Update(value => value with { PrivateKey = text, PrivateKeyFileName = file.Name });
-            }
-            catch (Exception exception) when (exception is not OperationCanceledException)
-            {
-                setKeyError($"Could not read the file: {exception.Message}");
-            }
-        }
-
-        var appId = FormField(
-            TextBox(draft.AppId, value =>
-                {
-                    Update(current => current with { AppId = value });
-                    validation.MarkTouched(AppIdField);
-                }, placeholderText: "123456")
-                .NumericInput()
-                .MaxLength(20)
-                .Validate(AppIdField, draft.AppId,
-                    Validate.Must<string>(IsPositiveInteger, "Enter the numeric App ID."))
-                .AutomationName("GitHub App ID"),
-            label: "App ID",
-            required: true,
-            description: "Found on the GitHub App settings page.",
-            fieldName: AppIdField);
-
-        var installationId = FormField(
-            TextBox(
-                    draft.InstallationId,
-                    value =>
-                    {
-                        Update(current => current with { InstallationId = value });
-                        validation.MarkTouched(InstallationIdField);
-                    },
-                    placeholderText: "12345678")
-                .NumericInput()
-                .MaxLength(20)
-                .Validate(InstallationIdField, draft.InstallationId,
-                    Validate.Must<string>(IsPositiveInteger, "Enter the numeric installation ID."))
-                .AutomationName("GitHub App installation ID"),
-            label: "Installation ID",
-            required: true,
-            description: "The installation that grants access to your repositories.",
-            fieldName: InstallationIdField);
-
-        var keyStatusText = draft switch
-        {
-            { PrivateKeyFileName.Length: > 0 } => $"Loaded {draft.PrivateKeyFileName}",
-            { HasStoredPrivateKey: true } => "Configured — choose a file to replace",
-            _ => string.Empty,
-        };
-        var keyStatus = keyStatusText.Length == 0
-            ? Empty()
-            : HStack(
-                6,
-                TextBlock("\uE73E")
-                    .FontFamily(IconFont.Family)
-                    .FontSize(12)
-                    .Foreground(Theme.SystemSuccess),
-                Caption(keyStatusText).Foreground(Theme.SecondaryText));
-        var hasKey = draft.PrivateKeyFileName.Length > 0 || draft.HasStoredPrivateKey;
-
-        var keyField = FormField(
-            VStack(
-                8,
-                FlexRow(
-                        Button(
-                                hasKey
-                                    ? "Replace .pem file…"
-                                    : "Choose .pem file…",
-                                () => _ = PickKeyAsync())
-                            .AutomationName(
-                                hasKey
-                                    ? "Replace GitHub App private key file"
-                                    : "Choose GitHub App private key file"),
-                        keyStatus)
-                    with
-                {
-                    Wrap = FlexWrap.Wrap,
-                    AlignItems = FlexAlign.Center,
-                    ColumnGap = 12,
-                    RowGap = 4,
-                },
-                keyError is null
-                    ? Empty()
-                    : Caption(keyError)
-                        .Foreground(Theme.SystemCaution)
-                        .TextWrapping(TextWrapping.Wrap)),
-            label: "Private key",
-            required: true,
-            description: "Open the .pem file downloaded from GitHub. Its path is not stored.");
-
-        var webhookSecret = FormField(
-            VStack(
-                8,
-                PasswordBox(
-                        draft.WebhookSecret,
-                        value =>
-                        {
-                            Update(current => current with { WebhookSecret = value });
-                            validation.MarkTouched(WebhookSecretField);
-                            setCopied(false);
-                        },
-                        placeholderText: draft.HasStoredWebhookSecret
-                            ? "Configured — leave blank to keep"
-                            : $"At least {MinWebhookSecretLength} characters")
-                    .PasswordRevealMode(PasswordRevealMode.Hidden)
-                    .Validate(WebhookSecretField, draft.WebhookSecret,
-                        Validate.Must<string>(
-                            value => string.IsNullOrWhiteSpace(value)
-                                ? draft.HasStoredWebhookSecret
-                                : IsWebhookSecretValid(value),
-                            $"Use at least {MinWebhookSecretLength} characters."))
-                    .AutomationName("GitHub App webhook secret"),
-                HStack(
-                    8,
-                    Button("Generate", GenerateSecret)
-                        .SubtleButton()
-                        .AutomationName("Generate webhook secret"),
-                    Button(copied ? "Copied" : "Copy", CopySecret)
-                        .SubtleButton()
-                        .IsEnabled(!string.IsNullOrEmpty(draft.WebhookSecret))
-                        .AutomationName("Copy webhook secret"))),
-            label: "Webhook secret",
-            required: true,
-            description: "GitHub signs each delivery with this secret.",
-            fieldName: WebhookSecretField);
-
-        var webhookUrl = FormField(
-            TextBox(
-                    draft.WebhookUrl,
-                    value =>
-                    {
-                        Update(current => current with { WebhookUrl = value });
-                        validation.MarkTouched(WebhookUrlField);
-                    },
-                    placeholderText: "https://example.com/api/github/webhook")
-                .Validate(WebhookUrlField, draft.WebhookUrl,
-                    Validate.Must<string>(IsValidWebhookUrl, "Use an HTTPS URL. HTTP is allowed only for localhost."))
-                .AutomationName("GitHub App webhook URL"),
-            label: "Webhook URL",
-            description: "Optional. Without it, GitHub cannot deliver events.",
-            fieldName: WebhookUrlField);
-
-        Element idFields = wide
-            ? Grid(
-                [GridSize.Star(), GridSize.Star()],
-                [GridSize.Auto],
-                [
-                    appId.Grid(row: 0, column: 0),
-                    installationId.Grid(row: 0, column: 1),
-                ]) with
-            {
-                ColumnSpacing = 16,
-            }
-            : VStack(12, appId, installationId);
-
-        Element webhookFields = wide
-            ? Grid(
-                [GridSize.Star(), GridSize.Star()],
-                [GridSize.Auto],
-                [
-                    webhookSecret.Grid(row: 0, column: 0),
-                    webhookUrl.Grid(row: 0, column: 1),
-                ]) with
-            {
-                ColumnSpacing = 16,
-            }
-            : VStack(12, webhookSecret, webhookUrl);
-
-        var canNext =
-            IsPositiveInteger(draft.AppId) &&
-            IsPositiveInteger(draft.InstallationId) &&
-            secretValid &&
-            IsValidWebhookUrl(draft.WebhookUrl) &&
-            keyValid &&
-            !test.IsPending;
-
-        async Task SubmitAsync()
-        {
-            if (!canNext || test.IsPending)
-            {
-                return;
-            }
-
-            var credentials = new GitHubAppCredentials(
-                draft.AppId.Trim(),
-                draft.InstallationId.Trim(),
-                draft.PrivateKey,
-                draft.WebhookSecret,
-                string.IsNullOrWhiteSpace(draft.WebhookUrl)
-                    ? null
-                    : new Uri(draft.WebhookUrl.Trim(), UriKind.Absolute));
-
-            GitHubAppValidation result;
-            try
-            {
-                result = await test.RunAsync(credentials).ConfigureAwait(true);
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                return;
-            }
-
-            Props.Next(result);
-        }
-
-        var next = Button("Next", () => _ = SubmitAsync())
+        var next = Button("Next", () => _ = SubmitAsync(canNext, test, draft, Props.Next))
             .AccentButton()
             .IsEnabled(canNext)
             .AutomationName("Continue to the provider step");
@@ -330,15 +96,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             .AutomationName("Back to the GitHub token step");
 
         var actions = SetupLayout.Actions(wide, back, next);
-
-        var patInfo = Props.Pat is null
-            ? Empty()
-            : InfoBar(
-                    $"Connected as {Props.Pat.Login}",
-                    $"{Props.Pat.RepositoryCount} repositories accessible.")
-                .Success()
-                .IsClosable(false)
-                .Margin(0, 16, 0, 0);
 
         var linkRow = FlexRow(
                 HyperlinkButton(
@@ -356,20 +113,6 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             RowGap = 4,
         };
 
-        var status = test switch
-        {
-            { IsPending: true } => HStack(
-                8,
-                ProgressRing().Width(16).Height(16),
-                Body("Testing GitHub App…").Foreground(Theme.SecondaryText)),
-            { Error: { } failure } => InfoBar(
-                    "Could not verify the GitHub App",
-                    failure.Message)
-                .Error()
-                .IsClosable(false),
-            _ => Empty(),
-        };
-
         var form = VStack(
             0,
             Title("Connect your GitHub App")
@@ -381,12 +124,12 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
                 .Margin(0, 8, 0, 0),
             linkRow.Margin(0, 8, 0, 0),
             patInfo,
-            idFields.Margin(0, 24, 0, 0),
-            keyField.Margin(0, 12, 0, 0),
+            BuildFieldRow(wide, fields.AppId, fields.InstallationId).Margin(0, 24, 0, 0),
+            fields.Key.Margin(0, 12, 0, 0),
             SubHeading("Webhook")
                 .HeadingLevel(AutomationHeadingLevel.Level2)
                 .Margin(0, 24, 0, 0),
-            webhookFields.Margin(0, 12, 0, 0),
+            BuildFieldRow(wide, fields.WebhookSecret, fields.WebhookUrl).Margin(0, 12, 0, 0),
             status.Margin(0, 16, 0, 0));
 
         // preview.16 requires an explicit provide; newer Reactor versions auto-provide.
@@ -399,6 +142,321 @@ internal sealed class GitHubAppStep : Component<GitHubAppStepProps>
             ])
             .Height(pageHeight)
             .Provide(ValidationContexts.Current, validation);
+    }
+
+    private sealed record AppFields(
+        Element AppId,
+        Element InstallationId,
+        Element Key,
+        Element WebhookSecret,
+        Element WebhookUrl);
+
+    private static AppFields BuildFields(
+        GitHubAppDraft draft,
+        ValidationContext validation,
+        Action<GitHubAppDraft> setDraft,
+        bool copied,
+        Action<bool> setCopied,
+        string? keyError,
+        Action pickKey)
+    {
+        var appId = FormField(
+            TextBox(draft.AppId, value =>
+                {
+                    setDraft(draft with { AppId = value });
+                    validation.MarkTouched(AppIdField);
+                }, placeholderText: "123456")
+                .NumericInput()
+                .MaxLength(20)
+                .Validate(AppIdField, draft.AppId,
+                    Validate.Must<string>(IsPositiveInteger, "Enter the numeric App ID."))
+                .AutomationName("GitHub App ID"),
+            label: "App ID",
+            required: true,
+            description: "Found on the GitHub App settings page.",
+            fieldName: AppIdField);
+
+        var installationId = FormField(
+            TextBox(
+                    draft.InstallationId,
+                    value =>
+                    {
+                        setDraft(draft with { InstallationId = value });
+                        validation.MarkTouched(InstallationIdField);
+                    },
+                    placeholderText: "12345678")
+                .NumericInput()
+                .MaxLength(20)
+                .Validate(InstallationIdField, draft.InstallationId,
+                    Validate.Must<string>(IsPositiveInteger, "Enter the numeric installation ID."))
+                .AutomationName("GitHub App installation ID"),
+            label: "Installation ID",
+            required: true,
+            description: "The installation that grants access to your repositories.",
+            fieldName: InstallationIdField);
+
+        var hasKey = draft.PrivateKeyFileName.Length > 0 || draft.HasStoredPrivateKey;
+        var keyField = FormField(
+            VStack(
+                8,
+                FlexRow(
+                        Button(
+                                hasKey
+                                    ? "Replace .pem file…"
+                                    : "Choose .pem file…",
+                                pickKey)
+                            .AutomationName(
+                                hasKey
+                                    ? "Replace GitHub App private key file"
+                                    : "Choose GitHub App private key file"),
+                        BuildKeyStatus(draft))
+                    with
+                {
+                    Wrap = FlexWrap.Wrap,
+                    AlignItems = FlexAlign.Center,
+                    ColumnGap = 12,
+                    RowGap = 4,
+                },
+                BuildKeyError(keyError)),
+            label: "Private key",
+            required: true,
+            description: "Open the .pem file downloaded from GitHub. Its path is not stored.");
+
+        var webhookSecret = FormField(
+            VStack(
+                8,
+                PasswordBox(
+                        draft.WebhookSecret,
+                        value =>
+                        {
+                            setDraft(draft with { WebhookSecret = value });
+                            validation.MarkTouched(WebhookSecretField);
+                            setCopied(false);
+                        },
+                        placeholderText: draft.HasStoredWebhookSecret
+                            ? "Configured — leave blank to keep"
+                            : $"At least {MinWebhookSecretLength} characters")
+                    .PasswordRevealMode(PasswordRevealMode.Hidden)
+                    .Validate(WebhookSecretField, draft.WebhookSecret,
+                        Validate.Must<string>(
+                            value => string.IsNullOrWhiteSpace(value)
+                                ? draft.HasStoredWebhookSecret
+                                : IsWebhookSecretValid(value),
+                            $"Use at least {MinWebhookSecretLength} characters."))
+                    .AutomationName("GitHub App webhook secret"),
+                HStack(
+                    8,
+                    Button("Generate", () =>
+                        {
+                            setDraft(draft with { WebhookSecret = NewWebhookSecret() });
+                            setCopied(false);
+                        })
+                        .SubtleButton()
+                        .AutomationName("Generate webhook secret"),
+                    Button(copied ? "Copied" : "Copy", () => CopyToClipboard(draft.WebhookSecret, setCopied))
+                        .SubtleButton()
+                        .IsEnabled(!string.IsNullOrEmpty(draft.WebhookSecret))
+                        .AutomationName("Copy webhook secret"))),
+            label: "Webhook secret",
+            required: true,
+            description: "GitHub signs each delivery with this secret.",
+            fieldName: WebhookSecretField);
+
+        var webhookUrl = FormField(
+            TextBox(
+                    draft.WebhookUrl,
+                    value =>
+                    {
+                        setDraft(draft with { WebhookUrl = value });
+                        validation.MarkTouched(WebhookUrlField);
+                    },
+                    placeholderText: "https://example.com/api/github/webhook")
+                .Validate(WebhookUrlField, draft.WebhookUrl,
+                    Validate.Must<string>(IsValidWebhookUrl, "Use an HTTPS URL. HTTP is allowed only for localhost."))
+                .AutomationName("GitHub App webhook URL"),
+            label: "Webhook URL",
+            description: "Optional. Without it, GitHub cannot deliver events.",
+            fieldName: WebhookUrlField);
+
+        return new AppFields(appId, installationId, keyField, webhookSecret, webhookUrl);
+    }
+
+    private static Element BuildKeyStatus(GitHubAppDraft draft)
+    {
+        var text = draft switch
+        {
+            { PrivateKeyFileName.Length: > 0 } => $"Loaded {draft.PrivateKeyFileName}",
+            { HasStoredPrivateKey: true } => "Configured — choose a file to replace",
+            _ => string.Empty,
+        };
+
+        return text.Length == 0
+            ? Empty()
+            : HStack(
+                6,
+                TextBlock("\uE73E")
+                    .FontFamily(IconFont.Family)
+                    .FontSize(12)
+                    .Foreground(Theme.SystemSuccess),
+                Caption(text).Foreground(Theme.SecondaryText));
+    }
+
+    private static Element BuildKeyError(string? keyError)
+    {
+        return keyError is null
+            ? Empty()
+            : Caption(keyError)
+                .Foreground(Theme.SystemCaution)
+                .TextWrapping(TextWrapping.Wrap);
+    }
+
+    private static GridElement BuildFieldRow(bool wide, Element first, Element second)
+    {
+        return wide
+            ? Grid(
+                [GridSize.Star(), GridSize.Star()],
+                [GridSize.Auto],
+                [
+                    first.Grid(row: 0, column: 0),
+                    second.Grid(row: 0, column: 1),
+                ]) with
+            {
+                ColumnSpacing = 16,
+            }
+            : Grid(
+                [GridSize.Star()],
+                [GridSize.Auto, GridSize.Auto],
+                [
+                    first.Grid(row: 0, column: 0),
+                    second.Grid(row: 1, column: 0),
+                ]) with
+            {
+                RowSpacing = 12,
+            };
+    }
+
+    private static bool CanContinue(
+        GitHubAppDraft draft,
+        bool secretValid,
+        bool keyValid,
+        bool pending)
+    {
+        return IsPositiveInteger(draft.AppId) &&
+            IsPositiveInteger(draft.InstallationId) &&
+            secretValid &&
+            IsValidWebhookUrl(draft.WebhookUrl) &&
+            keyValid &&
+            !pending;
+    }
+
+    private static Element BuildStatus(Mutation<GitHubAppCredentials, GitHubAppValidation> test)
+    {
+        return test switch
+        {
+            { IsPending: true } => HStack(
+                8,
+                ProgressRing().Width(16).Height(16),
+                Body("Testing GitHub App…").Foreground(Theme.SecondaryText)),
+            { Error: { } failure } => InfoBar(
+                    "Could not verify the GitHub App",
+                    failure.Message)
+                .Error()
+                .IsClosable(false),
+            _ => Empty(),
+        };
+    }
+
+    private static Element BuildPatInfo(PatValidation? pat)
+    {
+        return pat is null
+            ? Empty()
+            : InfoBar(
+                    $"Connected as {pat.Login}",
+                    $"{pat.RepositoryCount} repositories accessible.")
+                .Success()
+                .IsClosable(false)
+                .Margin(0, 16, 0, 0);
+    }
+
+    private static void CopyToClipboard(string secret, Action<bool> setCopied)
+    {
+        if (string.IsNullOrEmpty(secret))
+        {
+            return;
+        }
+
+        var package = new DataPackage();
+        package.SetText(secret);
+        Clipboard.SetContent(package);
+        setCopied(true);
+    }
+
+    private static async Task PickKeyAsync(
+        ReactorWindow? window,
+        GitHubAppDraft draft,
+        Action<GitHubAppDraft> setDraft,
+        Action<string?> setKeyError)
+    {
+        if (window is null)
+        {
+            return;
+        }
+
+        var file = await FilePicker.PickFileAsync(window, ".pem").ConfigureAwait(true);
+        if (file is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var text = await FileIO.ReadTextAsync(file);
+            if (!GitHubPrivateKey.IsValid(text))
+            {
+                setKeyError("That file does not contain a valid PEM private key.");
+                return;
+            }
+
+            setKeyError(null);
+            setDraft(draft with { PrivateKey = text, PrivateKeyFileName = file.Name });
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            setKeyError($"Could not read the file: {exception.Message}");
+        }
+    }
+
+    private static async Task SubmitAsync(
+        bool canNext,
+        Mutation<GitHubAppCredentials, GitHubAppValidation> test,
+        GitHubAppDraft draft,
+        Action<GitHubAppValidation> next)
+    {
+        if (!canNext || test.IsPending)
+        {
+            return;
+        }
+
+        var credentials = new GitHubAppCredentials(
+            draft.AppId.Trim(),
+            draft.InstallationId.Trim(),
+            draft.PrivateKey,
+            draft.WebhookSecret,
+            string.IsNullOrWhiteSpace(draft.WebhookUrl)
+                ? null
+                : new Uri(draft.WebhookUrl.Trim(), UriKind.Absolute));
+
+        GitHubAppValidation result;
+        try
+        {
+            result = await test.RunAsync(credentials).ConfigureAwait(true);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return;
+        }
+
+        next(result);
     }
 
     private static string NewWebhookSecret()
