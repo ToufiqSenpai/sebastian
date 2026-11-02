@@ -155,9 +155,12 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
 
         async Task SubmitAsync()
         {
+            if (!canTest)
+            {
+                return;
+            }
+
             var selection = BuildSelection(
-                canTest,
-                test.IsPending,
                 provider,
                 primary,
                 endpoint,
@@ -170,7 +173,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
             }
 
             var result = await RunTestAsync(test, selection).ConfigureAwait(true);
-            if (result?.Success is true)
+            if (result is { Success: true })
             {
                 Props.Next(result);
             }
@@ -258,8 +261,6 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
     }
 
     private static ProviderSelection? BuildSelection(
-        bool canTest,
-        bool pending,
         CatalogProvider? provider,
         ProviderField? primary,
         ProviderEndpoint endpoint,
@@ -267,9 +268,7 @@ internal sealed class ProviderStep : Component<ProviderStepProps>
         bool customEndpoint,
         Dictionary<string, string> env)
     {
-        return !canTest ||
-            pending ||
-            provider is null ||
+        return provider is null ||
             primary is null ||
             validation.Url is null
             ? null
